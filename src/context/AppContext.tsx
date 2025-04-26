@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from "sonner";
 
@@ -136,6 +135,7 @@ type ActionType =
   | { type: 'TOGGLE_ALERTS_MODAL' }
   | { type: 'SET_ALERTS'; payload: Alert[] }
   | { type: 'MARK_ALERT_READ'; payload: string }
+  | { type: 'MARK_ALL_ALERTS_READ' }
   | { type: 'SET_SETUP_STATE'; payload: Partial<AppState['setupState']> }
   | { type: 'RESET_SETUP_STATE' };
 
@@ -231,6 +231,11 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
           alert.id === action.payload ? { ...alert, read: true } : alert
         ),
       };
+    case 'MARK_ALL_ALERTS_READ':
+      return {
+        ...state,
+        alerts: state.alerts.map((alert) => ({ ...alert, read: true })),
+      };
     case 'SET_SETUP_STATE':
       return {
         ...state,
@@ -274,6 +279,7 @@ type AppContextType = {
   selectFeed: (feedId: string | null) => void;
   toggleAlertsModal: () => void;
   markAlertRead: (alertId: string) => void;
+  markAllAlertsRead: () => void;
   updateSetupState: (setupState: Partial<AppState['setupState']>) => void;
   resetSetupState: () => void;
 };
@@ -421,6 +427,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: 'MARK_ALERT_READ', payload: alertId });
   };
 
+  const markAllAlertsRead = () => {
+    dispatch({ type: 'MARK_ALL_ALERTS_READ' });
+    toast.success("All alerts marked as read");
+  };
+
   const updateSetupState = (setupState: Partial<AppState['setupState']>) => {
     dispatch({ type: 'SET_SETUP_STATE', payload: setupState });
   };
@@ -446,6 +457,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectFeed,
         toggleAlertsModal,
         markAlertRead,
+        markAllAlertsRead,
         updateSetupState,
         resetSetupState,
       }}

@@ -16,6 +16,7 @@ import Step2 from "./pages/Setup/Step2";
 import Step3 from "./pages/Setup/Step3";
 import Dashboard from "./pages/Dashboard";
 import Battlecard from "./pages/Battlecard";
+import AlertsDashboard from "./pages/AlertsDashboard";
 import ManageFeeds from "./pages/ManageFeeds";
 import NotFound from "./pages/NotFound";
 
@@ -93,6 +94,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <AlertsDashboard />
                 </ProtectedRoute>
               } 
             />
