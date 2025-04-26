@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,7 +31,24 @@ import { useIsMobile } from '../hooks/use-mobile';
 import { Alert } from '../context/AppContext';
 import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
 
-// Feed Card Component
+const renderStatus = (status: string) => {
+  if (status === 'active') {
+    return <span className="text-green-500 flex items-center"><span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>Active</span>;
+  } else if (status === 'paused') {
+    return <span className="text-orange-500 flex items-center"><span className="h-2 w-2 rounded-full bg-orange-500 mr-1"></span>Paused</span>;
+  } else if (status === 'error') {
+    return <span className="text-red-500 flex items-center"><span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>Error</span>;
+  }
+  return null;
+};
+
+const getFeedStatusText = (status: string): string => {
+  if (status === 'active') return 'Active';
+  if (status === 'paused') return 'Paused';
+  if (status === 'error') return 'Error';
+  return 'Unknown';
+};
+
 const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick }) => {
   return (
     <motion.div
@@ -51,7 +67,7 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
               variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
               className={feed.status === 'active' ? 'bg-green-500' : ''}
             >
-              {feed.status === 'active' ? 'Active' : feed.status === 'paused' ? 'Paused' : 'Error'}
+              {renderStatus(feed.status)}
             </Badge>
           </div>
           <div className="flex items-center text-xs text-gray-500 mt-1">
@@ -81,7 +97,6 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
   );
 };
 
-// Dashboard Page
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -97,7 +112,6 @@ const Dashboard: React.FC = () => {
   const [newViewName, setNewViewName] = useState('');
   const [isBoardDrawerOpen, setIsBoardDrawerOpen] = useState(!isMobile);
   
-  // Apply filters to feeds
   useEffect(() => {
     let result = [...userFeeds];
     
@@ -122,7 +136,6 @@ const Dashboard: React.FC = () => {
     }
     
     if (importance) {
-      // For demo purposes, just filter randomly
       if (importance === 'high') {
         result = result.filter((_, index) => index % 3 === 0);
       } else if (importance === 'medium') {
@@ -135,7 +148,6 @@ const Dashboard: React.FC = () => {
     setFilteredFeeds(result);
   }, [userFeeds, searchTerm, company, market, importance]);
   
-  // Apply current filters
   useEffect(() => {
     setCompany(currentFilters.company || '');
     setMarket(currentFilters.market || '');
@@ -180,7 +192,6 @@ const Dashboard: React.FC = () => {
   
   const feedsToDisplay = filteredFeeds.length > 0 ? filteredFeeds : userFeeds;
   
-  // Sample data for charts
   const sourceDistributionData = [
     { name: 'Web', value: 65 },
     { name: 'Documents', value: 25 },
@@ -206,7 +217,6 @@ const Dashboard: React.FC = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   const IMPORTANCE_COLORS = ['#EF4444', '#F59E0B', '#10B981'];
   
-  // Recent Alerts Modal
   const AlertsModal = () => {
     return (
       <Dialog open={isAlertsModalOpen} onOpenChange={() => selectFeed(null)}>
@@ -235,7 +245,6 @@ const Dashboard: React.FC = () => {
     );
   };
   
-  // Board Drawer (Saved Views)
   const BoardDrawer = () => {
     return (
       <Drawer open={isBoardDrawerOpen} onOpenChange={setIsBoardDrawerOpen}>
@@ -294,7 +303,6 @@ const Dashboard: React.FC = () => {
     );
   };
   
-  // Alert Item Component
   const AlertItem: React.FC<{ alert: Alert }> = ({ alert }) => {
     return (
       <div className={`p-3 rounded-md border ${alert.read ? 'bg-white' : 'bg-blue-50'}`}>
@@ -337,13 +345,10 @@ const Dashboard: React.FC = () => {
       
       <main className="flex-1 relative">
         <div className={`flex ${isBoardDrawerOpen && !isMobile ? 'ml-[250px]' : 'ml-0'} transition-all duration-300`}>
-          {/* Main content */}
           <div className="flex-1 container py-8 px-4">
-            {/* Metrics Section */}
             <section className="mb-8">
               <h2 className="text-xl font-bold mb-4">Intelligence Metrics</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Chart 1: Source Distribution */}
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">Source Distribution</CardTitle>
@@ -374,7 +379,6 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Chart 2: Alert Trend */}
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">Alert Trend (Last 7 Days)</CardTitle>
@@ -393,7 +397,6 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Chart 3: Importance Distribution */}
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">Importance Distribution</CardTitle>
@@ -418,7 +421,6 @@ const Dashboard: React.FC = () => {
               </div>
             </section>
             
-            {/* Filters Section */}
             <section className="mb-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">Intelligence Feeds</h2>
@@ -523,7 +525,6 @@ const Dashboard: React.FC = () => {
               </div>
             </section>
             
-            {/* Feeds Grid */}
             <section>
               <AnimatePresence>
                 {userFeeds.length === 0 ? (
@@ -566,7 +567,6 @@ const Dashboard: React.FC = () => {
         </div>
       </main>
       
-      {/* Save View Dialog */}
       <Dialog open={isSaveViewOpen} onOpenChange={setIsSaveViewOpen}>
         <DialogContent>
           <DialogHeader>
@@ -594,10 +594,8 @@ const Dashboard: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Boards Drawer */}
       <BoardDrawer />
       
-      {/* Alerts Modal */}
       <AlertsModal />
     </div>
   );
