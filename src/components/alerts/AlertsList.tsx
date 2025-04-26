@@ -29,7 +29,6 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems = 5, showAll = false }
       toast.success("Alert marked as read");
     }
     
-    // In a real app, you might navigate to the related feed or show more details
     toast("Viewing details", {
       description: `Viewing details for ${alert.title}`
     });
@@ -158,13 +157,24 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems = 5, showAll = false }
       </AnimatePresence>
       
       {!showAll && alerts.length > maxItems && (
-        <div className="text-center pt-2">
+        <div className="text-center pt-4 pb-2">
           <Button 
-            variant="link"
+            variant="outline" 
             onClick={() => navigate('/alerts')}
-            className="text-needl-primary hover:text-needl-dark gap-1"
+            className="text-needl-primary hover:text-needl-dark gap-1 hover:bg-blue-50"
           >
             View all {alerts.length} alerts <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      
+      {!showAll && (
+        <div className="text-center pt-2">
+          <Button
+            onClick={() => navigate('/alerts')}
+            className="bg-needl-primary hover:bg-needl-dark text-white gap-1 w-full"
+          >
+            <Bell className="h-4 w-4" /> Go to Alerts Dashboard
           </Button>
         </div>
       )}

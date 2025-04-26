@@ -15,7 +15,8 @@ import {
   BarChart2,
   Folder,
   FolderOpen,
-  ChevronRight
+  ChevronRight,
+  X
 } from 'lucide-react';
 import Header from '../components/Header';
 import { Button } from '@/components/ui/button';
@@ -41,7 +42,6 @@ import { Alert as AlertType } from '../context/AppContext';
 import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { toast } from 'sonner';
 import AlertsList from '../components/alerts/AlertsList';
-import { mockFeeds, mockAlerts } from '../utils/mockData';
 
 // Fix: Create a JSX component for status rendering
 const FeedStatus: React.FC<{ status: string }> = ({ status }) => {
@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
       market,
       importance,
     });
-    toast("Filters Applied", {
+    toast.success("Filters Applied", {
       description: "Your feed view has been updated with the selected filters."
     });
   };
@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
     setImportance('');
     setSearchTerm('');
     setFilters({});
-    toast("Filters Cleared", {
+    toast.success("Filters Cleared", {
       description: "All filters have been reset."
     });
   };
@@ -215,6 +215,9 @@ const Dashboard: React.FC = () => {
       addSavedView(newViewName.trim());
       setIsSaveViewOpen(false);
       setNewViewName('');
+      toast.success("Board Saved", {
+        description: `Your "${newViewName.trim()}" board has been saved.`
+      });
     }
   };
   
@@ -222,7 +225,7 @@ const Dashboard: React.FC = () => {
     const view = savedViews.find(v => v.id === viewId);
     if (view) {
       setFilters(view.filters);
-      toast(`Board "${view.name}" Applied`, {
+      toast.success(`Board "${view.name}" Applied`, {
         description: "Filters have been updated based on the selected board."
       });
     }
@@ -263,7 +266,7 @@ const Dashboard: React.FC = () => {
   const handleAlertClick = (alertId: string) => {
     markAlertRead(alertId);
     // In a real app, you'd likely navigate to a more detailed view
-    toast("Alert Marked as Read", {
+    toast.success("Alert Marked as Read", {
       description: "The alert has been marked as read."
     });
   };
@@ -302,10 +305,15 @@ const Dashboard: React.FC = () => {
     return (
       <Drawer open={isBoardDrawerOpen} onOpenChange={setIsBoardDrawerOpen}>
         <DrawerContent className="fixed left-0 right-auto top-16 bottom-0 w-[280px] rounded-none border-r border-t-0 border-b-0 border-l-0 bg-zinc-50">
-          <DrawerHeader className="px-4 py-3 border-b">
+          <DrawerHeader className="px-4 py-3 border-b flex justify-between items-center">
             <DrawerTitle className="text-base flex items-center">
               <Grid2x2 className="h-4 w-4 mr-2" /> Intelligence Boards
             </DrawerTitle>
+            {isMobile && (
+              <Button variant="ghost" size="icon" onClick={() => setIsBoardDrawerOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </DrawerHeader>
           <div className="p-4 space-y-2 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
             {savedViews.length > 0 ? (
@@ -326,6 +334,9 @@ const Dashboard: React.FC = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       removeSavedView(view.id);
+                      toast.success("Board Removed", {
+                        description: `The "${view.name}" board has been removed.`
+                      });
                     }}
                   >
                     <span className="text-xs">×</span>
@@ -362,51 +373,6 @@ const Dashboard: React.FC = () => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    );
-  };
-  
-  const AlertItem: React.FC<{ alert: AlertType; onClick: () => void }> = ({ alert, onClick }) => {
-    return (
-      <div 
-        className={`p-3 rounded-md border ${alert.read ? 'bg-white' : 'bg-blue-50'} cursor-pointer hover:shadow-md transition-shadow`}
-        onClick={onClick}
-      >
-        <div className="flex justify-between mb-1">
-          <span className="font-medium text-sm">{alert.feedName}</span>
-          <Badge variant={alert.importance === 'high' ? 'destructive' : alert.importance === 'medium' ? 'default' : 'outline'}>
-            {alert.importance}
-          </Badge>
-        </div>
-        <h3 className="font-semibold mb-1">{alert.title}</h3>
-        <p className="text-sm text-gray-600 mb-3">{alert.summary}</p>
-        <div className="flex justify-between items-center text-xs text-gray-500">
-          <div className="flex items-center">
-            {alert.source.type === 'web' ? (
-              <span className="flex items-center gap-1">
-                🌐 Source: {alert.source.name}
-                {alert.source.url && (
-                  <a 
-                    href={alert.source.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-needl-primary hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    🔗 Link
-                  </a>
-                )}
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                📄 Source: {alert.source.name}
-              </span>
-            )}
-          </div>
-          <span>
-            {new Date(alert.timestamp).toLocaleString()}
-          </span>
-        </div>
-      </div>
     );
   };
 
@@ -459,7 +425,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => setIsBoardDrawerOpen(!isBoardDrawerOpen)}
                 >
                   <Grid2x2 className="h-4 w-4" />
-                  <span>{isBoardDrawerOpen ? 'Hide' : 'Show'} Boards</span>
+                  <span className="hidden sm:inline">{isBoardDrawerOpen ? 'Hide' : 'Show'} Boards</span>
                 </Button>
                 
                 <Button
@@ -469,7 +435,7 @@ const Dashboard: React.FC = () => {
                   className="gap-1 bg-needl-primary hover:bg-needl-dark"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>New Feed</span>
+                  <span className="hidden sm:inline">New Feed</span>
                 </Button>
               </div>
             </div>
@@ -772,7 +738,7 @@ const Dashboard: React.FC = () => {
             <Button variant="outline" onClick={() => setIsSaveViewOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveView} disabled={!newViewName.trim()}>
+            <Button onClick={handleSaveView} disabled={!newViewName.trim()} className="bg-needl-primary hover:bg-needl-dark">
               Save Board
             </Button>
           </DialogFooter>

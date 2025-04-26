@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
@@ -7,7 +7,7 @@ import AnimatedBackground from '../components/AnimatedBackground';
 import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login: React.FC = () => {
@@ -16,7 +16,13 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useApp();
+  const { login, state } = useApp();
+  
+  useEffect(() => {
+    if (state.isLoggedIn) {
+      navigate('/dashboard');
+    }
+  }, [state.isLoggedIn, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +30,11 @@ const Login: React.FC = () => {
     
     try {
       await login(email, password);
-      navigate('/landing');
+      toast.success("Welcome back!", {
+        description: "You've been successfully logged in."
+      });
+      navigate('/dashboard');
     } catch (error) {
-      // Error is already handled in the login function
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -35,22 +43,22 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
-      <AnimatedBackground />
+      <AnimatedBackground variant="subtle" />
       
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-md"
       >
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden p-8 relative z-10">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden p-8 relative z-10 border border-gray-100">
           <div className="flex flex-col items-center justify-center mb-8">
             <Logo size="large" className="mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 mt-2">Sign in to access your intelligence hub</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-needl-primary to-blue-600 bg-clip-text text-transparent">Welcome Back</h1>
+            <p className="text-gray-500 text-center max-w-xs">Sign in to access your intelligence hub and start making informed decisions</p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email
@@ -67,9 +75,14 @@ const Login: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <div className="flex justify-between items-center">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <a href="#" className="text-xs text-needl-primary hover:underline">
+                  Forgot password?
+                </a>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
@@ -97,17 +110,41 @@ const Login: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-needl-primary hover:bg-needl-dark transition-all duration-200 glaze"
+              className="w-full bg-needl-primary hover:bg-needl-dark transition-all duration-200 gap-2 py-6"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Signing in...' : 'Sign In'} 
+              {!loading && <ArrowRight className="h-4 w-4" />}
+            </Button>
+            
+            <div className="flex items-center my-3">
+              <div className="h-px flex-1 bg-gray-200"></div>
+              <p className="px-4 text-sm text-gray-500">or</p>
+              <div className="h-px flex-1 bg-gray-200"></div>
+            </div>
+            
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                setEmail('demo@needl.ai');
+                setPassword('demo123');
+                toast.info("Demo credentials applied", {
+                  description: "Click Sign In to continue with the demo account"
+                });
+              }}
+            >
+              Try Demo Account
             </Button>
           </form>
           
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Demo credentials: any email and password will work
-            </p>
+          <div className="mt-8 text-center text-sm text-gray-500">
+            <p>Don't have an account? <a href="#" className="text-needl-primary font-medium hover:underline">Get Started</a></p>
           </div>
+        </div>
+        
+        <div className="text-center mt-6 text-sm text-gray-500">
+          <p>© 2025 Needl.ai • Intelligence for everyone</p>
         </div>
       </motion.div>
     </div>

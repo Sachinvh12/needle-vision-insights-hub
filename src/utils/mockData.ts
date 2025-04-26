@@ -1,158 +1,223 @@
-
 import { Feed, Alert, SavedView } from '../context/AppContext';
+import { v4 as uuidv4 } from 'uuid';
 
 // Mock feeds data
-export const mockFeeds: Feed[] = [
+export const mockFeeds = [
   {
-    id: 'feed-1',
-    name: 'Competitor Analysis - TechCorp',
-    query: 'TechCorp market share product launch',
-    type: 'competitor',
-    connectedApps: ['google-drive', 'dropbox'],
-    outputConfig: {
-      alerts: true,
-      summaries: true,
-      channels: ['email', 'slack'],
-      frequency: 'daily',
-      lookbackRange: 7,
-    },
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    lastActivity: new Date(Date.now() - 6 * 60 * 60 * 1000),
-    status: 'active',
-    sourceMix: {
-      web: 65,
-      docs: 30,
-      other: 5,
-    },
-    snippet: 'TechCorp announced a new product line that could disrupt...',
-  },
-  {
-    id: 'feed-2',
-    name: 'Market Trends - AI in Healthcare',
-    query: 'artificial intelligence healthcare innovation trends',
-    type: 'market',
-    connectedApps: ['onedrive', 'google-drive'],
-    outputConfig: {
-      alerts: true,
-      summaries: true,
-      channels: ['email'],
-      frequency: 'weekly',
-      lookbackRange: 30,
-    },
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-    lastActivity: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    status: 'active',
+    id: uuidv4(),
+    name: "OPEC Monitoring",
+    query: "opec oil production changes saudi arabia",
+    type: "trend",
+    status: "active",
+    createdAt: new Date("2023-06-01").toISOString(),
+    lastActivity: new Date("2023-06-12").toISOString(),
+    snippet: "Track OPEC+ production quotas and actual outputs from member countries, with a focus on Saudi Arabia's leadership position.",
     sourceMix: {
       web: 70,
       docs: 25,
-      other: 5,
+      other: 5
     },
-    snippet: 'New research suggests AI diagnostics could be more accurate than...',
+    alertsCount: 14,
+    documentsCount: 28
   },
   {
-    id: 'feed-3',
-    name: 'Regulatory Changes - Financial Sector',
-    query: 'financial regulation compliance banking laws',
-    type: 'trend',
-    connectedApps: ['dropbox'],
-    outputConfig: {
-      alerts: true,
-      summaries: false,
-      channels: ['email', 'slack'],
-      frequency: 'daily',
-      lookbackRange: 14,
+    id: uuidv4(),
+    name: "Energy Market Overview",
+    query: "global energy market trends renewable fossil",
+    type: "market",
+    status: "active",
+    createdAt: new Date("2023-05-15").toISOString(),
+    lastActivity: new Date("2023-06-10").toISOString(),
+    snippet: "General overview of global energy markets including transition trends, pricing models, and regional demand shifts.",
+    sourceMix: {
+      web: 65,
+      docs: 30,
+      other: 5
     },
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    status: 'paused',
+    alertsCount: 8,
+    documentsCount: 17
+  },
+  {
+    id: uuidv4(),
+    name: "ExxonMobil Intelligence",
+    query: "exxonmobil strategy investment portfolio",
+    type: "competitor",
+    status: "active",
+    createdAt: new Date("2023-04-20").toISOString(),
+    lastActivity: new Date("2023-06-11").toISOString(),
+    snippet: "Track ExxonMobil's strategic moves, investments, executive statements, and performance metrics against industry benchmarks.",
     sourceMix: {
       web: 55,
       docs: 40,
-      other: 5,
+      other: 5
     },
-    snippet: 'New SEC guidelines expected to impact reporting requirements...',
+    alertsCount: 11,
+    documentsCount: 23
   },
+  {
+    id: uuidv4(),
+    name: "Harvard Hospitality Reports",
+    query: "harvard business school hospitality research tourism",
+    type: "custom",
+    status: "paused",
+    createdAt: new Date("2023-03-10").toISOString(),
+    lastActivity: new Date("2023-05-30").toISOString(),
+    snippet: "Aggregate research from Harvard Business School related to hospitality industry trends, case studies, and market forecasts.",
+    sourceMix: {
+      web: 30,
+      docs: 65,
+      other: 5
+    },
+    alertsCount: 6,
+    documentsCount: 32
+  },
+  {
+    id: uuidv4(),
+    name: "Private Equity in Real Estate",
+    query: "private equity real estate investment hospitality commercial",
+    type: "trend",
+    status: "active",
+    createdAt: new Date("2023-02-15").toISOString(),
+    lastActivity: new Date("2023-06-09").toISOString(),
+    snippet: "Monitor private equity flows into commercial real estate with emphasis on hospitality sector acquisitions and developments.",
+    sourceMix: {
+      web: 45,
+      docs: 45,
+      other: 10
+    },
+    alertsCount: 9,
+    documentsCount: 21
+  },
+  {
+    id: uuidv4(),
+    name: "Global Oil Pricing",
+    query: "brent crude wti oil price forecast",
+    type: "market",
+    status: "error",
+    createdAt: new Date("2023-01-05").toISOString(),
+    lastActivity: new Date("2023-05-28").toISOString(),
+    snippet: "Track Brent crude and WTI oil price movements, including forecasts, geopolitical impacts, and market sentiment analysis.",
+    sourceMix: {
+      web: 75,
+      docs: 20,
+      other: 5
+    },
+    alertsCount: 16,
+    documentsCount: 19
+  }
 ];
 
 // Mock alerts data
-export const mockAlerts: Alert[] = [
+export const mockAlerts = [
   {
-    id: 'alert-1',
-    feedId: 'feed-1',
-    feedName: 'Competitor Analysis - TechCorp',
-    title: 'TechCorp Announces New Product Line',
-    summary: 'TechCorp unveiled a new suite of AI-powered products that could potentially disrupt the market and affect our positioning.',
-    importance: 'high',
-    source: {
-      type: 'web',
-      name: 'TechCorp Press Release',
-      url: 'https://example.com/techcorp-press',
-    },
-    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
+    id: uuidv4(),
+    feedId: mockFeeds[0].id,
+    feedName: "OPEC Monitoring",
+    title: "Crude Oil Faces Supply Surge",
+    summary: "OPEC+ weighs June output increase amid market volatility. Saudi Arabia signals potential production boost to stabilize prices after recent fluctuations.",
+    importance: "high",
     read: false,
+    timestamp: new Date("2023-06-12T09:47:00").toISOString(),
+    source: {
+      type: "web",
+      name: "Bloomberg Energy",
+      url: "https://www.bloomberg.com/energy"
+    }
   },
   {
-    id: 'alert-2',
-    feedId: 'feed-2',
-    feedName: 'Market Trends - AI in Healthcare',
-    title: 'New Research on AI Diagnostics Accuracy',
-    summary: 'Latest research published in Medical Journal shows AI diagnostic tools outperforming human doctors in certain areas by 15%.',
-    importance: 'medium',
+    id: uuidv4(),
+    feedId: mockFeeds[3].id,
+    feedName: "Harvard Hospitality Reports",
+    title: "Private Equity Deals Spike",
+    summary: "Harvard, Prestige Hospitality, Max Estates drive liquidity shifts in the market. New research indicates growing investor confidence in premium hospitality assets.",
+    importance: "medium",
+    read: false,
+    timestamp: new Date("2023-06-11T14:23:00").toISOString(),
     source: {
-      type: 'document',
-      name: 'Medical Journal Research Paper.pdf',
-    },
-    timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000),
+      type: "document",
+      name: "Harvard Business Review Q2 Report",
+      url: null
+    }
+  },
+  {
+    id: uuidv4(),
+    feedId: mockFeeds[3].id,
+    feedName: "Harvard Hospitality Reports",
+    title: "Hospitality Sector Heats Up",
+    summary: "New IPOs and acquisitions open fresh sales opportunities across the hospitality sector, with record number of deals closing in Q2 2023.",
+    importance: "medium",
     read: true,
+    timestamp: new Date("2023-06-10T11:32:00").toISOString(),
+    source: {
+      type: "web",
+      name: "Hotel Business Review",
+      url: "https://www.hotelbusiness.com"
+    }
   },
   {
-    id: 'alert-3',
-    feedId: 'feed-1',
-    feedName: 'Competitor Analysis - TechCorp',
-    title: 'TechCorp Market Share Increase',
-    summary: 'Q2 financial reports show TechCorp increasing market share by 5.3% in our core segments.',
-    importance: 'high',
-    source: {
-      type: 'web',
-      name: 'Financial Times',
-      url: 'https://example.com/financial-news',
-    },
-    timestamp: new Date(Date.now() - 16 * 60 * 60 * 1000),
-    read: false,
-  },
-  {
-    id: 'alert-4',
-    feedId: 'feed-3',
-    feedName: 'Regulatory Changes - Financial Sector',
-    title: 'SEC Announces New Compliance Rules',
-    summary: 'SEC will implement new financial reporting requirements starting next quarter, affecting all publicly traded companies.',
-    importance: 'medium',
-    source: {
-      type: 'document',
-      name: 'SEC-Guidelines-2023.pdf',
-    },
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    id: uuidv4(),
+    feedId: mockFeeds[5].id,
+    feedName: "Global Oil Pricing",
+    title: "Global Oil Markets Under Pressure",
+    summary: "Geopolitical shifts and oversupply concerns impact forecasts for Q3. Analysts predict potential 15% price fluctuation in coming months.",
+    importance: "high",
     read: true,
+    timestamp: new Date("2023-06-09T08:15:00").toISOString(),
+    source: {
+      type: "web",
+      name: "Energy Intelligence Weekly",
+      url: "https://www.energyintel.com"
+    }
   },
   {
-    id: 'alert-5',
-    feedId: 'feed-2',
-    feedName: 'Market Trends - AI in Healthcare',
-    title: 'Startup Raises $200M for AI Diagnostics',
-    summary: 'HealthAI secures $200M Series C funding to expand AI diagnostic tools to hospitals nationwide.',
-    importance: 'low',
-    source: {
-      type: 'web',
-      name: 'TechCrunch',
-      url: 'https://example.com/techcrunch-news',
-    },
-    timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000),
+    id: uuidv4(),
+    feedId: mockFeeds[1].id,
+    feedName: "Energy Market Overview",
+    title: "Renewable Integration Challenges",
+    summary: "New study highlights grid infrastructure limitations for renewable energy adoption in developing markets. Storage solutions becoming critical priority.",
+    importance: "low",
     read: false,
+    timestamp: new Date("2023-06-08T16:47:00").toISOString(),
+    source: {
+      type: "document",
+      name: "Global Energy Review 2023",
+      url: null
+    }
   },
+  {
+    id: uuidv4(),
+    feedId: mockFeeds[2].id,
+    feedName: "ExxonMobil Intelligence",
+    title: "ExxonMobil Announces Strategic Pivot",
+    summary: "Company unveils new carbon capture investments while maintaining core fossil fuel portfolio. $3.2B allocated to new green initiatives.",
+    importance: "high",
+    read: false,
+    timestamp: new Date("2023-06-07T10:30:00").toISOString(),
+    source: {
+      type: "web",
+      name: "Reuters Business",
+      url: "https://www.reuters.com/business"
+    }
+  },
+  {
+    id: uuidv4(),
+    feedId: mockFeeds[4].id,
+    feedName: "Private Equity in Real Estate",
+    title: "Blackstone Acquires Luxury Hotel Chain",
+    summary: "Private equity giant completes $4.8B acquisition of premium hospitality brand with 32 properties across 15 countries.",
+    importance: "medium",
+    read: true,
+    timestamp: new Date("2023-06-06T13:15:00").toISOString(),
+    source: {
+      type: "web",
+      name: "Financial Times",
+      url: "https://www.ft.com"
+    }
+  }
 ];
 
 // Mock saved views
-export const mockSavedViews: SavedView[] = [
+export const mockSavedViews = [
   {
     id: 'view-1',
     name: 'High Importance Competitor Updates',
