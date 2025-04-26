@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +31,9 @@ import { useApp } from '../context/AppContext';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Alert } from '../context/AppContext';
 import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { toast } from '@/hooks/use-toast';
 
+// Helper function to render status with the appropriate JSX
 const renderStatus = (status: string) => {
   if (status === 'active') {
     return <span className="text-green-500 flex items-center"><span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>Active</span>;
@@ -42,6 +45,7 @@ const renderStatus = (status: string) => {
   return null;
 };
 
+// This function returns a string for the status text
 const getFeedStatusText = (status: string): string => {
   if (status === 'active') return 'Active';
   if (status === 'paused') return 'Paused';
@@ -100,7 +104,7 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { state, setFilters, addSavedView, selectFeed, removeSavedView } = useApp();
+  const { state, setFilters, addSavedView, selectFeed, removeSavedView, markAlertRead } = useApp();
   const { userFeeds, savedViews, currentFilters, alerts, isAlertsModalOpen } = state;
   
   const [filteredFeeds, setFilteredFeeds] = useState(userFeeds);
@@ -160,6 +164,10 @@ const Dashboard: React.FC = () => {
       market,
       importance,
     });
+    toast({
+      title: "Filters Applied",
+      description: "Your feed view has been updated with the selected filters."
+    });
   };
   
   const handleClearFilters = () => {
@@ -168,6 +176,10 @@ const Dashboard: React.FC = () => {
     setImportance('');
     setSearchTerm('');
     setFilters({});
+    toast({
+      title: "Filters Cleared",
+      description: "All filters have been reset."
+    });
   };
   
   const handleSaveView = () => {
@@ -182,6 +194,10 @@ const Dashboard: React.FC = () => {
     const view = savedViews.find(v => v.id === viewId);
     if (view) {
       setFilters(view.filters);
+      toast({
+        title: `Board "${view.name}" Applied`,
+        description: "Filters have been updated based on the selected board."
+      });
     }
   };
   
@@ -217,6 +233,15 @@ const Dashboard: React.FC = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   const IMPORTANCE_COLORS = ['#EF4444', '#F59E0B', '#10B981'];
   
+  const handleAlertClick = (alertId: string) => {
+    markAlertRead(alertId);
+    // In a real app, you'd likely navigate to a more detailed view
+    toast({
+      title: "Alert Marked as Read",
+      description: "The alert has been marked as read."
+    });
+  };
+  
   const AlertsModal = () => {
     return (
       <Dialog open={isAlertsModalOpen} onOpenChange={() => selectFeed(null)}>
@@ -227,11 +252,19 @@ const Dashboard: React.FC = () => {
           <Separator className="my-2" />
           <div className="space-y-4 py-2">
             {alerts.map((alert) => (
-              <AlertItem key={alert.id} alert={alert} />
+              <AlertItem key={alert.id} alert={alert} onClick={() => handleAlertClick(alert.id)} />
             ))}
             {alerts.length === 0 && (
               <div className="text-center text-gray-500 py-8">
-                No alerts yet. They will appear here when detected.
+                <div className="mb-3">
+                  <span className="inline-block p-3 rounded-full bg-gray-100">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+                <p className="text-lg font-medium mb-1">No alerts yet</p>
+                <p className="text-sm">They will appear here when detected</p>
               </div>
             )}
           </div>
@@ -303,9 +336,12 @@ const Dashboard: React.FC = () => {
     );
   };
   
-  const AlertItem: React.FC<{ alert: Alert }> = ({ alert }) => {
+  const AlertItem: React.FC<{ alert: Alert; onClick: () => void }> = ({ alert, onClick }) => {
     return (
-      <div className={`p-3 rounded-md border ${alert.read ? 'bg-white' : 'bg-blue-50'}`}>
+      <div 
+        className={`p-3 rounded-md border ${alert.read ? 'bg-white' : 'bg-blue-50'} cursor-pointer hover:shadow-md transition-shadow`}
+        onClick={onClick}
+      >
         <div className="flex justify-between mb-1">
           <span className="font-medium text-sm">{alert.feedName}</span>
           <Badge variant={alert.importance === 'high' ? 'destructive' : alert.importance === 'medium' ? 'default' : 'outline'}>
@@ -320,7 +356,13 @@ const Dashboard: React.FC = () => {
               <span className="flex items-center gap-1">
                 🌐 Source: {alert.source.name}
                 {alert.source.url && (
-                  <a href={alert.source.url} target="_blank" rel="noopener noreferrer" className="text-needl-primary hover:underline">
+                  <a 
+                    href={alert.source.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-needl-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     🔗 Link
                   </a>
                 )}
@@ -528,14 +570,18 @@ const Dashboard: React.FC = () => {
             <section>
               <AnimatePresence>
                 {userFeeds.length === 0 ? (
-                  <div className="text-center py-12">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                  >
                     <h3 className="text-xl font-medium mb-4">No Intelligence Feeds Yet</h3>
                     <p className="text-gray-600 mb-6">Create your first intelligence feed to start gathering insights</p>
                     <Button onClick={() => navigate('/landing')} className="gap-2 bg-needl-primary hover:bg-needl-dark glaze">
                       <Plus className="h-4 w-4" />
                       Create New Feed
                     </Button>
-                  </div>
+                  </motion.div>
                 ) : (
                   <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {feedsToDisplay.map((feed) => (
