@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +10,17 @@ import {
   Plus,
   Save,
   Settings,
+  Bell,
+  FileText,
+  BarChart2,
+  Folder,
+  FolderOpen,
+  ChevronRight
 } from 'lucide-react';
 import Header from '../components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -26,14 +33,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useApp } from '../context/AppContext';
 import { useIsMobile } from '../hooks/use-mobile';
-import { Alert } from '../context/AppContext';
-import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { toast } from '@/hooks/use-toast';
+import { Alert as AlertType } from '../context/AppContext';
+import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { toast } from 'sonner';
+import AlertsList from '../components/alerts/AlertsList';
+import { mockFeeds, mockAlerts } from '../utils/mockData';
 
-// Helper function to render status with the appropriate JSX
-const renderStatus = (status: string) => {
+// Fix: Create a JSX component for status rendering
+const FeedStatus: React.FC<{ status: string }> = ({ status }) => {
   if (status === 'active') {
     return <span className="text-green-500 flex items-center"><span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>Active</span>;
   } else if (status === 'paused') {
@@ -41,7 +52,7 @@ const renderStatus = (status: string) => {
   } else if (status === 'error') {
     return <span className="text-red-500 flex items-center"><span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>Error</span>;
   }
-  return null;
+  return <span>Unknown</span>;
 };
 
 // This function returns a string for the status text
@@ -70,7 +81,7 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
               variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
               className={feed.status === 'active' ? 'bg-green-500' : ''}
             >
-              {renderStatus(feed.status)}
+              <FeedStatus status={feed.status} />
             </Badge>
           </div>
           <div className="flex items-center text-xs text-gray-500 mt-1">
@@ -84,7 +95,7 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
             </span>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-2">
           {feed.sourceMix && (
             <div className="flex items-center mb-3 h-2">
               <div className="bg-blue-400 h-full rounded-l-full" style={{ width: `${feed.sourceMix.web}%` }} />
@@ -95,6 +106,18 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
           
           <p className="text-sm text-gray-600 line-clamp-2">{feed.snippet}</p>
         </CardContent>
+        <CardFooter className="pt-0 pb-3 px-4">
+          <div className="w-full flex justify-between items-center text-xs text-gray-500">
+            <div className="flex gap-1 items-center">
+              <FileText className="h-3 w-3" />
+              <span>{feed.documentsCount || Math.floor(Math.random() * 20)} docs</span>
+            </div>
+            <div className="flex gap-1 items-center">
+              <Bell className="h-3 w-3" />
+              <span>{feed.alertsCount || Math.floor(Math.random() * 10)} alerts</span>
+            </div>
+          </div>
+        </CardFooter>
       </Card>
     </motion.div>
   );
@@ -103,7 +126,7 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { state, setFilters, addSavedView, selectFeed, removeSavedView, markAlertRead } = useApp();
+  const { state, setFilters, addSavedView, selectFeed, removeSavedView, markAlertRead, loadInitialData } = useApp();
   const { userFeeds, savedViews, currentFilters, alerts, isAlertsModalOpen } = state;
   
   const [filteredFeeds, setFilteredFeeds] = useState(userFeeds);
@@ -114,6 +137,14 @@ const Dashboard: React.FC = () => {
   const [isSaveViewOpen, setIsSaveViewOpen] = useState(false);
   const [newViewName, setNewViewName] = useState('');
   const [isBoardDrawerOpen, setIsBoardDrawerOpen] = useState(!isMobile);
+  
+  // Load initial data if needed
+  useEffect(() => {
+    // Only load initial data if the user's feeds are empty
+    if (userFeeds.length === 0) {
+      loadInitialData();
+    }
+  }, [userFeeds.length, loadInitialData]);
   
   useEffect(() => {
     let result = [...userFeeds];
@@ -163,8 +194,7 @@ const Dashboard: React.FC = () => {
       market,
       importance,
     });
-    toast({
-      title: "Filters Applied",
+    toast("Filters Applied", {
       description: "Your feed view has been updated with the selected filters."
     });
   };
@@ -175,8 +205,7 @@ const Dashboard: React.FC = () => {
     setImportance('');
     setSearchTerm('');
     setFilters({});
-    toast({
-      title: "Filters Cleared",
+    toast("Filters Cleared", {
       description: "All filters have been reset."
     });
   };
@@ -193,8 +222,7 @@ const Dashboard: React.FC = () => {
     const view = savedViews.find(v => v.id === viewId);
     if (view) {
       setFilters(view.filters);
-      toast({
-        title: `Board "${view.name}" Applied`,
+      toast(`Board "${view.name}" Applied`, {
         description: "Filters have been updated based on the selected board."
       });
     }
@@ -235,8 +263,7 @@ const Dashboard: React.FC = () => {
   const handleAlertClick = (alertId: string) => {
     markAlertRead(alertId);
     // In a real app, you'd likely navigate to a more detailed view
-    toast({
-      title: "Alert Marked as Read",
+    toast("Alert Marked as Read", {
       description: "The alert has been marked as read."
     });
   };
@@ -250,26 +277,20 @@ const Dashboard: React.FC = () => {
           </DialogHeader>
           <Separator className="my-2" />
           <div className="space-y-4 py-2">
-            {alerts.map((alert) => (
-              <AlertItem key={alert.id} alert={alert} onClick={() => handleAlertClick(alert.id)} />
-            ))}
-            {alerts.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
-                <div className="mb-3">
-                  <span className="inline-block p-3 rounded-full bg-gray-100">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-400">
-                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <p className="text-lg font-medium mb-1">No alerts yet</p>
-                <p className="text-sm">They will appear here when detected</p>
-              </div>
-            )}
+            <AlertsList showAll={true} />
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex justify-between">
             <Button variant="outline" onClick={() => selectFeed(null)}>
               Close
+            </Button>
+            <Button 
+              onClick={() => {
+                selectFeed(null);
+                navigate('/alerts');
+              }}
+              className="bg-needl-primary hover:bg-needl-dark"
+            >
+              View All Alerts
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -280,9 +301,11 @@ const Dashboard: React.FC = () => {
   const BoardDrawer = () => {
     return (
       <Drawer open={isBoardDrawerOpen} onOpenChange={setIsBoardDrawerOpen}>
-        <DrawerContent className="fixed left-0 right-auto top-16 bottom-0 w-[250px] rounded-none border-r border-t-0 border-b-0 border-l-0">
+        <DrawerContent className="fixed left-0 right-auto top-16 bottom-0 w-[280px] rounded-none border-r border-t-0 border-b-0 border-l-0 bg-zinc-50">
           <DrawerHeader className="px-4 py-3 border-b">
-            <DrawerTitle className="text-base">Boards</DrawerTitle>
+            <DrawerTitle className="text-base flex items-center">
+              <Grid2x2 className="h-4 w-4 mr-2" /> Intelligence Boards
+            </DrawerTitle>
           </DrawerHeader>
           <div className="p-4 space-y-2 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
             {savedViews.length > 0 ? (
@@ -290,13 +313,16 @@ const Dashboard: React.FC = () => {
                 <div
                   key={view.id}
                   onClick={() => handleSelectView(view.id)}
-                  className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                  className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer group"
                 >
-                  <span className="text-sm truncate">{view.name}</span>
+                  <div className="flex items-center">
+                    <div className="w-1.5 h-6 rounded-sm bg-needl-primary mr-2"></div>
+                    <span className="text-sm truncate">{view.name}</span>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6"
+                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={(e) => {
                       e.stopPropagation();
                       removeSavedView(view.id);
@@ -307,12 +333,16 @@ const Dashboard: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center text-sm text-gray-500 py-6">
-                No saved boards yet
+              <div className="text-center text-sm text-gray-500 py-8">
+                <div className="bg-gray-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                  <Grid2x2 className="h-5 w-5 text-gray-400" />
+                </div>
+                <p className="font-medium mb-1">No saved boards yet</p>
+                <p className="text-xs text-gray-400">Create a board by applying filters and saving the view</p>
               </div>
             )}
           </div>
-          <DrawerFooter className="p-4 pt-0">
+          <DrawerFooter className="p-4 pt-0 border-t">
             <Button
               variant="outline"
               className="w-full flex items-center justify-center gap-2 text-sm"
@@ -335,7 +365,7 @@ const Dashboard: React.FC = () => {
     );
   };
   
-  const AlertItem: React.FC<{ alert: Alert; onClick: () => void }> = ({ alert, onClick }) => {
+  const AlertItem: React.FC<{ alert: AlertType; onClick: () => void }> = ({ alert, onClick }) => {
     return (
       <div 
         className={`p-3 rounded-md border ${alert.read ? 'bg-white' : 'bg-blue-50'} cursor-pointer hover:shadow-md transition-shadow`}
@@ -379,235 +409,345 @@ const Dashboard: React.FC = () => {
       </div>
     );
   };
+
+  // Empty state component
+  const EmptyDashboard = () => (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-center py-12 max-w-lg mx-auto bg-white rounded-lg shadow-sm p-8 border border-gray-100"
+    >
+      <div className="bg-needl-lighter rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+        <BarChart2 className="h-8 w-8 text-needl-primary" />
+      </div>
+      <h3 className="text-xl font-semibold mb-3">Your Intelligence Hub</h3>
+      <p className="text-gray-600 mb-6">Create your first intelligence feed to start gathering insights about competitors, markets, and trends</p>
+      <div className="space-y-4">
+        <Button 
+          onClick={() => navigate('/use-cases')} 
+          className="w-full gap-2 bg-needl-primary hover:bg-needl-dark text-white"
+        >
+          <Plus className="h-4 w-4" />
+          Create New Feed
+        </Button>
+        <div className="flex items-center text-xs text-gray-500 justify-center">
+          <FolderOpen className="h-3 w-3 mr-1" />
+          <span>Choose from our pre-built use cases</span>
+        </div>
+      </div>
+    </motion.div>
+  );
   
   return (
     <div className="min-h-screen flex flex-col">
       <Header showAlertIcon />
       
-      <main className="flex-1 relative">
-        <div className={`flex ${isBoardDrawerOpen && !isMobile ? 'ml-[250px]' : 'ml-0'} transition-all duration-300`}>
+      <main className="flex-1 relative bg-gray-50">
+        <div className={`flex ${isBoardDrawerOpen && !isMobile ? 'ml-[280px]' : 'ml-0'} transition-all duration-300`}>
           <div className="flex-1 container py-8 px-4">
-            <section className="mb-8">
-              <h2 className="text-xl font-bold mb-4">Intelligence Metrics</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Source Distribution</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={sourceDistributionData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={2}
-                            dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                            labelLine={false}
-                          >
-                            {sourceDistributionData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Alert Trend (Last 7 Days)</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={alertTrendData}>
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="alerts" stroke="#367d8d" strokeWidth={2} dot={{ stroke: '#367d8d', strokeWidth: 2, r: 4 }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Importance Distribution</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={importanceDistributionData} layout="vertical">
-                          <XAxis type="number" />
-                          <YAxis dataKey="name" type="category" width={80} />
-                          <Tooltip />
-                          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                            {importanceDistributionData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={IMPORTANCE_COLORS[index % IMPORTANCE_COLORS.length]} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-            
-            <section className="mb-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Intelligence Feeds</h2>
-                <div className="mt-2 md:mt-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => setIsBoardDrawerOpen(!isBoardDrawerOpen)}
-                  >
-                    <Grid2x2 className="h-4 w-4" />
-                    <span>{isBoardDrawerOpen ? 'Hide' : 'Show'} Boards</span>
-                  </Button>
-                </div>
-              </div>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                <BarChart2 className="h-6 w-6 mr-2 text-needl-primary" /> 
+                Intelligence Dashboard
+              </h1>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div>
-                  <Input
-                    placeholder="Search feeds..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full"
-                    prefix={<Search className="h-4 w-4 text-gray-400" />}
-                  />
-                </div>
-                
-                <div>
-                  <Select value={company} onValueChange={setCompany}>
-                    <SelectTrigger className="w-full">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">🏢</span>
-                        <SelectValue placeholder="Company" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Companies</SelectItem>
-                      <SelectItem value="techcorp">TechCorp</SelectItem>
-                      <SelectItem value="healthcare">Healthcare Companies</SelectItem>
-                      <SelectItem value="financial">Financial Institutions</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Select value={market} onValueChange={setMarket}>
-                    <SelectTrigger className="w-full">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">📊</span>
-                        <SelectValue placeholder="Market/Type" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
-                      <SelectItem value="competitor">Competitor</SelectItem>
-                      <SelectItem value="market">Market</SelectItem>
-                      <SelectItem value="trend">Trend</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Select value={importance} onValueChange={setImportance}>
-                    <SelectTrigger className="w-full">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">🔍</span>
-                        <SelectValue placeholder="Importance" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Importance</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="flex justify-between mb-6">
-                <Button variant="outline" size="sm" onClick={handleClearFilters}>
-                  Clear Filters
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => setIsBoardDrawerOpen(!isBoardDrawerOpen)}
+                >
+                  <Grid2x2 className="h-4 w-4" />
+                  <span>{isBoardDrawerOpen ? 'Hide' : 'Show'} Boards</span>
                 </Button>
                 
-                <div className="space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-1"
-                    onClick={() => setIsSaveViewOpen(true)}
-                  >
-                    <Save className="h-4 w-4" />
-                    <span>Save View as Board</span>
-                  </Button>
-                  
-                  <Button size="sm" onClick={handleApplyFilters} className="gap-1 bg-needl-primary hover:bg-needl-dark">
-                    <Filter className="h-4 w-4" />
-                    <span>Apply Filters</span>
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => navigate('/use-cases')}
+                  variant="default"
+                  size="sm"
+                  className="gap-1 bg-needl-primary hover:bg-needl-dark"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>New Feed</span>
+                </Button>
               </div>
-            </section>
-            
-            <section>
-              <AnimatePresence>
-                {userFeeds.length === 0 ? (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-12"
-                  >
-                    <h3 className="text-xl font-medium mb-4">No Intelligence Feeds Yet</h3>
-                    <p className="text-gray-600 mb-6">Create your first intelligence feed to start gathering insights</p>
-                    <Button onClick={() => navigate('/landing')} className="gap-2 bg-needl-primary hover:bg-needl-dark glaze">
-                      <Plus className="h-4 w-4" />
-                      Create New Feed
+            </div>
+
+            {userFeeds.length > 0 ? (
+              <>
+                <motion.section 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-8"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Intelligence Metrics</h2>
+                    <Select defaultValue="7days">
+                      <SelectTrigger className="w-[140px] h-8 text-xs">
+                        <SelectValue placeholder="Time Period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7days">Last 7 days</SelectItem>
+                        <SelectItem value="30days">Last 30 days</SelectItem>
+                        <SelectItem value="90days">Last 90 days</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="overflow-hidden border-none shadow-sm">
+                      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 pb-2">
+                        <CardTitle className="text-base flex items-center">
+                          <span className="bg-blue-500 text-white p-1 rounded-md mr-2">
+                            <BarChart2 className="h-3 w-3" />
+                          </span>
+                          Source Distribution
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-3">
+                        <div className="h-[200px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={sourceDistributionData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={2}
+                                dataKey="value"
+                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                labelLine={false}
+                              >
+                                {sourceDistributionData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <RechartsTooltip />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="overflow-hidden border-none shadow-sm">
+                      <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 pb-2">
+                        <CardTitle className="text-base flex items-center">
+                          <span className="bg-green-500 text-white p-1 rounded-md mr-2">
+                            <BarChart2 className="h-3 w-3" />
+                          </span>
+                          Alert Trend
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-3">
+                        <div className="h-[200px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={alertTrendData}>
+                              <XAxis dataKey="name" />
+                              <YAxis />
+                              <RechartsTooltip />
+                              <Line type="monotone" dataKey="alerts" stroke="#367d8d" strokeWidth={2} dot={{ stroke: '#367d8d', strokeWidth: 2, r: 4 }} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="overflow-hidden border-none shadow-sm">
+                      <CardHeader className="bg-gradient-to-r from-amber-50 to-amber-100 pb-2">
+                        <CardTitle className="text-base flex items-center">
+                          <span className="bg-amber-500 text-white p-1 rounded-md mr-2">
+                            <BarChart2 className="h-3 w-3" />
+                          </span>
+                          Importance Distribution
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-3">
+                        <div className="h-[200px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={importanceDistributionData} layout="vertical">
+                              <XAxis type="number" />
+                              <YAxis dataKey="name" type="category" width={80} />
+                              <RechartsTooltip />
+                              <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                {importanceDistributionData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={IMPORTANCE_COLORS[index % IMPORTANCE_COLORS.length]} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </motion.section>
+                
+                <motion.section 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="mb-8"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Recent Alerts</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/alerts')}
+                      className="gap-2 text-xs"
+                    >
+                      <Bell className="h-3 w-3" />
+                      View All Alerts
                     </Button>
-                  </motion.div>
-                ) : (
-                  <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {feedsToDisplay.map((feed) => (
-                      <motion.div
-                        key={feed.id}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
+                  </div>
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <AlertsList maxItems={3} />
+                  </div>
+                </motion.section>
+
+                <section className="mb-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Intelligence Feeds</h2>
+                    <div className="mt-2 md:mt-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => navigate('/use-cases')}
                       >
-                        <FeedCard feed={feed} onClick={() => handleFeedClick(feed.id)} />
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              
-              {userFeeds.length > 0 && feedsToDisplay.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No feeds match your filters</p>
-                  <Button variant="link" onClick={handleClearFilters} className="mt-2">
-                    Clear Filters
-                  </Button>
-                </div>
-              )}
-            </section>
+                        <Plus className="h-4 w-4" />
+                        <span>New Feed</span>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div>
+                      <Input
+                        placeholder="Search feeds..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full"
+                        prefix={<Search className="h-4 w-4 text-gray-400" />}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Select value={company} onValueChange={setCompany}>
+                        <SelectTrigger className="w-full">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-400">🏢</span>
+                            <SelectValue placeholder="Company" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Companies</SelectItem>
+                          <SelectItem value="techcorp">TechCorp</SelectItem>
+                          <SelectItem value="healthcare">Healthcare Companies</SelectItem>
+                          <SelectItem value="financial">Financial Institutions</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select value={market} onValueChange={setMarket}>
+                        <SelectTrigger className="w-full">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-400">📊</span>
+                            <SelectValue placeholder="Market/Type" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Types</SelectItem>
+                          <SelectItem value="competitor">Competitor</SelectItem>
+                          <SelectItem value="market">Market</SelectItem>
+                          <SelectItem value="trend">Trend</SelectItem>
+                          <SelectItem value="custom">Custom</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select value={importance} onValueChange={setImportance}>
+                        <SelectTrigger className="w-full">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-400">🔍</span>
+                            <SelectValue placeholder="Importance" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Importance</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between mb-6">
+                    <Button variant="outline" size="sm" onClick={handleClearFilters}>
+                      Clear Filters
+                    </Button>
+                    
+                    <div className="space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-1"
+                        onClick={() => setIsSaveViewOpen(true)}
+                      >
+                        <Save className="h-4 w-4" />
+                        <span>Save View as Board</span>
+                      </Button>
+                      
+                      <Button size="sm" onClick={handleApplyFilters} className="gap-1 bg-needl-primary hover:bg-needl-dark">
+                        <Filter className="h-4 w-4" />
+                        <span>Apply Filters</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    <motion.div 
+                      layout 
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {feedsToDisplay.map((feed) => (
+                        <motion.div
+                          key={feed.id}
+                          layout
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <FeedCard feed={feed} onClick={() => handleFeedClick(feed.id)} />
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
+                  
+                  {userFeeds.length > 0 && feedsToDisplay.length === 0 && (
+                    <div className="text-center py-8 bg-white rounded-lg shadow-sm">
+                      <div className="bg-gray-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                        <Search className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 font-medium mb-2">No feeds match your filters</p>
+                      <Button variant="link" onClick={handleClearFilters} className="text-needl-primary">
+                        Clear Filters
+                      </Button>
+                    </div>
+                  )}
+                </section>
+              </>
+            ) : (
+              <EmptyDashboard />
+            )}
           </div>
         </div>
       </main>

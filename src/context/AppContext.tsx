@@ -1,5 +1,7 @@
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from "sonner";
+import { mockFeeds, mockAlerts, mockSavedViews } from '../utils/mockData';
 
 // Types
 export interface User {
@@ -30,6 +32,8 @@ export interface Feed {
     other: number;
   };
   snippet?: string;
+  documentsCount?: number;
+  alertsCount?: number;
 }
 
 export interface SavedView {
@@ -137,7 +141,8 @@ type ActionType =
   | { type: 'MARK_ALERT_READ'; payload: string }
   | { type: 'MARK_ALL_ALERTS_READ' }
   | { type: 'SET_SETUP_STATE'; payload: Partial<AppState['setupState']> }
-  | { type: 'RESET_SETUP_STATE' };
+  | { type: 'RESET_SETUP_STATE' }
+  | { type: 'LOAD_INITIAL_DATA' };
 
 // Reducer
 const appReducer = (state: AppState, action: ActionType): AppState => {
@@ -213,6 +218,7 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
       return {
         ...state,
         selectedFeedId: action.payload,
+        isAlertsModalOpen: action.payload !== null,
       };
     case 'TOGGLE_ALERTS_MODAL':
       return {
@@ -258,6 +264,13 @@ const appReducer = (state: AppState, action: ActionType): AppState => {
           },
         },
       };
+    case 'LOAD_INITIAL_DATA':
+      return {
+        ...state,
+        userFeeds: mockFeeds,
+        alerts: mockAlerts,
+        savedViews: mockSavedViews,
+      };
     default:
       return state;
   }
@@ -282,6 +295,7 @@ type AppContextType = {
   markAllAlertsRead: () => void;
   updateSetupState: (setupState: Partial<AppState['setupState']>) => void;
   resetSetupState: () => void;
+  loadInitialData: () => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -343,6 +357,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             email: email,
           };
           dispatch({ type: 'LOGIN', payload: mockUser });
+          
+          // Load initial data when user logs in
+          loadInitialData();
+          
           toast.success("Login successful!");
         }, 1000);
       } else {
@@ -356,7 +374,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = () => {
     dispatch({ type: 'LOGOUT' });
-    toast.info("Logged out successfully");
+    toast("Logged out successfully", {
+      description: "You've been successfully logged out of your account."
+    });
+  };
+
+  const loadInitialData = () => {
+    dispatch({ type: 'LOAD_INITIAL_DATA' });
+    // Don't show a toast for initial data loading
   };
 
   const addFeed = (feed: Omit<Feed, 'id' | 'createdAt' | 'status'>) => {
@@ -386,10 +411,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const toggleConnectedApp = (appName: string) => {
     if (state.connectedApps.includes(appName)) {
       dispatch({ type: 'REMOVE_CONNECTED_APP', payload: appName });
-      toast.info(`Disconnected from ${appName}`);
+      toast(`Disconnected from ${appName}`, {
+        description: `Your ${appName} account has been disconnected successfully.`
+      });
     } else {
       dispatch({ type: 'ADD_CONNECTED_APP', payload: appName });
-      toast.success(`Connected to ${appName}`);
+      toast.success(`Connected to ${appName}`, {
+        description: `Your ${appName} account has been successfully connected.`
+      });
     }
   };
 
@@ -404,14 +433,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       filters: state.currentFilters,
     };
     dispatch({ type: 'ADD_SAVED_VIEW', payload: newView });
-    toast.success(`View "${name}" saved`);
+    toast.success(`Board "${name}" saved`, {
+      description: "Your current view has been saved as a board."
+    });
   };
 
   const removeSavedView = (viewId: string) => {
     const view = state.savedViews.find((v) => v.id === viewId);
     dispatch({ type: 'REMOVE_SAVED_VIEW', payload: viewId });
     if (view) {
-      toast.success(`View "${view.name}" removed`);
+      toast.success(`Board "${view.name}" removed`);
     }
   };
 
@@ -460,6 +491,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         markAllAlertsRead,
         updateSetupState,
         resetSetupState,
+        loadInitialData,
       }}
     >
       {children}

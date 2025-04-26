@@ -1,49 +1,67 @@
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 const chipVariants = cva(
-  "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white",
+  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-        primary: "bg-needl-lighter text-needl-primary hover:bg-needl-light",
-        secondary: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-        destructive: "bg-red-100 text-red-800 hover:bg-red-200",
-        success: "bg-green-100 text-green-800 hover:bg-green-200",
-        warning: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        entity: "bg-needl-lighter text-needl-primary hover:bg-needl-light border border-needl-primary/30 shadow-sm",
-        criteria: "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-300/50 shadow-sm",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        entity:
+          "bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200",
+        criteria:
+          "bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200",
       },
-      size: {
-        default: "h-6",
-        sm: "h-5 text-[10px]",
-        lg: "h-7 text-sm",
+      removable: {
+        true: "pr-1",
       },
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
+      removable: false,
     },
   }
 );
 
 export interface ChipProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof chipVariants> {}
+    VariantProps<typeof chipVariants> {
+  onRemove?: () => void;
+}
 
-export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    return (
-      <div
-        className={cn(chipVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
+function Chip({
+  className,
+  variant,
+  removable,
+  onRemove,
+  children,
+  ...props
+}: ChipProps) {
+  return (
+    <div className={cn(chipVariants({ variant, removable }), className)} {...props}>
+      <span className="text-xs">{children}</span>
+      {removable && (
+        <button
+          type="button"
+          className="ml-1 rounded-full hover:bg-muted p-0.5"
+          onClick={onRemove}
+        >
+          <X className="h-3 w-3" />
+          <span className="sr-only">Remove</span>
+        </button>
+      )}
+    </div>
+  );
+}
 
-Chip.displayName = "Chip";
+export { Chip, chipVariants };
