@@ -3,49 +3,25 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { mockFeeds, mockAlerts } from '../utils/mockData';
-import type { Alert, Feed, FilterOptions, SavedView, SetupState } from '../types/feedTypes';
+import type { Feed, Alert, AppState } from '../types/appTypes';
 
-// Define App Context State and Types
-export type User = {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
+// Define Filter Options Type
+export type FilterOptions = {
+  importance?: string;
+  market?: string;
+  company?: string;
+  [key: string]: any;
 };
 
-export interface AppState {
-  isLoggedIn: boolean;
-  user: User | null;
-  isLoading: boolean;
-  userFeeds: Feed[];
-  savedViews: SavedView[];
-  currentFilters: FilterOptions;
-  selectedFeedId: string | null;
-  alerts: Alert[];
-  isAlertsModalOpen: boolean;
-  setupState: SetupState;
-  connectedApps: string[];
-}
+export type SavedView = {
+  id: string;
+  name: string;
+  filters: FilterOptions;
+};
 
-enum ActionTypes {
-  LOGIN_SUCCESS = 'LOGIN_SUCCESS',
-  LOGOUT = 'LOGOUT',
-  SET_LOADING = 'SET_LOADING',
-  SET_FILTERS = 'SET_FILTERS',
-  ADD_SAVED_VIEW = 'ADD_SAVED_VIEW',
-  REMOVE_SAVED_VIEW = 'REMOVE_SAVED_VIEW',
-  SELECT_FEED = 'SELECT_FEED',
-  MARK_ALERT_READ = 'MARK_ALERT_READ',
-  MARK_ALL_ALERTS_READ = 'MARK_ALL_ALERTS_READ',
-  LOAD_INITIAL_DATA = 'LOAD_INITIAL_DATA',
-  TOGGLE_ALERTS_MODAL = 'TOGGLE_ALERTS_MODAL',
-  UPDATE_SETUP_STATE = 'UPDATE_SETUP_STATE',
-  RESET_SETUP_STATE = 'RESET_SETUP_STATE',
-  TOGGLE_CONNECTED_APP = 'TOGGLE_CONNECTED_APP',
-  ADD_FEED = 'ADD_FEED',
-  REMOVE_FEED = 'REMOVE_FEED',
-  UPDATE_FEED = 'UPDATE_FEED',
-}
+export type SetupState = {
+  [key: string]: any;
+};
 
 // Create context with default values
 const initialState: AppState = {
@@ -103,8 +79,48 @@ const AppContext = createContext<AppContextType>({
   updateFeed: () => {},
 });
 
+enum ActionTypes {
+  LOGIN_SUCCESS = 'LOGIN_SUCCESS',
+  LOGOUT = 'LOGOUT',
+  SET_LOADING = 'SET_LOADING',
+  SET_FILTERS = 'SET_FILTERS',
+  ADD_SAVED_VIEW = 'ADD_SAVED_VIEW',
+  REMOVE_SAVED_VIEW = 'REMOVE_SAVED_VIEW',
+  SELECT_FEED = 'SELECT_FEED',
+  MARK_ALERT_READ = 'MARK_ALERT_READ',
+  MARK_ALL_ALERTS_READ = 'MARK_ALL_ALERTS_READ',
+  LOAD_INITIAL_DATA = 'LOAD_INITIAL_DATA',
+  TOGGLE_ALERTS_MODAL = 'TOGGLE_ALERTS_MODAL',
+  UPDATE_SETUP_STATE = 'UPDATE_SETUP_STATE',
+  RESET_SETUP_STATE = 'RESET_SETUP_STATE',
+  TOGGLE_CONNECTED_APP = 'TOGGLE_CONNECTED_APP',
+  ADD_FEED = 'ADD_FEED',
+  REMOVE_FEED = 'REMOVE_FEED',
+  UPDATE_FEED = 'UPDATE_FEED',
+}
+
+// Type for actions
+type Action = 
+  | { type: ActionTypes.LOGIN_SUCCESS; payload: any }
+  | { type: ActionTypes.LOGOUT }
+  | { type: ActionTypes.SET_LOADING; payload: boolean }
+  | { type: ActionTypes.SET_FILTERS; payload: FilterOptions }
+  | { type: ActionTypes.ADD_SAVED_VIEW; payload: { name: string } }
+  | { type: ActionTypes.REMOVE_SAVED_VIEW; payload: string }
+  | { type: ActionTypes.SELECT_FEED; payload: string | null }
+  | { type: ActionTypes.MARK_ALERT_READ; payload: string }
+  | { type: ActionTypes.MARK_ALL_ALERTS_READ }
+  | { type: ActionTypes.LOAD_INITIAL_DATA }
+  | { type: ActionTypes.TOGGLE_ALERTS_MODAL }
+  | { type: ActionTypes.UPDATE_SETUP_STATE; payload: Partial<SetupState> }
+  | { type: ActionTypes.RESET_SETUP_STATE }
+  | { type: ActionTypes.TOGGLE_CONNECTED_APP; payload: string }
+  | { type: ActionTypes.ADD_FEED; payload: Partial<Feed> }
+  | { type: ActionTypes.REMOVE_FEED; payload: string }
+  | { type: ActionTypes.UPDATE_FEED; payload: Feed };
+
 // Reducer function to handle state updates
-const appReducer = (state: AppState, action: any): AppState => {
+const appReducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
     case ActionTypes.LOGIN_SUCCESS:
       return {
@@ -148,7 +164,8 @@ const appReducer = (state: AppState, action: any): AppState => {
     case ActionTypes.SELECT_FEED:
       return {
         ...state,
-        selectedFeedId: action.payload
+        selectedFeedId: action.payload,
+        isAlertsModalOpen: action.payload !== null
       };
     case ActionTypes.MARK_ALERT_READ:
       return {
@@ -163,10 +180,15 @@ const appReducer = (state: AppState, action: any): AppState => {
         alerts: state.alerts.map(alert => ({ ...alert, read: true }))
       };
     case ActionTypes.LOAD_INITIAL_DATA:
-      // Load mock data for demo purposes
+      // Ensure mockFeeds has lastActivity set for all items
+      const enhancedMockFeeds = mockFeeds.map(feed => ({
+        ...feed,
+        lastActivity: feed.lastActivity || feed.createdAt // Ensure lastActivity is never undefined
+      }));
+      
       return {
         ...state,
-        userFeeds: mockFeeds,
+        userFeeds: enhancedMockFeeds,
         alerts: mockAlerts
       };
     case ActionTypes.TOGGLE_ALERTS_MODAL:
@@ -198,16 +220,17 @@ const appReducer = (state: AppState, action: any): AppState => {
     case ActionTypes.ADD_FEED:
       const newFeed: Feed = {
         id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
-        status: 'active',
-        alertsCount: 0,
-        documentsCount: 0,
-        ...action.payload,
         name: action.payload.name || '',
         query: action.payload.query || '',
         type: action.payload.type || 'custom',
+        status: action.payload.status || 'active',
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(), // Ensure lastActivity is always set
         snippet: action.payload.snippet || '',
+        sourceMix: action.payload.sourceMix,
+        alertsCount: action.payload.alertsCount || 0,
+        documentsCount: action.payload.documentsCount || 0,
+        outputConfig: action.payload.outputConfig
       };
       return {
         ...state,
@@ -267,11 +290,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mock login - in a real app, validate credentials with API
-      const user: User = {
+      const user = {
         id: uuidv4(),
         email,
         name: email.split('@')[0],
-        role: 'user'
+        role: 'user' as const
       };
       
       localStorage.setItem('user', JSON.stringify(user));
@@ -331,7 +354,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Feed selection function
-  const selectFeed = (id: string) => {
+  const selectFeed = (id: string | null) => {
     dispatch({
       type: ActionTypes.SELECT_FEED,
       payload: id

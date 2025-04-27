@@ -356,7 +356,7 @@ const Dashboard: React.FC = () => {
                       });
                     }}
                   >
-                    <span className="text-xs">×</span>
+                    <X className="h-4 w-4" aria-label="Remove board" />
                   </Button>
                 </div>
               ))
@@ -410,7 +410,7 @@ const Dashboard: React.FC = () => {
           className="w-full gap-2 bg-needl-primary hover:bg-needl-dark text-white"
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Create New Feed</span>
+          <span>Create New Feed</span>
         </Button>
         <div className="flex items-center text-xs text-gray-500 justify-center">
           <FolderOpen className="h-3 w-3 mr-1" />

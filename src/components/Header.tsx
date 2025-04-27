@@ -1,198 +1,254 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Logo from './Logo';
 import { Button } from '@/components/ui/button';
-import { Bell, Menu, X } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import Logo from './Logo';
 import { useApp } from '../context/AppContext';
-import { toast } from 'sonner';
+import { User, LogOut, ChevronDown, Menu, X } from 'lucide-react';
+import { AlertBadge } from './alerts/AlertBadge';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 interface HeaderProps {
   showLoginButton?: boolean;
   showAlertIcon?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
+const Header: React.FC<HeaderProps> = ({
   showLoginButton = false,
   showAlertIcon = false
 }) => {
+  const { state, logout } = useApp();
+  const { isLoggedIn, user } = state;
   const navigate = useNavigate();
-  const { state, logout, toggleAlertsModal } = useApp();
-  const { isLoggedIn, alerts } = state;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   
-  const unreadAlerts = alerts.filter(alert => !alert.read).length;
+  // Update scrolled state on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  const mainNavItems = [
+    { label: 'Home', path: '/landing' },
+    { label: 'Dashboard', path: '/dashboard' },
+    { label: 'Alerts', path: '/alerts' },
+    { label: 'Manage Feeds', path: '/manage-feeds' },
+  ];
+  
+  const userNavItems = [
+    { label: 'Profile', action: () => navigate('/profile') },
+    { label: 'Settings', action: () => navigate('/settings') },
+    { label: 'Sign Out', action: logout },
+  ];
   
   const handleLogin = () => {
     navigate('/login');
   };
   
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const handleAlertClick = () => {
-    navigate('/alerts');
-  };
-  
-  const handleLogoClick = () => {
-    if (isLoggedIn) {
-      navigate('/landing');
-    } else {
-      navigate('/');
-    }
-  };
-  
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm border-b">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center">
-          <div 
-            className="flex items-center cursor-pointer" 
-            onClick={handleLogoClick}
-          >
-            <Logo className="h-8 w-8" />
-            <span className="ml-2 text-xl font-semibold text-gray-900">needl.ai</span>
-          </div>
-        </div>
+    <header 
+      className={`sticky top-0 z-50 py-3 px-4 md:px-6 transition-all duration-200 ${
+        scrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm' : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <Logo height={32} width={32} />
+          <span className="text-xl font-semibold text-gray-900">Needl.ai</span>
+        </Link>
         
-        <div className="hidden md:flex items-center space-x-4">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-1">
           {isLoggedIn && (
-            <>
-              {showAlertIcon && (
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={handleAlertClick} 
-                  className="relative"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadAlerts > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5">
-                      <Badge variant="destructive" className="h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full">
-                        {unreadAlerts}
-                      </Badge>
-                    </span>
-                  )}
-                </Button>
-              )}
-              
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-              >
-                Dashboard
-              </Button>
-              
-              <Button 
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </>
-          )}
-          
-          {showLoginButton && !isLoggedIn && (
-            <Button 
-              onClick={handleLogin}
-              className="bg-needl-primary hover:bg-needl-dark text-white"
-            >
-              Login
-            </Button>
-          )}
-        </div>
-        
-        <div className="md:hidden">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-        </div>
-      </div>
-      
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t px-4 py-2 shadow-md overflow-hidden"
-          >
-            <nav className="flex flex-col space-y-2 pb-2">
-              {isLoggedIn && (
-                <>
-                  {showAlertIcon && (
+            <nav className="mr-4">
+              <ul className="flex space-x-1">
+                {mainNavItems.map((item) => (
+                  <li key={item.path}>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => {
-                        handleAlertClick();
-                        setIsMenuOpen(false);
-                      }} 
-                      className="justify-start"
+                      onClick={() => navigate(item.path)}
+                      className="text-gray-700 hover:text-needl-primary"
                     >
-                      <Bell className="h-4 w-4 mr-2" />
-                      Alerts
-                      {unreadAlerts > 0 && (
-                        <Badge variant="destructive" className="ml-2">{unreadAlerts}</Badge>
-                      )}
+                      {item.label}
                     </Button>
-                  )}
-                  
-                  <Button 
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start"
-                    onClick={() => {
-                      navigate('/dashboard');
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    Dashboard
-                  </Button>
-                  
-                  <Button 
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start"
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    Logout
-                  </Button>
-                </>
-              )}
-              
-              {showLoginButton && !isLoggedIn && (
-                <Button 
-                  onClick={() => {
-                    handleLogin();
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full bg-needl-primary hover:bg-needl-dark text-white"
-                >
-                  Login
-                </Button>
-              )}
+                  </li>
+                ))}
+              </ul>
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+          
+          {/* Alert badge for notifications */}
+          {isLoggedIn && showAlertIcon && (
+            <div className="mr-2">
+              <AlertBadge />
+            </div>
+          )}
+          
+          {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                >
+                  <span className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-gray-600" />
+                  </span>
+                  <span className="hidden sm:inline max-w-[100px] truncate">
+                    {user?.name}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>
+                  <div className="truncate">
+                    {user?.email}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {userNavItems.map((item, index) => (
+                  <DropdownMenuItem 
+                    key={index} 
+                    onClick={item.action}
+                    className="cursor-pointer"
+                  >
+                    {item.label === 'Sign Out' && (
+                      <LogOut className="mr-2 h-4 w-4" />
+                    )}
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            showLoginButton && (
+              <Button 
+                onClick={handleLogin}
+                variant="default"
+                size="sm"
+                className="bg-needl-primary hover:bg-needl-dark text-white"
+              >
+                Login
+              </Button>
+            )
+          )}
+        </div>
+        
+        {/* Mobile menu trigger */}
+        <div className="md:hidden flex items-center space-x-4">
+          {/* Alert badge for notifications on mobile */}
+          {isLoggedIn && showAlertIcon && (
+            <AlertBadge />
+          )}
+          
+          <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-1">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+              <SheetHeader className="pb-4">
+                <SheetTitle className="flex items-center gap-2">
+                  <Logo height={24} width={24} />
+                  <span>Needl.ai</span>
+                </SheetTitle>
+              </SheetHeader>
+              
+              {/* Mobile Navigation Items */}
+              {isLoggedIn ? (
+                <div className="space-y-4 py-4">
+                  <div className="flex items-center space-x-2 px-1 py-2 rounded-md bg-gray-50">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium truncate max-w-[170px]">
+                        {user?.name}
+                      </span>
+                      <span className="text-xs text-gray-500 truncate max-w-[170px]">
+                        {user?.email}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <nav>
+                    <ul className="space-y-1">
+                      {mainNavItems.map((item) => (
+                        <li key={item.path}>
+                          <SheetClose asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="w-full justify-start text-gray-700"
+                              onClick={() => navigate(item.path)}
+                            >
+                              {item.label}
+                            </Button>
+                          </SheetClose>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                  
+                  <div className="pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        logout();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign out
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-4 pt-4">
+                  <SheetClose asChild>
+                    <Button 
+                      onClick={handleLogin}
+                      className="w-full bg-needl-primary hover:bg-needl-dark"
+                    >
+                      Login
+                    </Button>
+                  </SheetClose>
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
     </header>
   );
 };
