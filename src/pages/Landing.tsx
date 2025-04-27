@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { Button } from '@/components/ui/button';
 import { useApp } from '../context/AppContext';
-import { FileText, Database, Folder, ChevronRight } from 'lucide-react';
+import { FileText, Database, Folder, ChevronRight, BarChart2, Zap, Target, Globe } from 'lucide-react';
 import CloudProviderIcon from '../components/CloudProviderIcon';
 import PersonaSection from '../components/personas/PersonaSection';
 
@@ -14,173 +14,255 @@ const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useApp();
   const { isLoggedIn } = state;
+  const controls = useAnimation();
+  const [isInView, setIsInView] = useState(false);
 
-  // Animated dots for the intelligence processing visualization with faster animations
-  const IntelligenceDots = () => (
-    <div className="relative w-full max-w-3xl mx-auto my-6 lg:my-8 h-[180px]">
-      <motion.div
-        className="absolute top-1/4 left-1/4 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-lg shadow-lg"
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.2, delay: 0.1 }}
-      >
-        <motion.div
-          animate={{ scale: [0.9, 1.1, 0.9] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
-        >
-          🌐
-        </motion.div>
-      </motion.div>
-      
-      <motion.div
-        className="absolute top-1/4 left-1/2 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-lg shadow-lg"
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.2, delay: 0.15 }}
-      >
-        <motion.div
-          animate={{ scale: [0.9, 1.1, 0.9] }}
-          transition={{ repeat: Infinity, duration: 1.2, delay: 0.3 }}
-        >
-          <FileText className="h-5 w-5 text-green-600" />
-        </motion.div>
-      </motion.div>
-      
-      <motion.div
-        className="absolute top-1/4 right-1/4 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-lg shadow-lg"
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.2, delay: 0.2 }}
-      >
-        <motion.div
-          animate={{ scale: [0.9, 1.1, 0.9] }}
-          transition={{ repeat: Infinity, duration: 1.2, delay: 0.6 }}
-        >
-          <Database className="h-5 w-5 text-purple-600" />
-        </motion.div>
-      </motion.div>
-      
-      <motion.div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-needl-primary flex items-center justify-center shadow-xl z-10"
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: [0.5, 1.1, 1], opacity: 1 }}
-        transition={{
+  // Trigger animations when component mounts
+  useEffect(() => {
+    setIsInView(true);
+    controls.start("visible");
+  }, [controls]);
+
+  // Enhanced dynamic intelligence visualization
+  const IntelligenceVisualization = () => {
+    const nodeVariants = {
+      hidden: { opacity: 0, y: -20 },
+      visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        transition: {
+          delay: i * 0.15,
           duration: 0.4,
-          delay: 0.3,
-          scale: {
-            times: [0, 0.7, 1],
-            type: "spring",
-            stiffness: 300,
-            damping: 15
-          }
-        }}
-      >
-        <img 
-          src="/lovable-uploads/0a70d7fb-99b8-48e3-aee0-4b62df7703cc.png" 
-          alt="Needl.ai" 
-          className="w-8 h-8 object-contain"
-        />
-      </motion.div>
-      
-      {/* Connecting lines with faster animations */}
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-        <motion.line
-          x1="25%" y1="25%" x2="50%" y2="50%"
-          stroke="#367d8d"
-          strokeWidth="2"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.6 }}
-          transition={{ duration: 0.25, delay: 0.4 }}
-        />
-        <motion.line
-          x1="50%" y1="25%" x2="50%" y2="50%"
-          stroke="#367d8d"
-          strokeWidth="2"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.6 }}
-          transition={{ duration: 0.25, delay: 0.45 }}
-        />
-        <motion.line
-          x1="75%" y1="25%" x2="50%" y2="50%"
-          stroke="#367d8d"
-          strokeWidth="2"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.6 }}
-          transition={{ duration: 0.25, delay: 0.5 }}
-        />
-      </svg>
-      
-      {/* Battlecards fanning out with faster animations */}
-      <motion.div
-        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.25, delay: 0.6 }}
-      >
-        <motion.div
-          className="w-28 h-16 bg-white border border-needl-lighter rounded-md shadow-md p-2 -rotate-12 origin-bottom-left absolute left-0"
-          initial={{ rotate: 0, x: 30 }}
-          animate={{ rotate: -12, x: 0 }}
-          transition={{ duration: 0.25, delay: 0.7 }}
-        >
-          <div className="h-2 w-14 bg-red-100 rounded mb-1"></div>
-          <div className="h-2 w-20 bg-gray-100 rounded mb-1"></div>
-          <div className="h-2 w-16 bg-gray-100 rounded"></div>
-        </motion.div>
-        
-        <motion.div
-          className="w-28 h-16 bg-white border border-needl-lighter rounded-md shadow-md p-2 z-10"
-          initial={{ y: 15, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.25, delay: 0.8 }}
-        >
-          <div className="h-2 w-14 bg-needl-lighter rounded mb-1"></div>
-          <div className="h-2 w-20 bg-gray-100 rounded mb-1"></div>
-          <div className="h-2 w-16 bg-gray-100 rounded"></div>
-        </motion.div>
-        
-        <motion.div
-          className="w-28 h-16 bg-white border border-needl-lighter rounded-md shadow-md p-2 rotate-12 origin-bottom-right absolute right-0"
-          initial={{ rotate: 0, x: -30 }}
-          animate={{ rotate: 12, x: 0 }}
-          transition={{ duration: 0.25, delay: 0.9 }}
-        >
-          <div className="h-2 w-14 bg-amber-100 rounded mb-1"></div>
-          <div className="h-2 w-20 bg-gray-100 rounded mb-1"></div>
-          <div className="h-2 w-16 bg-gray-100 rounded"></div>
-        </motion.div>
-      </motion.div>
-    </div>
-  );
+          ease: [0.22, 1, 0.36, 1]
+        }
+      })
+    };
 
-  // Cloud storage provider icons with actual icons
+    const pathVariants = {
+      hidden: { pathLength: 0, opacity: 0 },
+      visible: (i: number) => ({
+        pathLength: 1,
+        opacity: 0.8,
+        transition: {
+          delay: i * 0.15 + 0.2,
+          duration: 0.5,
+          ease: "easeInOut"
+        }
+      })
+    };
+
+    const pulseVariants = {
+      pulse: {
+        scale: [0.95, 1.05, 0.95],
+        opacity: [0.8, 1, 0.8],
+        transition: {
+          repeat: Infinity,
+          duration: 2.5
+        }
+      }
+    };
+
+    const floatVariants = {
+      float: (i: number) => ({
+        y: [0, -8, 0],
+        transition: {
+          delay: i * 0.2,
+          repeat: Infinity,
+          duration: 3,
+          ease: "easeInOut"
+        }
+      })
+    };
+
+    const dataSources = [
+      { icon: <Globe className="h-5 w-5 text-blue-600" />, bg: "bg-blue-100", name: "Web" },
+      { icon: <FileText className="h-5 w-5 text-green-600" />, bg: "bg-green-100", name: "Docs" },
+      { icon: <Database className="h-5 w-5 text-purple-600" />, bg: "bg-purple-100", name: "Data" },
+      { icon: <BarChart2 className="h-5 w-5 text-amber-600" />, bg: "bg-amber-100", name: "Market" }
+    ];
+
+    const outputTypes = [
+      { icon: <Target className="h-5 w-5 text-red-600" />, label: "Alerts", bg: "bg-red-100" },
+      { icon: <FileText className="h-5 w-5 text-indigo-600" />, label: "Reports", bg: "bg-indigo-100" },
+      { icon: <BarChart2 className="h-5 w-5 text-emerald-600" />, label: "Insights", bg: "bg-emerald-100" }
+    ];
+
+    return (
+      <div className="relative w-full max-w-4xl mx-auto my-8 lg:my-12 h-[280px] md:h-[320px]">
+        {/* Central Processing Hub with pulsing effect */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={nodeVariants}
+          custom={0}
+        >
+          <motion.div
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-needl-primary to-blue-600 
+                     flex items-center justify-center shadow-lg shadow-needl-primary/20"
+            variants={pulseVariants}
+            animate="pulse"
+          >
+            <Zap className="h-8 w-8 md:h-10 md:w-10 text-white" />
+          </motion.div>
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/80 backdrop-blur-sm 
+                        px-3 py-1 rounded-full text-xs font-medium text-needl-primary shadow-sm">
+            AI Processing
+          </div>
+        </motion.div>
+
+        {/* Input Data Sources */}
+        <div className="absolute top-0 left-0 w-full flex justify-between px-10 md:px-20">
+          {dataSources.map((source, i) => (
+            <motion.div
+              key={`source-${i}`}
+              className="relative"
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              variants={nodeVariants}
+              custom={i + 1}
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
+              <motion.div
+                className={`w-12 h-12 ${source.bg} rounded-full flex items-center justify-center shadow-md`}
+                variants={floatVariants}
+                animate="float"
+                custom={i}
+              >
+                {source.icon}
+              </motion.div>
+              <div className="mt-2 text-center text-xs font-medium text-gray-700">{source.name}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Output Types at Bottom */}
+        <div className="absolute bottom-0 w-full flex justify-center gap-16 md:gap-32">
+          {outputTypes.map((output, i) => (
+            <motion.div
+              key={`output-${i}`}
+              className="relative flex flex-col items-center"
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              variants={nodeVariants}
+              custom={i + 5}
+              whileHover={{ scale: 1.05 }}
+            >
+              <motion.div
+                className={`w-16 h-16 ${output.bg} rounded-lg flex items-center justify-center shadow-md`}
+                variants={floatVariants}
+                animate="float"
+                custom={i + 4}
+              >
+                {output.icon}
+              </motion.div>
+              <div className="mt-2 text-center text-sm font-medium">{output.label}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Connection Lines */}
+        <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+          {/* Data source connections to center */}
+          {dataSources.map((_, i) => {
+            const x1 = `${15 + (i * 23)}%`;
+            return (
+              <motion.path
+                key={`line-in-${i}`}
+                d={`M ${x1} 20% Q 50% 30%, 50% 50%`}
+                stroke="url(#gradientLine)"
+                strokeWidth="2"
+                fill="transparent"
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                variants={pathVariants}
+                custom={i + 1}
+              />
+            );
+          })}
+
+          {/* Center to output connections */}
+          {outputTypes.map((_, i) => {
+            const x2 = `${25 + (i * 25)}%`;
+            return (
+              <motion.path
+                key={`line-out-${i}`}
+                d={`M 50% 50% Q 50% 70%, ${x2} 80%`}
+                stroke="url(#gradientLine)"
+                strokeWidth="2"
+                fill="transparent"
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                variants={pathVariants}
+                custom={i + 5}
+              />
+            );
+          })}
+
+          {/* Gradient definition for paths */}
+          <defs>
+            <linearGradient id="gradientLine" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0891b2" />
+              <stop offset="100%" stopColor="#2563eb" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        {/* Data Flow Animation */}
+        <AnimatePresence>
+          {isInView && dataSources.map((_, i) => {
+            const x1 = `${15 + (i * 23)}%`;
+            return (
+              <motion.circle
+                key={`data-particle-${i}`}
+                cx={x1}
+                cy="20%"
+                r="4"
+                fill="#367d8d"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: [0, 1, 0],
+                  cx: ["15%", "50%"],
+                  cy: ["20%", "50%"]
+                }}
+                transition={{
+                  duration: 1.5,
+                  delay: i * 2,
+                  repeat: Infinity,
+                  repeatDelay: 6
+                }}
+              />
+            );
+          })}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+  // Improved cloud storage provider icons with consistent styling
   const CloudProviders = () => (
     <motion.div 
-      className="flex justify-center gap-8 mt-4"
+      className="flex justify-center gap-10 mt-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 1.0 }}
     >
-      <div className="flex flex-col items-center">
-        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-          <CloudProviderIcon provider="google-drive" />
-        </div>
-        <span className="text-xs text-gray-600">Google Drive</span>
-      </div>
-
-      <div className="flex flex-col items-center">
-        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-          <CloudProviderIcon provider="dropbox" />
-        </div>
-        <span className="text-xs text-gray-600">Dropbox</span>
-      </div>
-
-      <div className="flex flex-col items-center">
-        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-          <CloudProviderIcon provider="onedrive" />
-        </div>
-        <span className="text-xs text-gray-600">OneDrive</span>
-      </div>
+      {['google-drive', 'dropbox', 'onedrive'].map((provider, index) => (
+        <motion.div 
+          key={provider}
+          className="flex flex-col items-center"
+          whileHover={{ y: -5, scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-gray-100 rounded-full flex items-center justify-center mb-2 shadow-md">
+            <CloudProviderIcon provider={provider} className="w-8 h-8" />
+          </div>
+          <span className="text-sm text-gray-700 font-medium">
+            {provider === 'google-drive' ? 'Google Drive' : 
+             provider === 'dropbox' ? 'Dropbox' : 'OneDrive'}
+          </span>
+        </motion.div>
+      ))}
     </motion.div>
   );
 
@@ -197,7 +279,7 @@ const Landing: React.FC = () => {
               className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-needl-primary to-blue-600 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.5 }}
             >
               Turning Information into Intelligence
             </motion.h1>
@@ -206,21 +288,23 @@ const Landing: React.FC = () => {
               className="text-lg md:text-xl text-gray-600 mb-6 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               Needl.ai consolidates insights from the web and your documents, 
               providing real-time intelligence for confident decision making.
             </motion.p>
 
-            <IntelligenceDots />
+            {/* Enhanced visualization component */}
+            <IntelligenceVisualization />
             
+            {/* Improved cloud providers section */}
             <CloudProviders />
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.5 }}
-              className="mt-8"
+              className="mt-10"
             >
               <Button 
                 onClick={() => navigate('/use-cases')}
@@ -230,6 +314,7 @@ const Landing: React.FC = () => {
               </Button>
             </motion.div>
             
+            {/* Persona section must remain below the visualization */}
             <PersonaSection />
           </div>
         </section>

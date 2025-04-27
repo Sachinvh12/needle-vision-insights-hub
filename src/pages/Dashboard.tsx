@@ -120,6 +120,23 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
   );
 };
 
+const FeatureCard = ({ icon, title, description, actionLabel, onClick }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-md p-5 border border-gray-100">
+      <div className="flex items-center mb-3">
+        <div className="p-2 bg-needl-lighter rounded-md text-needl-primary mr-3">
+          {icon}
+        </div>
+        <h3 className="font-semibold text-lg">{title}</h3>
+      </div>
+      <p className="text-gray-600 mb-4 text-sm">{description}</p>
+      <Button variant="outline" onClick={onClick} className="w-full justify-center">
+        {actionLabel}
+      </Button>
+    </div>
+  );
+};
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();

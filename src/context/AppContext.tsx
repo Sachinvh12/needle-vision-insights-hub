@@ -3,10 +3,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { mockFeeds, mockAlerts } from '../utils/mockData';
-import { Alert, Feed, FilterOptions, SavedView, SetupState } from '../types/feedTypes';
-
-// Re-export types
-export type { Alert, Feed, FilterOptions, SavedView, SetupState };
+import type { Alert, Feed, FilterOptions, SavedView, SetupState } from '../types/feedTypes';
 
 // Define App Context State and Types
 export type User = {
@@ -16,75 +13,7 @@ export type User = {
   role: string;
 };
 
-export type Alert = {
-  id: string;
-  feedId: string;
-  feedName: string;
-  title: string;
-  summary: string;
-  importance: 'high' | 'medium' | 'low';
-  read: boolean;
-  timestamp: string;
-  source: {
-    type: 'web' | 'document';
-    name: string;
-    url: string | null;
-  };
-};
-
-export type Feed = {
-  id: string;
-  name: string;
-  query: string;
-  type: string;
-  status: string;
-  createdAt: string;
-  lastActivity: string;
-  snippet: string;
-  sourceMix?: {
-    web: number;
-    docs: number;
-    other: number;
-  };
-  alertsCount?: number;
-  documentsCount?: number;
-  outputConfig?: {
-    format?: string;
-    frequency?: string;
-    channels?: string[];
-  };
-  connectedApps?: string[];
-};
-
-export type SavedView = {
-  id: string;
-  name: string;
-  filters: FilterOptions;
-};
-
-export type FilterOptions = {
-  company?: string;
-  market?: string;
-  importance?: string;
-};
-
-export type SetupState = {
-  selectedPersona?: string;
-  setupQuery?: string;
-  selectedSources?: string[];
-  outputFormat?: string;
-  feedName?: string;
-  connectedApps?: string[];
-  outputConfig?: {
-    alerts?: boolean;
-    summaries?: boolean;
-    channels?: string[];
-    frequency?: string;
-    lookbackRange?: number;
-  };
-};
-
-type AppState = {
+export interface AppState {
   isLoggedIn: boolean;
   user: User | null;
   isLoading: boolean;
@@ -96,7 +25,7 @@ type AppState = {
   isAlertsModalOpen: boolean;
   setupState: SetupState;
   connectedApps: string[];
-};
+}
 
 enum ActionTypes {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
@@ -118,25 +47,6 @@ enum ActionTypes {
   UPDATE_FEED = 'UPDATE_FEED',
 }
 
-type Action =
-  | { type: ActionTypes.LOGIN_SUCCESS; payload: User }
-  | { type: ActionTypes.LOGOUT }
-  | { type: ActionTypes.SET_LOADING; payload: boolean }
-  | { type: ActionTypes.SET_FILTERS; payload: FilterOptions }
-  | { type: ActionTypes.ADD_SAVED_VIEW; payload: { name: string } }
-  | { type: ActionTypes.REMOVE_SAVED_VIEW; payload: string }
-  | { type: ActionTypes.SELECT_FEED; payload: string | null }
-  | { type: ActionTypes.MARK_ALERT_READ; payload: string }
-  | { type: ActionTypes.MARK_ALL_ALERTS_READ }
-  | { type: ActionTypes.LOAD_INITIAL_DATA }
-  | { type: ActionTypes.TOGGLE_ALERTS_MODAL }
-  | { type: ActionTypes.UPDATE_SETUP_STATE; payload: Partial<SetupState> }
-  | { type: ActionTypes.RESET_SETUP_STATE }
-  | { type: ActionTypes.TOGGLE_CONNECTED_APP; payload: string }
-  | { type: ActionTypes.ADD_FEED; payload: Partial<Feed> }
-  | { type: ActionTypes.REMOVE_FEED; payload: string }
-  | { type: ActionTypes.UPDATE_FEED; payload: Partial<Feed> };
-
 // Create context with default values
 const initialState: AppState = {
   isLoggedIn: false,
@@ -149,17 +59,18 @@ const initialState: AppState = {
   alerts: [],
   isAlertsModalOpen: false,
   setupState: {},
-  connectedApps: [],
+  connectedApps: []
 };
 
-const AppContext = createContext<{
+// Define context interface
+interface AppContextType {
   state: AppState;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setFilters: (filters: FilterOptions) => void;
   addSavedView: (name: string) => void;
   removeSavedView: (id: string) => void;
-  selectFeed: (id: string | null) => void;
+  selectFeed: (id: string) => void;
   markAlertRead: (id: string) => void;
   markAllAlertsRead: () => void;
   loadInitialData: () => void;
@@ -169,8 +80,10 @@ const AppContext = createContext<{
   toggleConnectedApp: (appId: string) => void;
   addFeed: (feed: Partial<Feed>) => void;
   removeFeed: (id: string) => void;
-  updateFeed: (feed: Partial<Feed>) => void;
-}>({
+  updateFeed: (feed: Feed) => void;
+}
+
+const AppContext = createContext<AppContextType>({
   state: initialState,
   login: async () => {},
   logout: () => {},
@@ -191,13 +104,13 @@ const AppContext = createContext<{
 });
 
 // Reducer function to handle state updates
-const appReducer = (state: AppState, action: Action): AppState => {
+const appReducer = (state: AppState, action: any): AppState => {
   switch (action.type) {
     case ActionTypes.LOGIN_SUCCESS:
       return {
         ...state,
         isLoggedIn: true,
-        user: action.payload,
+        user: action.payload
       };
     case ActionTypes.LOGOUT:
       return {
@@ -205,56 +118,56 @@ const appReducer = (state: AppState, action: Action): AppState => {
         isLoggedIn: false,
         user: null,
         userFeeds: [],
-        savedViews: [],
+        savedViews: []
       };
     case ActionTypes.SET_LOADING:
       return {
         ...state,
-        isLoading: action.payload,
+        isLoading: action.payload
       };
     case ActionTypes.SET_FILTERS:
       return {
         ...state,
-        currentFilters: action.payload,
+        currentFilters: action.payload
       };
     case ActionTypes.ADD_SAVED_VIEW:
-      const newView = {
+      const newView: SavedView = {
         id: uuidv4(),
         name: action.payload.name,
-        filters: state.currentFilters,
+        filters: state.currentFilters
       };
       return {
         ...state,
-        savedViews: [...state.savedViews, newView],
+        savedViews: [...state.savedViews, newView]
       };
     case ActionTypes.REMOVE_SAVED_VIEW:
       return {
         ...state,
-        savedViews: state.savedViews.filter((view) => view.id !== action.payload),
+        savedViews: state.savedViews.filter(view => view.id !== action.payload)
       };
     case ActionTypes.SELECT_FEED:
       return {
         ...state,
-        selectedFeedId: action.payload,
+        selectedFeedId: action.payload
       };
     case ActionTypes.MARK_ALERT_READ:
       return {
         ...state,
-        alerts: state.alerts.map((alert) =>
+        alerts: state.alerts.map(alert =>
           alert.id === action.payload ? { ...alert, read: true } : alert
-        ),
+        )
       };
     case ActionTypes.MARK_ALL_ALERTS_READ:
       return {
         ...state,
-        alerts: state.alerts.map((alert) => ({ ...alert, read: true })),
+        alerts: state.alerts.map(alert => ({ ...alert, read: true }))
       };
     case ActionTypes.LOAD_INITIAL_DATA:
       // Load mock data for demo purposes
       return {
         ...state,
         userFeeds: mockFeeds,
-        alerts: mockAlerts,
+        alerts: mockAlerts
       };
     case ActionTypes.TOGGLE_ALERTS_MODAL:
       return {
@@ -278,23 +191,27 @@ const appReducer = (state: AppState, action: Action): AppState => {
       const isConnected = state.connectedApps.includes(action.payload);
       return {
         ...state,
-        connectedApps: isConnected 
+        connectedApps: isConnected
           ? state.connectedApps.filter(app => app !== action.payload)
           : [...state.connectedApps, action.payload]
       };
     case ActionTypes.ADD_FEED:
-      const newFeed = {
+      const newFeed: Feed = {
         id: uuidv4(),
         createdAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
         status: 'active',
         alertsCount: 0,
         documentsCount: 0,
-        ...action.payload
+        ...action.payload,
+        name: action.payload.name || '',
+        query: action.payload.query || '',
+        type: action.payload.type || 'custom',
+        snippet: action.payload.snippet || '',
       };
       return {
         ...state,
-        userFeeds: [...state.userFeeds, newFeed as Feed]
+        userFeeds: [...state.userFeeds, newFeed]
       };
     case ActionTypes.REMOVE_FEED:
       return {
@@ -325,8 +242,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        dispatch({ type: ActionTypes.LOGIN_SUCCESS, payload: user });
-        dispatch({ type: ActionTypes.LOAD_INITIAL_DATA });
+        dispatch({
+          type: ActionTypes.LOGIN_SUCCESS,
+          payload: user
+        });
+        dispatch({
+          type: ActionTypes.LOAD_INITIAL_DATA
+        });
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('user');
@@ -336,103 +258,156 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Login function
   const login = async (email: string, password: string) => {
-    dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+    dispatch({
+      type: ActionTypes.SET_LOADING,
+      payload: true
+    });
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mock login - in a real app, validate credentials with API
       const user: User = {
         id: uuidv4(),
         email,
         name: email.split('@')[0],
-        role: 'user',
+        role: 'user'
       };
       
       localStorage.setItem('user', JSON.stringify(user));
-      dispatch({ type: ActionTypes.LOGIN_SUCCESS, payload: user });
-      dispatch({ type: ActionTypes.LOAD_INITIAL_DATA });
+      
+      dispatch({
+        type: ActionTypes.LOGIN_SUCCESS,
+        payload: user
+      });
+      
+      dispatch({
+        type: ActionTypes.LOAD_INITIAL_DATA
+      });
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed', {
-        description: 'Please check your credentials and try again',
+        description: 'Please check your credentials and try again'
       });
       throw error;
     } finally {
-      dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+      dispatch({
+        type: ActionTypes.SET_LOADING,
+        payload: false
+      });
     }
   };
 
   // Logout function
   const logout = () => {
     localStorage.removeItem('user');
-    dispatch({ type: ActionTypes.LOGOUT });
+    dispatch({
+      type: ActionTypes.LOGOUT
+    });
     toast.info('You have been logged out');
   };
 
   // Filter functions
   const setFilters = (filters: FilterOptions) => {
-    dispatch({ type: ActionTypes.SET_FILTERS, payload: filters });
+    dispatch({
+      type: ActionTypes.SET_FILTERS,
+      payload: filters
+    });
   };
 
   // Saved view functions
   const addSavedView = (name: string) => {
-    dispatch({ type: ActionTypes.ADD_SAVED_VIEW, payload: { name } });
+    dispatch({
+      type: ActionTypes.ADD_SAVED_VIEW,
+      payload: { name }
+    });
   };
 
   const removeSavedView = (id: string) => {
-    dispatch({ type: ActionTypes.REMOVE_SAVED_VIEW, payload: id });
+    dispatch({
+      type: ActionTypes.REMOVE_SAVED_VIEW,
+      payload: id
+    });
   };
 
   // Feed selection function
-  const selectFeed = (id: string | null) => {
-    dispatch({ type: ActionTypes.SELECT_FEED, payload: id });
+  const selectFeed = (id: string) => {
+    dispatch({
+      type: ActionTypes.SELECT_FEED,
+      payload: id
+    });
   };
 
   // Alert functions
   const markAlertRead = (id: string) => {
-    dispatch({ type: ActionTypes.MARK_ALERT_READ, payload: id });
+    dispatch({
+      type: ActionTypes.MARK_ALERT_READ,
+      payload: id
+    });
   };
 
   const markAllAlertsRead = () => {
-    dispatch({ type: ActionTypes.MARK_ALL_ALERTS_READ });
+    dispatch({
+      type: ActionTypes.MARK_ALL_ALERTS_READ
+    });
   };
 
   // Initial data loading function
   const loadInitialData = () => {
-    dispatch({ type: ActionTypes.LOAD_INITIAL_DATA });
+    dispatch({
+      type: ActionTypes.LOAD_INITIAL_DATA
+    });
   };
 
   // Toggle alerts modal
   const toggleAlertsModal = () => {
-    dispatch({ type: ActionTypes.TOGGLE_ALERTS_MODAL });
+    dispatch({
+      type: ActionTypes.TOGGLE_ALERTS_MODAL
+    });
   };
 
   // Setup state functions
   const updateSetupState = (updates: Partial<SetupState>) => {
-    dispatch({ type: ActionTypes.UPDATE_SETUP_STATE, payload: updates });
+    dispatch({
+      type: ActionTypes.UPDATE_SETUP_STATE,
+      payload: updates
+    });
   };
 
   const resetSetupState = () => {
-    dispatch({ type: ActionTypes.RESET_SETUP_STATE });
+    dispatch({
+      type: ActionTypes.RESET_SETUP_STATE
+    });
   };
 
   // Connected apps functions
   const toggleConnectedApp = (appId: string) => {
-    dispatch({ type: ActionTypes.TOGGLE_CONNECTED_APP, payload: appId });
+    dispatch({
+      type: ActionTypes.TOGGLE_CONNECTED_APP,
+      payload: appId
+    });
   };
 
   // Feed management functions
   const addFeed = (feed: Partial<Feed>) => {
-    dispatch({ type: ActionTypes.ADD_FEED, payload: feed });
+    dispatch({
+      type: ActionTypes.ADD_FEED,
+      payload: feed
+    });
   };
 
   const removeFeed = (id: string) => {
-    dispatch({ type: ActionTypes.REMOVE_FEED, payload: id });
+    dispatch({
+      type: ActionTypes.REMOVE_FEED,
+      payload: id
+    });
   };
 
-  const updateFeed = (feed: Partial<Feed>) => {
-    dispatch({ type: ActionTypes.UPDATE_FEED, payload: feed });
+  const updateFeed = (feed: Feed) => {
+    dispatch({
+      type: ActionTypes.UPDATE_FEED,
+      payload: feed
+    });
   };
 
   return (
@@ -454,7 +429,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleConnectedApp,
         addFeed,
         removeFeed,
-        updateFeed,
+        updateFeed
       }}
     >
       {children}
@@ -463,4 +438,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 };
 
 // Custom hook to use the AppContext
-export const useApp = () => useContext(AppContext);
+export const useApp = () => {
+  return useContext(AppContext);
+};
