@@ -25,12 +25,13 @@ export const useAnimationControls = (threshold = 0.1) => {
         if (inView) {
           controls.start("visible");
         } else {
-          controls.start("hidden");
+          // Optional: Reset animation when leaving viewport
+          // controls.start("hidden");
         }
       },
       { 
         threshold,
-        // Optional root margin to trigger slightly before the element is visible
+        // Trigger animations slightly before element comes into view
         rootMargin: '0px 0px -50px 0px' 
       }
     );
