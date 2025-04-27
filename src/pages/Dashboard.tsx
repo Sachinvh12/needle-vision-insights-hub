@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,7 +42,6 @@ import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip as Recha
 import { toast } from 'sonner';
 import AlertsList from '../components/alerts/AlertsList';
 
-// Fix: Create a JSX component for status rendering
 const FeedStatus: React.FC<{ status: string }> = ({ status }) => {
   if (status === 'active') {
     return <span className="text-green-500 flex items-center"><span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>Active</span>;
@@ -55,7 +53,6 @@ const FeedStatus: React.FC<{ status: string }> = ({ status }) => {
   return <span>Unknown</span>;
 };
 
-// This function returns a string for the status text
 const getFeedStatusText = (status: string): string => {
   if (status === 'active') return 'Active';
   if (status === 'paused') return 'Paused';
@@ -138,9 +135,7 @@ const Dashboard: React.FC = () => {
   const [newViewName, setNewViewName] = useState('');
   const [isBoardDrawerOpen, setIsBoardDrawerOpen] = useState(!isMobile);
   
-  // Load initial data if needed
   useEffect(() => {
-    // Only load initial data if the user's feeds are empty
     if (userFeeds.length === 0) {
       loadInitialData();
     }
@@ -265,7 +260,6 @@ const Dashboard: React.FC = () => {
   
   const handleAlertClick = (alertId: string) => {
     markAlertRead(alertId);
-    // In a real app, you'd likely navigate to a more detailed view
     toast.success("Alert Marked as Read", {
       description: "The alert has been marked as read."
     });
@@ -376,7 +370,6 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  // Empty state component
   const EmptyDashboard = () => (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -394,7 +387,7 @@ const Dashboard: React.FC = () => {
           className="w-full gap-2 bg-needl-primary hover:bg-needl-dark text-white"
         >
           <Plus className="h-4 w-4" />
-          Create New Feed
+          <span className="hidden sm:inline">Create New Feed</span>
         </Button>
         <div className="flex items-center text-xs text-gray-500 justify-center">
           <FolderOpen className="h-3 w-3 mr-1" />

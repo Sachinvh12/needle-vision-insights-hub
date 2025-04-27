@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
@@ -47,8 +46,9 @@ export type Feed = {
   outputConfig?: {
     format?: string;
     frequency?: string;
-    channel?: string;
+    channels?: string[];
   };
+  connectedApps?: string[];
 };
 
 export type SavedView = {
@@ -68,6 +68,15 @@ export type SetupState = {
   setupQuery?: string;
   selectedSources?: string[];
   outputFormat?: string;
+  feedName?: string;
+  connectedApps?: string[];
+  outputConfig?: {
+    alerts?: boolean;
+    summaries?: boolean;
+    channels?: string[];
+    frequency?: string;
+    lookbackRange?: number;
+  };
 };
 
 type AppState = {
@@ -121,7 +130,7 @@ type Action =
   | { type: ActionTypes.TOGGLE_CONNECTED_APP; payload: string }
   | { type: ActionTypes.ADD_FEED; payload: Partial<Feed> }
   | { type: ActionTypes.REMOVE_FEED; payload: string }
-  | { type: ActionTypes.UPDATE_FEED; payload: { id: string, updates: Partial<Feed> } };
+  | { type: ActionTypes.UPDATE_FEED; payload: Partial<Feed> };
 
 // Create context with default values
 const initialState: AppState = {
@@ -155,7 +164,7 @@ const AppContext = createContext<{
   toggleConnectedApp: (appId: string) => void;
   addFeed: (feed: Partial<Feed>) => void;
   removeFeed: (id: string) => void;
-  updateFeed: (id: string, updates: Partial<Feed>) => void;
+  updateFeed: (feed: Partial<Feed>) => void;
 }>({
   state: initialState,
   login: async () => {},
@@ -417,8 +426,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: ActionTypes.REMOVE_FEED, payload: id });
   };
 
-  const updateFeed = (id: string, updates: Partial<Feed>) => {
-    dispatch({ type: ActionTypes.UPDATE_FEED, payload: { id, updates } });
+  const updateFeed = (feed: Partial<Feed>) => {
+    dispatch({ type: ActionTypes.UPDATE_FEED, payload: feed });
   };
 
   return (

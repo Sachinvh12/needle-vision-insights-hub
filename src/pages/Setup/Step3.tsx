@@ -21,11 +21,11 @@ const Step3: React.FC = () => {
   const { setupState } = state;
   
   const [feedName, setFeedName] = useState(setupState.feedName || '');
-  const [alerts, setAlerts] = useState(setupState.outputConfig.alerts);
-  const [summaries, setSummaries] = useState(setupState.outputConfig.summaries);
-  const [channels, setChannels] = useState<string[]>(setupState.outputConfig.channels);
-  const [frequency, setFrequency] = useState(setupState.outputConfig.frequency || 'realtime');
-  const [lookbackRange, setLookbackRange] = useState(setupState.outputConfig.lookbackRange || 7);
+  const [alerts, setAlerts] = useState(setupState.outputConfig?.alerts || false);
+  const [summaries, setSummaries] = useState(setupState.outputConfig?.summaries || false);
+  const [channels, setChannels] = useState<string[]>(setupState.outputConfig?.channels || []);
+  const [frequency, setFrequency] = useState(setupState.outputConfig?.frequency || 'realtime');
+  const [lookbackRange, setLookbackRange] = useState(setupState.outputConfig?.lookbackRange || 7);
   const [isCreating, setIsCreating] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   
@@ -40,7 +40,7 @@ const Step3: React.FC = () => {
         lookbackRange,
       },
     });
-  }, [feedName, alerts, summaries, channels, frequency, lookbackRange]);
+  }, [feedName, alerts, summaries, channels, frequency, lookbackRange, updateSetupState]);
   
   const handleToggleChannel = (channel: string) => {
     if (channels.includes(channel)) {
@@ -62,18 +62,14 @@ const Step3: React.FC = () => {
       // Create the feed with the gathered information
       addFeed({
         name: feedName,
-        query: setupState.setupQuery,
+        query: setupState.setupQuery || '',
         type: 'market', // This could be more dynamic based on earlier selections
-        connectedApps: setupState.connectedApps,
+        connectedApps: setupState.connectedApps || [],
         outputConfig: {
-          alerts,
-          summaries,
-          channels,
-          frequency,
-          lookbackRange,
+          channels: channels,
         },
         // Sample data for display
-        snippet: `Auto-generated summary for ${setupState.setupQuery}`,
+        snippet: `Auto-generated summary for ${setupState.setupQuery || ''}`,
         sourceMix: {
           web: 65,
           docs: 25,
@@ -211,7 +207,7 @@ const Step3: React.FC = () => {
                   Connected Sources
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {setupState.connectedApps.length > 0 ? (
+                  {setupState.connectedApps && setupState.connectedApps.length > 0 ? (
                     setupState.connectedApps.map((app) => (
                       <Chip key={app} variant="secondary">
                         {app}
