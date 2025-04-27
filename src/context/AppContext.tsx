@@ -44,6 +44,11 @@ export type Feed = {
   };
   alertsCount?: number;
   documentsCount?: number;
+  outputConfig?: {
+    format?: string;
+    frequency?: string;
+    channel?: string;
+  };
 };
 
 export type SavedView = {
@@ -58,6 +63,13 @@ export type FilterOptions = {
   importance?: string;
 };
 
+export type SetupState = {
+  selectedPersona?: string;
+  setupQuery?: string;
+  selectedSources?: string[];
+  outputFormat?: string;
+};
+
 type AppState = {
   isLoggedIn: boolean;
   user: User | null;
@@ -68,6 +80,8 @@ type AppState = {
   selectedFeedId: string | null;
   alerts: Alert[];
   isAlertsModalOpen: boolean;
+  setupState: SetupState;
+  connectedApps: string[];
 };
 
 enum ActionTypes {
@@ -81,6 +95,13 @@ enum ActionTypes {
   MARK_ALERT_READ = 'MARK_ALERT_READ',
   MARK_ALL_ALERTS_READ = 'MARK_ALL_ALERTS_READ',
   LOAD_INITIAL_DATA = 'LOAD_INITIAL_DATA',
+  TOGGLE_ALERTS_MODAL = 'TOGGLE_ALERTS_MODAL',
+  UPDATE_SETUP_STATE = 'UPDATE_SETUP_STATE',
+  RESET_SETUP_STATE = 'RESET_SETUP_STATE',
+  TOGGLE_CONNECTED_APP = 'TOGGLE_CONNECTED_APP',
+  ADD_FEED = 'ADD_FEED',
+  REMOVE_FEED = 'REMOVE_FEED',
+  UPDATE_FEED = 'UPDATE_FEED',
 }
 
 type Action =
@@ -93,7 +114,14 @@ type Action =
   | { type: ActionTypes.SELECT_FEED; payload: string | null }
   | { type: ActionTypes.MARK_ALERT_READ; payload: string }
   | { type: ActionTypes.MARK_ALL_ALERTS_READ }
-  | { type: ActionTypes.LOAD_INITIAL_DATA };
+  | { type: ActionTypes.LOAD_INITIAL_DATA }
+  | { type: ActionTypes.TOGGLE_ALERTS_MODAL }
+  | { type: ActionTypes.UPDATE_SETUP_STATE; payload: Partial<SetupState> }
+  | { type: ActionTypes.RESET_SETUP_STATE }
+  | { type: ActionTypes.TOGGLE_CONNECTED_APP; payload: string }
+  | { type: ActionTypes.ADD_FEED; payload: Partial<Feed> }
+  | { type: ActionTypes.REMOVE_FEED; payload: string }
+  | { type: ActionTypes.UPDATE_FEED; payload: { id: string, updates: Partial<Feed> } };
 
 // Create context with default values
 const initialState: AppState = {
@@ -106,6 +134,8 @@ const initialState: AppState = {
   selectedFeedId: null,
   alerts: [],
   isAlertsModalOpen: false,
+  setupState: {},
+  connectedApps: [],
 };
 
 const AppContext = createContext<{
@@ -119,6 +149,13 @@ const AppContext = createContext<{
   markAlertRead: (id: string) => void;
   markAllAlertsRead: () => void;
   loadInitialData: () => void;
+  toggleAlertsModal: () => void;
+  updateSetupState: (updates: Partial<SetupState>) => void;
+  resetSetupState: () => void;
+  toggleConnectedApp: (appId: string) => void;
+  addFeed: (feed: Partial<Feed>) => void;
+  removeFeed: (id: string) => void;
+  updateFeed: (id: string, updates: Partial<Feed>) => void;
 }>({
   state: initialState,
   login: async () => {},
@@ -130,6 +167,13 @@ const AppContext = createContext<{
   markAlertRead: () => {},
   markAllAlertsRead: () => {},
   loadInitialData: () => {},
+  toggleAlertsModal: () => {},
+  updateSetupState: () => {},
+  resetSetupState: () => {},
+  toggleConnectedApp: () => {},
+  addFeed: () => {},
+  removeFeed: () => {},
+  updateFeed: () => {},
 });
 
 // Reducer function to handle state updates
@@ -178,7 +222,6 @@ const appReducer = (state: AppState, action: Action): AppState => {
       return {
         ...state,
         selectedFeedId: action.payload,
-        isAlertsModalOpen: action.payload === 'alerts',
       };
     case ActionTypes.MARK_ALERT_READ:
       return {
@@ -198,6 +241,60 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state,
         userFeeds: mockFeeds,
         alerts: mockAlerts,
+      };
+    case ActionTypes.TOGGLE_ALERTS_MODAL:
+      return {
+        ...state,
+        isAlertsModalOpen: !state.isAlertsModalOpen
+      };
+    case ActionTypes.UPDATE_SETUP_STATE:
+      return {
+        ...state,
+        setupState: {
+          ...state.setupState,
+          ...action.payload
+        }
+      };
+    case ActionTypes.RESET_SETUP_STATE:
+      return {
+        ...state,
+        setupState: {}
+      };
+    case ActionTypes.TOGGLE_CONNECTED_APP:
+      const isConnected = state.connectedApps.includes(action.payload);
+      return {
+        ...state,
+        connectedApps: isConnected 
+          ? state.connectedApps.filter(app => app !== action.payload)
+          : [...state.connectedApps, action.payload]
+      };
+    case ActionTypes.ADD_FEED:
+      const newFeed = {
+        id: uuidv4(),
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        status: 'active',
+        alertsCount: 0,
+        documentsCount: 0,
+        ...action.payload
+      };
+      return {
+        ...state,
+        userFeeds: [...state.userFeeds, newFeed as Feed]
+      };
+    case ActionTypes.REMOVE_FEED:
+      return {
+        ...state,
+        userFeeds: state.userFeeds.filter(feed => feed.id !== action.payload)
+      };
+    case ActionTypes.UPDATE_FEED:
+      return {
+        ...state,
+        userFeeds: state.userFeeds.map(feed => 
+          feed.id === action.payload.id 
+            ? { ...feed, ...action.payload.updates } 
+            : feed
+        )
       };
     default:
       return state;
@@ -292,6 +389,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({ type: ActionTypes.LOAD_INITIAL_DATA });
   };
 
+  // Toggle alerts modal
+  const toggleAlertsModal = () => {
+    dispatch({ type: ActionTypes.TOGGLE_ALERTS_MODAL });
+  };
+
+  // Setup state functions
+  const updateSetupState = (updates: Partial<SetupState>) => {
+    dispatch({ type: ActionTypes.UPDATE_SETUP_STATE, payload: updates });
+  };
+
+  const resetSetupState = () => {
+    dispatch({ type: ActionTypes.RESET_SETUP_STATE });
+  };
+
+  // Connected apps functions
+  const toggleConnectedApp = (appId: string) => {
+    dispatch({ type: ActionTypes.TOGGLE_CONNECTED_APP, payload: appId });
+  };
+
+  // Feed management functions
+  const addFeed = (feed: Partial<Feed>) => {
+    dispatch({ type: ActionTypes.ADD_FEED, payload: feed });
+  };
+
+  const removeFeed = (id: string) => {
+    dispatch({ type: ActionTypes.REMOVE_FEED, payload: id });
+  };
+
+  const updateFeed = (id: string, updates: Partial<Feed>) => {
+    dispatch({ type: ActionTypes.UPDATE_FEED, payload: { id, updates } });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -305,6 +434,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         markAlertRead,
         markAllAlertsRead,
         loadInitialData,
+        toggleAlertsModal,
+        updateSetupState,
+        resetSetupState,
+        toggleConnectedApp,
+        addFeed,
+        removeFeed,
+        updateFeed,
       }}
     >
       {children}

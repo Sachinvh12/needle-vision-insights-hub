@@ -1,3 +1,4 @@
+
 import { Feed, Alert, SavedView } from '../context/AppContext';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,7 +19,12 @@ export const mockFeeds = [
       other: 5
     },
     alertsCount: 14,
-    documentsCount: 28
+    documentsCount: 28,
+    outputConfig: {
+      format: "dashboard",
+      frequency: "daily",
+      channel: "email"
+    }
   },
   {
     id: uuidv4(),
@@ -35,7 +41,12 @@ export const mockFeeds = [
       other: 5
     },
     alertsCount: 8,
-    documentsCount: 17
+    documentsCount: 17,
+    outputConfig: {
+      format: "alert",
+      frequency: "weekly",
+      channel: "app"
+    }
   },
   {
     id: uuidv4(),
@@ -52,7 +63,12 @@ export const mockFeeds = [
       other: 5
     },
     alertsCount: 11,
-    documentsCount: 23
+    documentsCount: 23,
+    outputConfig: {
+      format: "report",
+      frequency: "monthly",
+      channel: "both"
+    }
   },
   {
     id: uuidv4(),
@@ -69,7 +85,12 @@ export const mockFeeds = [
       other: 5
     },
     alertsCount: 6,
-    documentsCount: 32
+    documentsCount: 32,
+    outputConfig: {
+      format: "dashboard",
+      frequency: "weekly",
+      channel: "email"
+    }
   },
   {
     id: uuidv4(),
@@ -86,7 +107,12 @@ export const mockFeeds = [
       other: 10
     },
     alertsCount: 9,
-    documentsCount: 21
+    documentsCount: 21,
+    outputConfig: {
+      format: "alert",
+      frequency: "daily",
+      channel: "app"
+    }
   },
   {
     id: uuidv4(),
@@ -103,12 +129,17 @@ export const mockFeeds = [
       other: 5
     },
     alertsCount: 16,
-    documentsCount: 19
+    documentsCount: 19,
+    outputConfig: {
+      format: "report",
+      frequency: "weekly",
+      channel: "both"
+    }
   }
 ];
 
 // Mock alerts data
-export const mockAlerts = [
+export const mockAlerts: Alert[] = [
   {
     id: uuidv4(),
     feedId: mockFeeds[0].id,
@@ -217,13 +248,12 @@ export const mockAlerts = [
 ];
 
 // Mock saved views
-export const mockSavedViews = [
+export const mockSavedViews: SavedView[] = [
   {
     id: 'view-1',
     name: 'High Importance Competitor Updates',
     filters: {
       importance: 'high',
-      keywords: ['competitor', 'market share'],
     },
   },
   {
@@ -231,18 +261,13 @@ export const mockSavedViews = [
     name: 'Healthcare AI Trends',
     filters: {
       market: 'healthcare',
-      keywords: ['ai', 'innovation'],
     },
   },
   {
     id: 'view-3',
     name: 'Recent Financial Regulations',
     filters: {
-      dateRange: {
-        start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        end: new Date(),
-      },
-      keywords: ['regulation', 'compliance'],
+      company: 'financial',
     },
   },
 ];
@@ -314,28 +339,28 @@ export const mockBattlecard = {
 export const mockPersonas = [
   {
     id: 'persona-1',
-    title: 'Investment Analyst',
+    title: 'Energy Trader',
     description: 'Track market movements, competitor activities, and financial performance for investment decisions.',
     icon: '📈',
     defaultQuery: 'Market trends financial performance stock movements for Company X and their competitors',
   },
   {
     id: 'persona-2',
-    title: 'Product Manager',
+    title: 'Junior Analyst',
     description: 'Monitor competitor product launches, feature updates, and customer feedback.',
     icon: '🔍',
     defaultQuery: 'Product features competitor analysis customer feedback for our market segment',
   },
   {
     id: 'persona-3',
-    title: 'Sales Development',
+    title: 'SDR',
     description: 'Gather intelligence on prospect companies, identify triggers, and build battlecards.',
     icon: '🤝',
     defaultQuery: 'Sales triggers organizational changes funding rounds for target accounts',
   },
   {
     id: 'persona-4',
-    title: 'Market Researcher',
+    title: 'Researcher',
     description: 'Track industry trends, regulatory changes, and emerging technologies.',
     icon: '📊',
     defaultQuery: 'Industry trends regulatory changes innovation for our market sector',
