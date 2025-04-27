@@ -1,180 +1,128 @@
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Circle, ChevronRight, FileText, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { useApp } from '@/context/AppContext';
-import { Alert } from '@/context/AppContext';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Bell, ChevronRight, ExternalLink, File, Globe, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Alert } from '../../types/appTypes';
+import { useApp } from '../../context/AppContext';
 
 interface AlertsListProps {
   maxItems?: number;
   showAll?: boolean;
 }
 
-const AlertsList: React.FC<AlertsListProps> = ({ maxItems = 5, showAll = false }) => {
-  const { state, markAlertRead, markAllAlertsRead } = useApp();
-  const { alerts } = state;
+const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false }) => {
   const navigate = useNavigate();
+  const { state, markAlertRead, selectFeed } = useApp();
+  const { alerts } = state;
 
-  const displayAlerts = showAll ? alerts : alerts.slice(0, maxItems);
-  const unreadCount = alerts.filter(alert => !alert.read).length;
+  // Filter unread alerts first, then sort by timestamp, and limit the number if maxItems is specified
+  const sortedAlerts = [...alerts]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, maxItems || alerts.length);
 
-  const handleAlertClick = (alert: Alert) => {
-    if (!alert.read) {
-      markAlertRead(alert.id);
-      toast.success("Alert marked as read");
-    }
-    
-    toast("Viewing details", {
-      description: `Viewing details for ${alert.title}`
+  const handleAlertClick = (alertId: string, feedId: string) => {
+    markAlertRead(alertId);
+    selectFeed(feedId);
+    navigate(`/battlecard/${feedId}`);
+  };
+
+  const getImportanceColor = (importance: string) => {
+    if (importance === 'high') return 'bg-red-500';
+    if (importance === 'medium') return 'bg-amber-500';
+    return 'bg-green-500';
+  };
+
+  const getImportanceLabel = (importance: string) => {
+    if (importance === 'high') return 'High';
+    if (importance === 'medium') return 'Medium';
+    return 'Low';
+  };
+
+  const formattedDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  if (alerts.length === 0) {
+  if (sortedAlerts.length === 0) {
     return (
-      <div className="text-center p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-4">
-          <Bell className="h-5 w-5 text-gray-400" />
+      <div className="p-8 text-center">
+        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+          <Circle className="h-6 w-6 text-gray-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">No alerts yet</h3>
-        <p className="text-sm text-gray-500 mt-1">When new intelligence is discovered, alerts will appear here</p>
+        <h4 className="text-lg font-medium text-gray-900 mb-1">No alerts yet</h4>
+        <p className="text-sm text-gray-500">Alerts will appear here as they are generated</p>
       </div>
     );
   }
 
-  const getImportanceBadgeVariant = (importance: string) => {
-    switch(importance) {
-      case 'high':
-        return 'destructive';
-      case 'medium':
-        return 'default';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getImportanceIcon = (importance: string) => {
-    switch(importance) {
-      case 'high':
-        return <span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>;
-      case 'medium':
-        return <span className="h-2 w-2 rounded-full bg-amber-500 mr-1"></span>;
-      default:
-        return <span className="h-2 w-2 rounded-full bg-green-500 mr-1"></span>;
-    }
-  };
-
   return (
-    <div className="space-y-3 p-1">
-      {unreadCount > 0 && showAll && (
-        <div className="flex justify-between items-center mb-4">
-          <div className="text-sm font-medium">
-            {unreadCount} unread alert{unreadCount !== 1 ? 's' : ''}
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => markAllAlertsRead()}
-            className="text-xs gap-1"
-          >
-            <Check className="h-3 w-3" /> Mark all as read
-          </Button>
-        </div>
-      )}
-      <AnimatePresence>
-        {displayAlerts.map((alert, index) => (
-          <motion.div
-            key={alert.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
-            <Card 
-              className={`p-3 cursor-pointer hover:shadow-md transition-shadow border-l-4 ${
-                alert.read 
-                  ? 'border-l-gray-300' 
-                  : alert.importance === 'high' 
-                    ? 'border-l-red-500' 
-                    : alert.importance === 'medium' 
-                      ? 'border-l-amber-500' 
-                      : 'border-l-green-500'
-              } ${alert.read ? 'bg-white' : 'bg-blue-50'}`}
-              onClick={() => handleAlertClick(alert)}
-            >
-              <div className="flex justify-between mb-1">
-                <span className="font-medium text-sm text-gray-600">{alert.feedName}</span>
-                <Badge variant={getImportanceBadgeVariant(alert.importance)} className="flex items-center">
-                  {getImportanceIcon(alert.importance)}
-                  {alert.importance}
+    <div className="space-y-3">
+      {sortedAlerts.map((alert) => (
+        <Card 
+          key={alert.id}
+          className={`p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${!alert.read ? 'border-l-4 border-l-needl-primary' : 'border-l-4 border-l-transparent'}`}
+          onClick={() => handleAlertClick(alert.id, alert.feedId)}
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 mt-1">
+              {alert.source.type === 'web' ? (
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Globe className="h-4 w-4 text-blue-600" />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                  <FileText className="h-4 w-4 text-amber-600" />
+                </div>
+              )}
+            </div>
+            
+            <div className="flex-1">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="text-base font-medium text-gray-900 mb-1">{alert.title}</h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <span>{alert.feedName}</span>
+                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                    <span>{formattedDate(alert.timestamp)}</span>
+                  </div>
+                </div>
+                
+                <Badge className={`${getImportanceColor(alert.importance)} text-white text-xs`}>
+                  {getImportanceLabel(alert.importance)}
                 </Badge>
               </div>
-              <h3 className="font-semibold mb-1 text-gray-900">{alert.title}</h3>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{alert.summary}</p>
-              <div className="flex justify-between items-center text-xs text-gray-500">
-                <div className="flex items-center">
-                  {alert.source.type === 'web' ? (
-                    <span className="flex items-center gap-1">
-                      <Globe className="h-3 w-3 text-blue-500" /> {alert.source.name}
-                      {alert.source.url && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-4 w-4 rounded-full ml-1"
-                          asChild
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          <a href={alert.source.url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 text-needl-primary" />
-                          </a>
-                        </Button>
-                      )}
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1">
-                      <File className="h-3 w-3 text-amber-500" /> {alert.source.name}
-                    </span>
-                  )}
+              
+              <p className="text-sm text-gray-600 mb-2">{alert.summary}</p>
+              
+              {alert.source.url && (
+                <div className="flex items-center text-xs text-needl-primary">
+                  <span>Source: {alert.source.name}</span>
                 </div>
-                <span>
-                  {new Date(alert.timestamp).toLocaleString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </span>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+              )}
+            </div>
+            
+            <div className="flex-shrink-0 self-center">
+              <ChevronRight className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+        </Card>
+      ))}
       
-      {!showAll && alerts.length > maxItems && (
-        <div className="text-center pt-4 pb-2">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/alerts')}
-            className="text-needl-primary hover:text-needl-dark gap-1 hover:bg-blue-50"
-          >
-            View all {alerts.length} alerts <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-      
-      {!showAll && (
+      {!showAll && alerts.length > (maxItems || 0) && (
         <div className="text-center pt-2">
           <Button
+            variant="link"
+            className="text-needl-primary"
             onClick={() => navigate('/alerts')}
-            className="bg-needl-primary hover:bg-needl-dark text-white gap-1 w-full"
           >
-            <Bell className="h-4 w-4" /> Go to Alerts Dashboard
+            View all alerts
           </Button>
         </div>
       )}

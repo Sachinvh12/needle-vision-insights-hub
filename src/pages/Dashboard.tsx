@@ -33,11 +33,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useApp } from '../context/AppContext';
 import { useIsMobile } from '../hooks/use-mobile';
-import { Alert as AlertType } from '../context/AppContext';
+import { Feed, Alert as AlertType } from '../types/appTypes';
 import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { toast } from 'sonner';
 import AlertsList from '../components/alerts/AlertsList';
@@ -60,7 +59,7 @@ const getFeedStatusText = (status: string): string => {
   return 'Unknown';
 };
 
-const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick }) => {
+const FeedCard: React.FC<{ feed: Feed; onClick: () => void }> = ({ feed, onClick }) => {
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -78,7 +77,14 @@ const FeedCard: React.FC<{ feed: any; onClick: () => void }> = ({ feed, onClick 
               variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
               className={feed.status === 'active' ? 'bg-green-500' : ''}
             >
-              <FeedStatus status={feed.status} />
+              <span className="text-xs flex items-center">
+                <span className={`inline-block h-2 w-2 rounded-full mr-1 ${
+                  feed.status === 'active' ? 'bg-green-500' : 
+                  feed.status === 'paused' ? 'bg-orange-500' : 'bg-red-500'
+                }`}></span>
+                {feed.status === 'active' ? 'Active' : 
+                  feed.status === 'paused' ? 'Paused' : 'Error'}
+              </span>
             </Badge>
           </div>
           <div className="flex items-center text-xs text-gray-500 mt-1">

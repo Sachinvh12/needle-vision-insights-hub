@@ -3,12 +3,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import CloudProviderIcon from './CloudProviderIcon';
 
+type ProviderType = 'google-drive' | 'dropbox' | 'onedrive';
+
+interface Provider {
+  id: ProviderType;
+  name: string;
+}
+
 const CloudProvidersSection: React.FC = () => {
-  const providers = [
+  const providers: Provider[] = [
     { id: 'google-drive', name: 'Google Drive' },
     { id: 'dropbox', name: 'Dropbox' },
     { id: 'onedrive', name: 'OneDrive' }
-  ] as const;
+  ];
 
   return (
     <motion.div 

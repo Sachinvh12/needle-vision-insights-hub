@@ -1,9 +1,8 @@
-
-import { Feed, Alert, SavedView } from '../context/AppContext';
 import { v4 as uuidv4 } from 'uuid';
+import { Feed, Alert, SavedView } from '../types/appTypes';
 
 // Mock feeds data
-export const mockFeeds = [
+export const mockFeeds: Feed[] = [
   {
     id: uuidv4(),
     name: "OPEC Monitoring",
@@ -253,23 +252,23 @@ export const mockSavedViews: SavedView[] = [
     id: 'view-1',
     name: 'High Importance Competitor Updates',
     filters: {
-      importance: 'high',
-    },
+      importance: 'high'
+    }
   },
   {
     id: 'view-2',
     name: 'Healthcare AI Trends',
     filters: {
-      market: 'healthcare',
-    },
+      market: 'healthcare'
+    }
   },
   {
     id: 'view-3',
     name: 'Recent Financial Regulations',
     filters: {
-      company: 'financial',
-    },
-  },
+      company: 'financial'
+    }
+  }
 ];
 
 // Mock battlecard data

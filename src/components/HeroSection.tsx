@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DataFlowVisualization from './DataFlowVisualization';
+import EnhancedDataFlowVisualization from './EnhancedDataFlowVisualization';
+import CloudProvidersSection from './CloudProvidersSection';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -28,12 +29,14 @@ const HeroSection: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Needl.ai consolidates insights from the web and your documents, 
-            providing real-time intelligence for confident decision making.
+            Needl.ai consolidates insights from your data sources in real-time, 
+            empowering your team with actionable intelligence for confident decision making.
           </motion.p>
         </motion.div>
 
-        <DataFlowVisualization />
+        <EnhancedDataFlowVisualization />
+        
+        <CloudProvidersSection />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
