@@ -118,19 +118,34 @@ const ManageFeeds: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-1">
-                          {feed.outputConfig?.channels?.includes('email') && (
+                          {feed.outputConfig?.channel === 'email' && (
                             <Badge variant="secondary" className="text-xs py-0">
                               Email
                             </Badge>
                           )}
-                          {feed.outputConfig?.channels?.includes('slack') && (
+                          {feed.outputConfig?.channel === 'slack' && (
                             <Badge variant="secondary" className="text-xs py-0">
                               Slack
                             </Badge>
                           )}
-                          {feed.outputConfig?.channels?.includes('storage') && (
+                          {feed.outputConfig?.channel === 'storage' && (
                             <Badge variant="secondary" className="text-xs py-0">
                               Storage
+                            </Badge>
+                          )}
+                          {feed.outputConfig?.channel === 'both' && (
+                            <>
+                              <Badge variant="secondary" className="text-xs py-0">
+                                Email
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs py-0">
+                                App
+                              </Badge>
+                            </>
+                          )}
+                          {feed.outputConfig?.channel === 'app' && (
+                            <Badge variant="secondary" className="text-xs py-0">
+                              App
                             </Badge>
                           )}
                         </div>

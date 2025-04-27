@@ -1,7 +1,12 @@
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { mockFeeds, mockAlerts } from '../utils/mockData';
+import { Alert, Feed, FilterOptions, SavedView, SetupState } from '../types/feedTypes';
+
+// Re-export types
+export type { Alert, Feed, FilterOptions, SavedView, SetupState };
 
 // Define App Context State and Types
 export type User = {
@@ -301,7 +306,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state,
         userFeeds: state.userFeeds.map(feed => 
           feed.id === action.payload.id 
-            ? { ...feed, ...action.payload.updates } 
+            ? { ...feed, ...action.payload } 
             : feed
         )
       };
