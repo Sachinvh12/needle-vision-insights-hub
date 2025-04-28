@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,30 +13,26 @@ import { useApp } from '../../context/AppContext';
 import PageTransition from '../../components/PageTransition';
 import Header from '../../components/Header';
 
-const Step3 = () => {
+const Step3: React.FC = () => {
   const navigate = useNavigate();
   const { state, updateSetupState, addFeed, resetSetupState } = useApp();
   const { setupState } = state;
   
-  // Default values for the form - ensuring we use the correct type properties
   const feedName = setupState.feedName || '';
   const outputFormat = setupState.outputFormat || 'dashboard';
   const connectedApps = setupState.connectedApps || [];
   
-  // State for form controls
   const [enableAlerts, setEnableAlerts] = useState(true);
   const [enableSummaries, setEnableSummaries] = useState(true);
-  const [frequency, setFrequency] = useState('daily');
+  const [frequency, setFrequency] = useState<"daily" | "weekly" | "monthly">("daily");
   const [lookbackRange, setLookbackRange] = useState(30);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Update the setup state with the final configuration
     updateSetupState({
       feedName,
       outputConfig: {
-        // Use the correct property names according to types
         alerts: enableAlerts,
         summaries: enableSummaries,
         frequency: frequency,
@@ -45,7 +40,6 @@ const Step3 = () => {
       }
     });
     
-    // Create a feed with the collected data
     addFeed({
       name: feedName,
       query: setupState.setupQuery || '',
@@ -54,20 +48,17 @@ const Step3 = () => {
       outputConfig: {
         format: outputFormat,
         frequency: frequency,
-        channel: 'app' // Use channel instead of channels
+        channel: 'app'
       },
       connectedApps: connectedApps
     });
     
-    // Show success notification
     toast.success("Intelligence Feed Created", {
       description: `Your feed "${feedName}" has been created successfully.`
     });
     
-    // Reset setup state
     resetSetupState();
     
-    // Navigate to dashboard
     navigate('/dashboard');
   };
   
@@ -96,7 +87,6 @@ const Step3 = () => {
             
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
-                {/* Feed Name Field */}
                 <div>
                   <Label htmlFor="feedName" className="text-base">Feed Name</Label>
                   <Input
@@ -109,7 +99,6 @@ const Step3 = () => {
                   />
                 </div>
                 
-                {/* Output Format Selection */}
                 <div>
                   <Label className="text-base">Output Format</Label>
                   <RadioGroup
@@ -138,7 +127,6 @@ const Step3 = () => {
                   </RadioGroup>
                 </div>
                 
-                {/* Alert Settings */}
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                   <h3 className="font-medium mb-3">Notification Settings</h3>
                   
@@ -193,6 +181,12 @@ const Step3 = () => {
                             Weekly (Once per week)
                           </Label>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="monthly" id="monthly" />
+                          <Label htmlFor="monthly" className="font-normal text-sm cursor-pointer">
+                            Monthly (Once per month)
+                          </Label>
+                        </div>
                       </RadioGroup>
                     </div>
                     
@@ -219,7 +213,6 @@ const Step3 = () => {
                   </div>
                 </div>
                 
-                {/* Connected Data Sources */}
                 <div>
                   <Label className="text-base mb-2 block">Connected Data Sources</Label>
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -238,7 +231,6 @@ const Step3 = () => {
                   </div>
                 </div>
                 
-                {/* Form Actions */}
                 <div className="flex justify-between pt-4">
                   <Button
                     type="button"

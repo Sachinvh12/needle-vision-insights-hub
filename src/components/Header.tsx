@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,7 +32,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({
   showLoginButton = false,
-  showAlertIcon = false
+  showAlertIcon = true
 }) => {
   const { state, logout } = useApp();
   const { isLoggedIn, user } = state;
@@ -41,7 +40,6 @@ const Header: React.FC<HeaderProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
-  // Update scrolled state on scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -75,14 +73,12 @@ const Header: React.FC<HeaderProps> = ({
       }`}
     >
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <Logo />
           <span className="text-xl font-semibold text-gray-900">Needl.ai</span>
         </Link>
         
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-1">
+        <div className="hidden md:flex items-center space-x-4">
           {isLoggedIn && (
             <nav className="mr-4">
               <ul className="flex space-x-1">
@@ -102,9 +98,8 @@ const Header: React.FC<HeaderProps> = ({
             </nav>
           )}
           
-          {/* Alert badge for notifications */}
           {isLoggedIn && showAlertIcon && (
-            <div className="mr-2">
+            <div className="mr-4">
               <AlertBadge />
             </div>
           )}
@@ -161,9 +156,7 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
         
-        {/* Mobile menu trigger */}
         <div className="md:hidden flex items-center space-x-4">
-          {/* Alert badge for notifications on mobile */}
           {isLoggedIn && showAlertIcon && (
             <AlertBadge />
           )}
@@ -182,7 +175,6 @@ const Header: React.FC<HeaderProps> = ({
                 </SheetTitle>
               </SheetHeader>
               
-              {/* Mobile Navigation Items */}
               {isLoggedIn ? (
                 <div className="space-y-4 py-4">
                   <div className="flex items-center space-x-2 px-1 py-2 rounded-md bg-gray-50">
