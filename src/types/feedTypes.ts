@@ -21,7 +21,7 @@ export type Feed = {
     frequency?: string;
     channel?: string;
   };
-  connectedApps?: string[];
+  connectedApps?: string[]; // Add connectedApps property
 };
 
 export type Alert = {

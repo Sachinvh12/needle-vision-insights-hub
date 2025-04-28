@@ -77,14 +77,14 @@ const FeedCard: React.FC<{ feed: Feed; onClick: () => void }> = ({ feed, onClick
               variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
               className={feed.status === 'active' ? 'bg-green-500' : ''}
             >
-              <span className="text-xs flex items-center">
+              <div className="text-xs flex items-center">
                 <span className={`inline-block h-2 w-2 rounded-full mr-1 ${
                   feed.status === 'active' ? 'bg-green-500' : 
                   feed.status === 'paused' ? 'bg-orange-500' : 'bg-red-500'
                 }`}></span>
                 {feed.status === 'active' ? 'Active' : 
                   feed.status === 'paused' ? 'Paused' : 'Error'}
-              </span>
+              </div>
             </Badge>
           </div>
           <div className="flex items-center text-xs text-gray-500 mt-1">

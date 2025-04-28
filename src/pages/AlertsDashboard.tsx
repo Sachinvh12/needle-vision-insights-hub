@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -36,7 +35,6 @@ const AlertsDashboard: React.FC = () => {
   const unreadCount = alerts.filter(alert => !alert.read).length;
   const highImportanceCount = alerts.filter(alert => alert.importance === 'high').length;
   
-  // Filter alerts based on selected filters
   let filteredAlerts = [...alerts];
   
   if (filter === 'unread') {
@@ -67,7 +65,6 @@ const AlertsDashboard: React.FC = () => {
     navigate(`/battlecard/${feedId}`);
   };
 
-  // Analytics data
   const alertTrendData = [
     { name: 'Mon', alerts: 4 },
     { name: 'Tue', alerts: 7 },
@@ -93,7 +90,6 @@ const AlertsDashboard: React.FC = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   const IMPORTANCE_COLORS = ['#EF4444', '#F59E0B', '#10B981'];
 
-  // Recent feeds section
   const recentFeeds = [...userFeeds]
     .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
     .slice(0, 3);
@@ -322,14 +318,14 @@ const AlertsDashboard: React.FC = () => {
                             variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
                             className={feed.status === 'active' ? 'bg-green-500' : ''}
                           >
-                            <span className="text-xs flex items-center">
+                            <div className="text-xs flex items-center">
                               <span className={`inline-block h-2 w-2 rounded-full mr-1 ${
                                 feed.status === 'active' ? 'bg-green-500' : 
                                 feed.status === 'paused' ? 'bg-orange-500' : 'bg-red-500'
                               }`}></span>
                               {feed.status === 'active' ? 'Active' : 
                                 feed.status === 'paused' ? 'Paused' : 'Error'}
-                            </span>
+                            </div>
                           </Badge>
                         </div>
                         <div className="flex items-center text-xs text-gray-500 mt-1">
@@ -381,7 +377,6 @@ const AlertsDashboard: React.FC = () => {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full"
-                      prefix={<Search className="h-4 w-4 text-gray-400" />}
                     />
                   </div>
                   

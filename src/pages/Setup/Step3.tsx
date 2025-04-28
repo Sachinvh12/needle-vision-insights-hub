@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -13,6 +14,8 @@ import { useApp } from '../../context/AppContext';
 import PageTransition from '../../components/PageTransition';
 import Header from '../../components/Header';
 
+type FrequencyType = "realtime" | "daily" | "weekly" | "monthly";
+
 const Step3: React.FC = () => {
   const navigate = useNavigate();
   const { state, updateSetupState, addFeed, resetSetupState } = useApp();
@@ -24,7 +27,7 @@ const Step3: React.FC = () => {
   
   const [enableAlerts, setEnableAlerts] = useState(true);
   const [enableSummaries, setEnableSummaries] = useState(true);
-  const [frequency, setFrequency] = useState<"daily" | "weekly" | "monthly">("daily");
+  const [frequency, setFrequency] = useState<FrequencyType>("daily");
   const [lookbackRange, setLookbackRange] = useState(30);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -50,7 +53,8 @@ const Step3: React.FC = () => {
         frequency: frequency,
         channel: 'app'
       },
-      connectedApps: connectedApps
+      // Using feedType definition from Feed type which includes connectedApps
+      connectedApps
     });
     
     toast.success("Intelligence Feed Created", {
@@ -64,6 +68,14 @@ const Step3: React.FC = () => {
   
   const handleBack = () => {
     navigate('/setup/step2');
+  };
+
+  // Handle frequency change with proper type checking
+  const handleFrequencyChange = (value: string) => {
+    // Type-safe way to set the frequency
+    if (value === "realtime" || value === "daily" || value === "weekly" || value === "monthly") {
+      setFrequency(value);
+    }
   };
   
   return (
@@ -160,7 +172,7 @@ const Step3: React.FC = () => {
                       <RadioGroup
                         id="frequency"
                         value={frequency}
-                        onValueChange={setFrequency}
+                        onValueChange={handleFrequencyChange}
                         className="mt-2 flex flex-col space-y-1"
                       >
                         <div className="flex items-center space-x-2">
