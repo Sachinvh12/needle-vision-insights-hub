@@ -36,7 +36,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useApp } from '../context/AppContext';
 import { useIsMobile } from '../hooks/use-mobile';
-import { Feed, Alert as AlertType } from '../types/appTypes';
+import { Feed, Alert as AlertType } from '../types/feedTypes';
 import { BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Line, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { toast } from 'sonner';
 import AlertsList from '../components/alerts/AlertsList';

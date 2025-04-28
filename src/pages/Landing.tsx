@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from '../components/Header';
 import AnimatedBackground from '../components/AnimatedBackground';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
 import HeroSection from '../components/HeroSection';
 
 const Landing: React.FC = () => {

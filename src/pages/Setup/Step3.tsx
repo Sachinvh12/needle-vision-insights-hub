@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -38,7 +37,7 @@ const Step3: React.FC = () => {
       outputConfig: {
         alerts: enableAlerts,
         summaries: enableSummaries,
-        frequency: frequency,
+        frequency: frequency === "realtime" ? "daily" : frequency,
         lookbackRange: lookbackRange
       }
     });
@@ -46,14 +45,13 @@ const Step3: React.FC = () => {
     addFeed({
       name: feedName,
       query: setupState.setupQuery || '',
-      type: setupState.selectedPersona || 'custom',
+      type: setupState.selectedPersona as "market" | "competitor" | "trend" | "custom" || 'custom',
       snippet: `Intelligence feed for ${setupState.setupQuery || 'custom search'}`,
       outputConfig: {
         format: outputFormat,
-        frequency: frequency,
+        frequency: frequency === "realtime" ? "daily" : frequency,
         channel: 'app'
       },
-      // Using feedType definition from Feed type which includes connectedApps
       connectedApps
     });
     
@@ -70,9 +68,7 @@ const Step3: React.FC = () => {
     navigate('/setup/step2');
   };
 
-  // Handle frequency change with proper type checking
   const handleFrequencyChange = (value: string) => {
-    // Type-safe way to set the frequency
     if (value === "realtime" || value === "daily" || value === "weekly" || value === "monthly") {
       setFrequency(value);
     }

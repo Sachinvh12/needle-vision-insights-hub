@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,7 +12,8 @@ import { Separator } from '@/components/ui/separator';
 import { useApp } from '../context/AppContext';
 import { toast } from 'sonner';
 import { Check, Copy, Plus, Settings } from 'lucide-react';
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
+import { Feed } from '../types/feedTypes';
 
 const ManageFeeds: React.FC = () => {
   const navigate = useNavigate();
@@ -21,8 +23,8 @@ const ManageFeeds: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [feedName, setFeedName] = useState('');
   const [feedQuery, setFeedQuery] = useState('');
-  const [feedType, setFeedType] = useState('');
-  const [feedStatus, setFeedStatus] = useState('');
+  const [feedType, setFeedType] = useState<"market" | "competitor" | "trend" | "custom">("custom");
+  const [feedStatus, setFeedStatus] = useState<"active" | "paused" | "error">("active");
   const [notifications, setNotifications] = useState({
     slack: false,
     storage: false,
@@ -44,8 +46,8 @@ const ManageFeeds: React.FC = () => {
       setIsEditing(false);
       setFeedName('');
       setFeedQuery('');
-      setFeedType('');
-      setFeedStatus('');
+      setFeedType("custom");
+      setFeedStatus("active");
       setNotifications({
         slack: false,
         storage: false,
@@ -88,7 +90,7 @@ const ManageFeeds: React.FC = () => {
         name: feedName,
         query: feedQuery,
         type: feedType,
-        status: 'active',
+        status: feedStatus,
         notifications: {
           slack: notifications.slack,
           storage: notifications.storage,
@@ -110,7 +112,7 @@ const ManageFeeds: React.FC = () => {
       setIsNewFeed(false);
       setFeedName('');
       setFeedQuery('');
-      setFeedType('');
+      setFeedType("custom");
       navigate('/dashboard');
     } else {
       toast.error("Missing Information", {

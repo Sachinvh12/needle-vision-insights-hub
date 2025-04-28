@@ -82,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
           {isLoggedIn && (
             <nav className="mr-4">
               <ul className="flex space-x-1">
-                {mainNavItems.map((item) => (
+                {mainNavItems.filter(item => item.label !== 'Alerts').map((item) => (
                   <li key={item.path}>
                     <Button 
                       variant="ghost" 
@@ -99,7 +99,7 @@ const Header: React.FC<HeaderProps> = ({
           )}
           
           {isLoggedIn && showAlertIcon && (
-            <div className="mr-4">
+            <div className="mr-6">
               <AlertBadge />
             </div>
           )}

@@ -1,11 +1,10 @@
-
 // Define feed-related types for the application
 export type Feed = {
   id: string;
   name: string;
   query: string;
-  type: string;
-  status: string;
+  type: "market" | "competitor" | "trend" | "custom";
+  status: "active" | "paused" | "error";
   createdAt: string;
   lastActivity: string;
   snippet: string;
@@ -18,10 +17,14 @@ export type Feed = {
   documentsCount?: number;
   outputConfig?: {
     format?: string;
-    frequency?: string;
+    frequency?: "daily" | "weekly" | "monthly";
     channel?: string;
   };
-  connectedApps?: string[]; // Add connectedApps property
+  connectedApps?: string[];
+  notifications?: {
+    slack: boolean;
+    storage: boolean;
+  };
 };
 
 export type Alert = {
