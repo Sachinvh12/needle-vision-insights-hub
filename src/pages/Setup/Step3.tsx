@@ -13,72 +13,66 @@ import { Slider } from '@/components/ui/slider';
 import { useApp } from '../../context/AppContext';
 import PageTransition from '../../components/PageTransition';
 import Header from '../../components/Header';
-import { Feed } from '../../types/feedTypes';
 
-type FrequencyType = "realtime" | "daily" | "weekly" | "monthly";
-
-const Step3: React.FC = () => {
+const Step3 = () => {
   const navigate = useNavigate();
   const { state, updateSetupState, addFeed, resetSetupState } = useApp();
   const { setupState } = state;
   
+  // Default values for the form - ensuring we use the correct type properties
   const feedName = setupState.feedName || '';
   const outputFormat = setupState.outputFormat || 'dashboard';
   const connectedApps = setupState.connectedApps || [];
   
+  // State for form controls
   const [enableAlerts, setEnableAlerts] = useState(true);
   const [enableSummaries, setEnableSummaries] = useState(true);
-  const [frequency, setFrequency] = useState<FrequencyType>("daily");
+  const [frequency, setFrequency] = useState('daily');
   const [lookbackRange, setLookbackRange] = useState(30);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Update the setup state with the final configuration
     updateSetupState({
       feedName,
       outputConfig: {
+        // Use the correct property names according to types
         alerts: enableAlerts,
         summaries: enableSummaries,
-        frequency: frequency === "realtime" ? "daily" : frequency,
+        frequency: frequency,
         lookbackRange: lookbackRange
       }
     });
     
-    const newFeed: Partial<Feed> = {
+    // Create a feed with the collected data
+    addFeed({
       name: feedName,
       query: setupState.setupQuery || '',
-      type: setupState.selectedPersona as "market" | "competitor" | "trend" | "custom" || 'custom',
+      type: setupState.selectedPersona || 'custom',
       snippet: `Intelligence feed for ${setupState.setupQuery || 'custom search'}`,
       outputConfig: {
         format: outputFormat,
-        frequency: frequency === "realtime" ? "daily" : frequency,
-        channel: 'app'
+        frequency: frequency,
+        channel: 'app' // Use channel instead of channels
       },
-      notifications: {
-        slack: false,
-        storage: false
-      }
-    };
+      connectedApps: connectedApps
+    });
     
-    addFeed(newFeed);
-    
+    // Show success notification
     toast.success("Intelligence Feed Created", {
       description: `Your feed "${feedName}" has been created successfully.`
     });
     
+    // Reset setup state
     resetSetupState();
     
+    // Navigate to dashboard
     navigate('/dashboard');
   };
   
   const handleBack = () => {
     navigate('/setup/step2');
-  };
-
-  const handleFrequencyChange = (value: string) => {
-    if (value === "realtime" || value === "daily" || value === "weekly" || value === "monthly") {
-      setFrequency(value);
-    }
   };
   
   return (
@@ -102,6 +96,7 @@ const Step3: React.FC = () => {
             
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
+                {/* Feed Name Field */}
                 <div>
                   <Label htmlFor="feedName" className="text-base">Feed Name</Label>
                   <Input
@@ -114,6 +109,7 @@ const Step3: React.FC = () => {
                   />
                 </div>
                 
+                {/* Output Format Selection */}
                 <div>
                   <Label className="text-base">Output Format</Label>
                   <RadioGroup
@@ -142,6 +138,7 @@ const Step3: React.FC = () => {
                   </RadioGroup>
                 </div>
                 
+                {/* Alert Settings */}
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                   <h3 className="font-medium mb-3">Notification Settings</h3>
                   
@@ -175,7 +172,7 @@ const Step3: React.FC = () => {
                       <RadioGroup
                         id="frequency"
                         value={frequency}
-                        onValueChange={handleFrequencyChange}
+                        onValueChange={setFrequency}
                         className="mt-2 flex flex-col space-y-1"
                       >
                         <div className="flex items-center space-x-2">
@@ -194,12 +191,6 @@ const Step3: React.FC = () => {
                           <RadioGroupItem value="weekly" id="weekly" />
                           <Label htmlFor="weekly" className="font-normal text-sm cursor-pointer">
                             Weekly (Once per week)
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="monthly" id="monthly" />
-                          <Label htmlFor="monthly" className="font-normal text-sm cursor-pointer">
-                            Monthly (Once per month)
                           </Label>
                         </div>
                       </RadioGroup>
@@ -228,6 +219,7 @@ const Step3: React.FC = () => {
                   </div>
                 </div>
                 
+                {/* Connected Data Sources */}
                 <div>
                   <Label className="text-base mb-2 block">Connected Data Sources</Label>
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -246,6 +238,7 @@ const Step3: React.FC = () => {
                   </div>
                 </div>
                 
+                {/* Form Actions */}
                 <div className="flex justify-between pt-4">
                   <Button
                     type="button"

@@ -4,8 +4,8 @@ export type Feed = {
   id: string;
   name: string;
   query: string;
-  type: "market" | "competitor" | "trend" | "custom";
-  status: "active" | "paused" | "error";
+  type: string;
+  status: string;
   createdAt: string;
   lastActivity: string;
   snippet: string;
@@ -18,14 +18,10 @@ export type Feed = {
   documentsCount?: number;
   outputConfig?: {
     format?: string;
-    frequency?: "daily" | "weekly" | "monthly";
+    frequency?: string;
     channel?: string;
   };
   connectedApps?: string[];
-  notifications?: {
-    slack: boolean;
-    storage: boolean;
-  };
 };
 
 export type Alert = {

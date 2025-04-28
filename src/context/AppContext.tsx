@@ -1,8 +1,9 @@
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { mockFeeds, mockAlerts } from '../utils/mockData';
-import type { Feed, Alert } from '../types/appTypes';
+import type { Feed, Alert, AppState } from '../types/appTypes';
 
 // Define Filter Options Type
 export type FilterOptions = {
@@ -23,21 +24,6 @@ export type SetupState = {
 };
 
 // Create context with default values
-export interface AppState {
-  isLoggedIn: boolean;
-  user: any;
-  isLoading: boolean;
-  userFeeds: Feed[];
-  savedViews: SavedView[];
-  currentFilters: FilterOptions;
-  selectedFeedId: string | null;
-  selectedFeed?: Feed | null;
-  alerts: Alert[];
-  isAlertsModalOpen: boolean;
-  setupState: SetupState;
-  connectedApps: string[];
-}
-
 const initialState: AppState = {
   isLoggedIn: false,
   user: null,
@@ -46,7 +32,6 @@ const initialState: AppState = {
   savedViews: [],
   currentFilters: {},
   selectedFeedId: null,
-  selectedFeed: null,
   alerts: [],
   isAlertsModalOpen: false,
   setupState: {},
@@ -61,7 +46,7 @@ interface AppContextType {
   setFilters: (filters: FilterOptions) => void;
   addSavedView: (name: string) => void;
   removeSavedView: (id: string) => void;
-  selectFeed: (id: string | null) => void;
+  selectFeed: (id: string) => void;
   markAlertRead: (id: string) => void;
   markAllAlertsRead: () => void;
   loadInitialData: () => void;
@@ -72,8 +57,6 @@ interface AppContextType {
   addFeed: (feed: Partial<Feed>) => void;
   removeFeed: (id: string) => void;
   updateFeed: (feed: Feed) => void;
-  createFeed: (feed: Partial<Feed>) => void;
-  deleteFeed: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType>({
@@ -94,8 +77,6 @@ const AppContext = createContext<AppContextType>({
   addFeed: () => {},
   removeFeed: () => {},
   updateFeed: () => {},
-  createFeed: () => {},
-  deleteFeed: () => {},
 });
 
 enum ActionTypes {
@@ -116,8 +97,6 @@ enum ActionTypes {
   ADD_FEED = 'ADD_FEED',
   REMOVE_FEED = 'REMOVE_FEED',
   UPDATE_FEED = 'UPDATE_FEED',
-  CREATE_FEED = 'CREATE_FEED',
-  DELETE_FEED = 'DELETE_FEED',
 }
 
 // Type for actions
@@ -138,9 +117,7 @@ type Action =
   | { type: ActionTypes.TOGGLE_CONNECTED_APP; payload: string }
   | { type: ActionTypes.ADD_FEED; payload: Partial<Feed> }
   | { type: ActionTypes.REMOVE_FEED; payload: string }
-  | { type: ActionTypes.UPDATE_FEED; payload: Feed }
-  | { type: ActionTypes.CREATE_FEED; payload: Partial<Feed> }
-  | { type: ActionTypes.DELETE_FEED; payload: string };
+  | { type: ActionTypes.UPDATE_FEED; payload: Feed };
 
 // Reducer function to handle state updates
 const appReducer = (state: AppState, action: Action): AppState => {
@@ -185,14 +162,9 @@ const appReducer = (state: AppState, action: Action): AppState => {
         savedViews: state.savedViews.filter(view => view.id !== action.payload)
       };
     case ActionTypes.SELECT_FEED:
-      const selectedFeed = action.payload 
-        ? state.userFeeds.find(feed => feed.id === action.payload)
-        : null;
-      
       return {
         ...state,
         selectedFeedId: action.payload,
-        selectedFeed: selectedFeed || null,
         isAlertsModalOpen: action.payload !== null
       };
     case ActionTypes.MARK_ALERT_READ:
@@ -208,9 +180,10 @@ const appReducer = (state: AppState, action: Action): AppState => {
         alerts: state.alerts.map(alert => ({ ...alert, read: true }))
       };
     case ActionTypes.LOAD_INITIAL_DATA:
+      // Ensure mockFeeds has lastActivity set for all items
       const enhancedMockFeeds = mockFeeds.map(feed => ({
         ...feed,
-        lastActivity: feed.lastActivity || feed.createdAt
+        lastActivity: feed.lastActivity || feed.createdAt // Ensure lastActivity is never undefined
       }));
       
       return {
@@ -252,7 +225,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
         type: action.payload.type || 'custom',
         status: action.payload.status || 'active',
         createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
+        lastActivity: new Date().toISOString(), // Ensure lastActivity is always set
         snippet: action.payload.snippet || '',
         sourceMix: action.payload.sourceMix,
         alertsCount: action.payload.alertsCount || 0,
@@ -263,36 +236,10 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state,
         userFeeds: [...state.userFeeds, newFeed]
       };
-    case ActionTypes.CREATE_FEED:
-      const createdFeed: Feed = {
-        id: uuidv4(),
-        name: action.payload.name || '',
-        query: action.payload.query || '',
-        type: action.payload.type || 'custom',
-        status: action.payload.status || 'active',
-        createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
-        snippet: action.payload.snippet || '',
-        sourceMix: action.payload.sourceMix,
-        alertsCount: action.payload.alertsCount || 0,
-        documentsCount: action.payload.documentsCount || 0,
-        outputConfig: action.payload.outputConfig
-      };
-      return {
-        ...state,
-        userFeeds: [...state.userFeeds, createdFeed]
-      };
     case ActionTypes.REMOVE_FEED:
       return {
         ...state,
-        userFeeds: state.userFeeds.filter(feed => feed.id !== action.payload),
-        selectedFeed: state.selectedFeed?.id === action.payload ? null : state.selectedFeed
-      };
-    case ActionTypes.DELETE_FEED:
-      return {
-        ...state,
-        userFeeds: state.userFeeds.filter(feed => feed.id !== action.payload),
-        selectedFeed: state.selectedFeed?.id === action.payload ? null : state.selectedFeed
+        userFeeds: state.userFeeds.filter(feed => feed.id !== action.payload)
       };
     case ActionTypes.UPDATE_FEED:
       return {
@@ -301,10 +248,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
           feed.id === action.payload.id 
             ? { ...feed, ...action.payload } 
             : feed
-        ),
-        selectedFeed: state.selectedFeed?.id === action.payload.id 
-          ? { ...state.selectedFeed, ...action.payload }
-          : state.selectedFeed
+        )
       };
     default:
       return state;
@@ -315,6 +259,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  // Check if user is already logged in (e.g., from localStorage)
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -334,14 +279,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  // Login function
   const login = async (email: string, password: string) => {
     dispatch({
       type: ActionTypes.SET_LOADING,
       payload: true
     });
     try {
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Mock login - in a real app, validate credentials with API
       const user = {
         id: uuidv4(),
         email,
@@ -373,6 +321,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // Logout function
   const logout = () => {
     localStorage.removeItem('user');
     dispatch({
@@ -381,6 +330,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toast.info('You have been logged out');
   };
 
+  // Filter functions
   const setFilters = (filters: FilterOptions) => {
     dispatch({
       type: ActionTypes.SET_FILTERS,
@@ -388,6 +338,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Saved view functions
   const addSavedView = (name: string) => {
     dispatch({
       type: ActionTypes.ADD_SAVED_VIEW,
@@ -402,6 +353,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Feed selection function
   const selectFeed = (id: string | null) => {
     dispatch({
       type: ActionTypes.SELECT_FEED,
@@ -409,6 +361,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Alert functions
   const markAlertRead = (id: string) => {
     dispatch({
       type: ActionTypes.MARK_ALERT_READ,
@@ -422,18 +375,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Initial data loading function
   const loadInitialData = () => {
     dispatch({
       type: ActionTypes.LOAD_INITIAL_DATA
     });
   };
 
+  // Toggle alerts modal
   const toggleAlertsModal = () => {
     dispatch({
       type: ActionTypes.TOGGLE_ALERTS_MODAL
     });
   };
 
+  // Setup state functions
   const updateSetupState = (updates: Partial<SetupState>) => {
     dispatch({
       type: ActionTypes.UPDATE_SETUP_STATE,
@@ -447,6 +403,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Connected apps functions
   const toggleConnectedApp = (appId: string) => {
     dispatch({
       type: ActionTypes.TOGGLE_CONNECTED_APP,
@@ -454,6 +411,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  // Feed management functions
   const addFeed = (feed: Partial<Feed>) => {
     dispatch({
       type: ActionTypes.ADD_FEED,
@@ -472,20 +430,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dispatch({
       type: ActionTypes.UPDATE_FEED,
       payload: feed
-    });
-  };
-
-  const createFeed = (feed: Partial<Feed>) => {
-    dispatch({
-      type: ActionTypes.CREATE_FEED,
-      payload: feed
-    });
-  };
-
-  const deleteFeed = (id: string) => {
-    dispatch({
-      type: ActionTypes.DELETE_FEED,
-      payload: id
     });
   };
 
@@ -508,9 +452,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleConnectedApp,
         addFeed,
         removeFeed,
-        updateFeed,
-        createFeed,
-        deleteFeed
+        updateFeed
       }}
     >
       {children}
@@ -518,6 +460,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
+// Custom hook to use the AppContext
 export const useApp = () => {
   return useContext(AppContext);
 };
