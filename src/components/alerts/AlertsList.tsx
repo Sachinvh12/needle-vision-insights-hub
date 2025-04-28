@@ -11,9 +11,10 @@ import { useApp } from '../../context/AppContext';
 interface AlertsListProps {
   maxItems?: number;
   showAll?: boolean;
+  compact?: boolean; // Added compact property
 }
 
-const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false }) => {
+const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false, compact = false }) => {
   const navigate = useNavigate();
   const { state, markAlertRead, selectFeed } = useApp();
   const { alerts } = state;
@@ -67,7 +68,7 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false }) =>
       {sortedAlerts.map((alert) => (
         <Card 
           key={alert.id}
-          className={`p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${!alert.read ? 'border-l-4 border-l-needl-primary' : 'border-l-4 border-l-transparent'}`}
+          className={`${compact ? 'p-3' : 'p-4'} cursor-pointer transition-all duration-200 hover:shadow-md ${!alert.read ? 'border-l-4 border-l-needl-primary' : 'border-l-4 border-l-transparent'}`}
           onClick={() => handleAlertClick(alert.id, alert.feedId)}
         >
           <div className="flex items-start gap-4">
@@ -86,7 +87,7 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false }) =>
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="text-base font-medium text-gray-900 mb-1">{alert.title}</h4>
+                  <h4 className={`${compact ? 'text-sm' : 'text-base'} font-medium text-gray-900 mb-1`}>{alert.title}</h4>
                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                     <span>{alert.feedName}</span>
                     <span className="w-1 h-1 rounded-full bg-gray-300"></span>
@@ -99,7 +100,8 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false }) =>
                 </Badge>
               </div>
               
-              <p className="text-sm text-gray-600 mb-2">{alert.summary}</p>
+              {!compact && <p className="text-sm text-gray-600 mb-2">{alert.summary}</p>}
+              {compact && <p className="text-xs text-gray-600 mb-2 line-clamp-1">{alert.summary}</p>}
               
               {alert.source.url && (
                 <div className="flex items-center text-xs text-needl-primary">

@@ -91,7 +91,7 @@ const App = () => (
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Navigate to="/alerts" />
                 </ProtectedRoute>
               } 
             />

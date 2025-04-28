@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
-          <Logo height={32} width={32} />
+          <Logo />
           <span className="text-xl font-semibold text-gray-900">Needl.ai</span>
         </Link>
         
@@ -177,7 +177,7 @@ const Header: React.FC<HeaderProps> = ({
             <SheetContent side="right" className="w-[240px] sm:w-[280px]">
               <SheetHeader className="pb-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <Logo height={24} width={24} />
+                  <Logo />
                   <span>Needl.ai</span>
                 </SheetTitle>
               </SheetHeader>
