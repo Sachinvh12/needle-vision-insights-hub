@@ -15,8 +15,8 @@ export interface Feed {
   type: 'competitor' | 'market' | 'trend' | 'custom';
   status: 'active' | 'paused' | 'error';
   createdAt: string;
-  lastActivity: string; // Changed from optional to required to match feedTypes.ts
-  snippet?: string;
+  lastActivity: string;
+  snippet: string;
   sourceMix?: {
     web: number;
     docs: number;
@@ -25,9 +25,14 @@ export interface Feed {
   alertsCount?: number;
   documentsCount?: number;
   outputConfig?: {
-    format: 'dashboard' | 'report' | 'alert';
-    frequency: 'daily' | 'weekly' | 'monthly';
-    channel: 'email' | 'app' | 'both';
+    format?: string;
+    frequency?: "daily" | "weekly" | "monthly";
+    channel?: string;
+  };
+  connectedApps?: string[];
+  notifications?: {
+    slack: boolean;
+    storage: boolean;
   };
 }
 

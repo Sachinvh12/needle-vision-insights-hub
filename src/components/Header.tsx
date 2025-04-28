@@ -52,7 +52,6 @@ const Header: React.FC<HeaderProps> = ({
   const mainNavItems = [
     { label: 'Home', path: '/landing' },
     { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Alerts', path: '/alerts' },
     { label: 'Manage Feeds', path: '/manage-feeds' },
   ];
   
@@ -78,11 +77,11 @@ const Header: React.FC<HeaderProps> = ({
           <span className="text-xl font-semibold text-gray-900">Needl.ai</span>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-6">
           {isLoggedIn && (
             <nav className="mr-4">
               <ul className="flex space-x-1">
-                {mainNavItems.filter(item => item.label !== 'Alerts').map((item) => (
+                {mainNavItems.map((item) => (
                   <li key={item.path}>
                     <Button 
                       variant="ghost" 
@@ -99,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({
           )}
           
           {isLoggedIn && showAlertIcon && (
-            <div className="mr-6">
+            <div className="mr-4">
               <AlertBadge />
             </div>
           )}

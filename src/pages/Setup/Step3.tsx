@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { useApp } from '../../context/AppContext';
 import PageTransition from '../../components/PageTransition';
 import Header from '../../components/Header';
+import { Feed } from '../../types/feedTypes';
 
 type FrequencyType = "realtime" | "daily" | "weekly" | "monthly";
 
@@ -42,7 +44,7 @@ const Step3: React.FC = () => {
       }
     });
     
-    addFeed({
+    const newFeed: Partial<Feed> = {
       name: feedName,
       query: setupState.setupQuery || '',
       type: setupState.selectedPersona as "market" | "competitor" | "trend" | "custom" || 'custom',
@@ -52,8 +54,13 @@ const Step3: React.FC = () => {
         frequency: frequency === "realtime" ? "daily" : frequency,
         channel: 'app'
       },
-      connectedApps
-    });
+      notifications: {
+        slack: false,
+        storage: false
+      }
+    };
+    
+    addFeed(newFeed);
     
     toast.success("Intelligence Feed Created", {
       description: `Your feed "${feedName}" has been created successfully.`

@@ -1,3 +1,4 @@
+
 // Define feed-related types for the application
 export type Feed = {
   id: string;
