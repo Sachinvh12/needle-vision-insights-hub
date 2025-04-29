@@ -59,10 +59,9 @@ export const AlertBadge: React.FC = () => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button 
-          variant="ghost" 
-          size="sm" 
-          className="relative p-0 h-9 w-9 rounded-full"
-          onClick={() => setIsOpen(!isOpen)}
+          variant="outline" 
+          size="icon" 
+          className="relative h-9 w-9 rounded-full border-none shadow-none hover:bg-gray-100"
         >
           <AnimatePresence>
             {hasNewAlerts ? (
@@ -134,7 +133,7 @@ export const AlertBadge: React.FC = () => {
             size="sm" 
             className="w-full text-needl-primary"
             onClick={() => {
-              navigate('/alerts');
+              navigate('/intelligence-hub');
               setIsOpen(false);
             }}
           >

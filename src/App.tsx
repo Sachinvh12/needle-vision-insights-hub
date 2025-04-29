@@ -14,9 +14,8 @@ import UseCases from "./pages/UseCases";
 import Step1 from "./pages/Setup/Step1";
 import Step2 from "./pages/Setup/Step2";
 import Step3 from "./pages/Setup/Step3";
-import Dashboard from "./pages/Dashboard";
+import IntelligenceHub from "./pages/IntelligenceHub";
 import Battlecard from "./pages/Battlecard";
-import AlertsDashboard from "./pages/AlertsDashboard";
 import ManageFeeds from "./pages/ManageFeeds";
 import NotFound from "./pages/NotFound";
 
@@ -27,7 +26,7 @@ const App = () => (
     <TooltipProvider>
       <AppProvider>
         <Toaster />
-        <Sonner />
+        <Sonner closeButton position="top-right" />
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -91,7 +90,7 @@ const App = () => (
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Navigate to="/alerts" />
+                  <Navigate to="/intelligence-hub" />
                 </ProtectedRoute>
               } 
             />
@@ -99,7 +98,15 @@ const App = () => (
               path="/alerts" 
               element={
                 <ProtectedRoute>
-                  <AlertsDashboard />
+                  <Navigate to="/intelligence-hub" />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/intelligence-hub" 
+              element={
+                <ProtectedRoute>
+                  <IntelligenceHub />
                 </ProtectedRoute>
               } 
             />

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Edit, Trash2, Play, Pause } from 'lucide-react';
-import Header from '../components/Header';
+import MainHeader from '../components/MainHeader';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useApp } from '../context/AppContext';
+import { toast } from 'sonner';
 
 const ManageFeeds: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +35,10 @@ const ManageFeeds: React.FC = () => {
       ...feed,
       status: newStatus,
     });
+    
+    toast.success(`Feed ${newStatus === 'active' ? 'activated' : 'paused'}`, {
+      description: `Feed "${feed.name}" has been ${newStatus === 'active' ? 'activated' : 'paused'}.`
+    });
   };
   
   const handleEditFeed = (feedId: string) => {
@@ -44,6 +49,9 @@ const ManageFeeds: React.FC = () => {
   const handleDeleteFeed = () => {
     if (deleteFeedId) {
       removeFeed(deleteFeedId);
+      toast.success("Feed deleted", {
+        description: "The intelligence feed has been removed."
+      });
       setDeleteFeedId(null);
     }
   };
@@ -51,18 +59,18 @@ const ManageFeeds: React.FC = () => {
   // Fixed comparisons for channel strings
   return (
     <div className="min-h-screen flex flex-col">
-      <Header showAlertIcon />
+      <MainHeader showAlertIcon />
       
       <main className="flex-1 container py-8 px-4">
         <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/intelligence-hub')}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              Back to Intelligence Hub
             </Button>
           </div>
           
@@ -91,7 +99,7 @@ const ManageFeeds: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border rounded-lg overflow-hidden shadow-sm">
               <Table>
                 <TableHeader>
                   <TableRow>

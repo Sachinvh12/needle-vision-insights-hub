@@ -11,13 +11,17 @@ import { useApp } from '../../context/AppContext';
 interface AlertsListProps {
   maxItems?: number;
   showAll?: boolean;
-  compact?: boolean; // Added compact property
+  compact?: boolean;
+  alerts?: Alert[];
 }
 
-const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false, compact = false }) => {
+const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false, compact = false, alerts: propAlerts }) => {
   const navigate = useNavigate();
   const { state, markAlertRead, selectFeed } = useApp();
-  const { alerts } = state;
+  const { alerts: contextAlerts } = state;
+  
+  // Use passed alerts if provided, otherwise use alerts from context
+  const alerts = propAlerts || contextAlerts;
 
   // Filter unread alerts first, then sort by timestamp, and limit the number if maxItems is specified
   const sortedAlerts = [...alerts]
@@ -122,7 +126,7 @@ const AlertsList: React.FC<AlertsListProps> = ({ maxItems, showAll = false, comp
           <Button
             variant="link"
             className="text-needl-primary"
-            onClick={() => navigate('/alerts')}
+            onClick={() => navigate('/intelligence-hub')}
           >
             View all alerts
           </Button>
