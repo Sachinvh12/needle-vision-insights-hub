@@ -1,5 +1,6 @@
 
 import { toast as sonnerToast } from "sonner";
+import React from "react";
 
 // Define default toast options with close button
 const defaultOptions = {
@@ -17,6 +18,13 @@ export const toast = {
   custom: (message: React.ReactNode, options = {}) => sonnerToast(message, { ...defaultOptions, ...options }),
 };
 
+// Dummy toasts array to maintain compatibility with the shadcn toaster component
+// This isn't actually used by sonner but prevents TypeScript errors
+const dummyToasts = [];
+
 export const useToast = () => {
-  return { toast };
+  return { 
+    toast,
+    toasts: dummyToasts
+  };
 };

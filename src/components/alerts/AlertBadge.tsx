@@ -12,14 +12,11 @@ export const AlertBadge: React.FC = () => {
   const { state, markAlertRead } = useApp();
   const { alerts } = state;
   
-  const [isOpen, setIsOpen] = useState(false);
-  
   const unreadCount = alerts.filter(alert => !alert.read).length;
   
   const handleAlertClick = (alertId: string, feedId: string) => {
     markAlertRead(alertId);
     navigate(`/battlecard/${feedId}`);
-    setIsOpen(false);
     
     toast.success("Alert marked as read", {
       description: "You'll now be redirected to the corresponding intelligence feed",
