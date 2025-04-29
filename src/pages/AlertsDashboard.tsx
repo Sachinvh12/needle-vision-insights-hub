@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -376,13 +375,15 @@ const AlertsDashboard: React.FC = () => {
                 
                 <div className="flex gap-2">
                   <div className="w-full sm:w-auto">
-                    <Input
-                      placeholder="Search alerts..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full"
-                      prefix={<Search className="h-4 w-4 text-gray-400" />}
-                    />
+                    <div className="relative">
+                      <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <Input
+                        placeholder="Search alerts..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-9"
+                      />
+                    </div>
                   </div>
                   
                   <Select value={filter} onValueChange={setFilter}>

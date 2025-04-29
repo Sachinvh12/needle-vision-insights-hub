@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -24,10 +23,10 @@ const Step3 = () => {
   const outputFormat = setupState.outputFormat || 'dashboard';
   const connectedApps = setupState.connectedApps || [];
   
-  // State for form controls
+  // State for form controls with proper type defined
   const [enableAlerts, setEnableAlerts] = useState(true);
   const [enableSummaries, setEnableSummaries] = useState(true);
-  const [frequency, setFrequency] = useState('daily');
+  const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [lookbackRange, setLookbackRange] = useState(30);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,7 +36,6 @@ const Step3 = () => {
     updateSetupState({
       feedName,
       outputConfig: {
-        // Use the correct property names according to types
         alerts: enableAlerts,
         summaries: enableSummaries,
         frequency: frequency,
@@ -53,8 +51,8 @@ const Step3 = () => {
       snippet: `Intelligence feed for ${setupState.setupQuery || 'custom search'}`,
       outputConfig: {
         format: outputFormat,
-        frequency: frequency,
-        channel: 'app' // Use channel instead of channels
+        frequency: frequency as 'daily' | 'weekly' | 'monthly',
+        channel: 'app'
       },
       connectedApps: connectedApps
     });
@@ -172,18 +170,12 @@ const Step3 = () => {
                       <RadioGroup
                         id="frequency"
                         value={frequency}
-                        onValueChange={setFrequency}
+                        onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setFrequency(value)}
                         className="mt-2 flex flex-col space-y-1"
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="realtime" id="realtime" />
-                          <Label htmlFor="realtime" className="font-normal text-sm cursor-pointer">
-                            Real-time (As soon as possible)
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="daily" id="daily" />
-                          <Label htmlFor="daily" className="font-normal text-sm cursor-pointer">
+                          <RadioGroupItem value="daily" id="daily-option" />
+                          <Label htmlFor="daily-option" className="font-normal text-sm cursor-pointer">
                             Daily (Once per day)
                           </Label>
                         </div>
@@ -191,6 +183,12 @@ const Step3 = () => {
                           <RadioGroupItem value="weekly" id="weekly" />
                           <Label htmlFor="weekly" className="font-normal text-sm cursor-pointer">
                             Weekly (Once per week)
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="monthly" id="monthly" />
+                          <Label htmlFor="monthly" className="font-normal text-sm cursor-pointer">
+                            Monthly (Once per month)
                           </Label>
                         </div>
                       </RadioGroup>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -48,6 +47,7 @@ const ManageFeeds: React.FC = () => {
     }
   };
   
+  // Fix for line 126 and 131 - comparing channel strings
   return (
     <div className="min-h-screen flex flex-col">
       <Header showAlertIcon />
@@ -123,16 +123,13 @@ const ManageFeeds: React.FC = () => {
                               Email
                             </Badge>
                           )}
-                          {feed.outputConfig?.channel === 'slack' && (
+                          {/* Fix the comparison for slack */}
+                          {feed.outputConfig?.channel === 'app' && (
                             <Badge variant="secondary" className="text-xs py-0">
-                              Slack
+                              App
                             </Badge>
                           )}
-                          {feed.outputConfig?.channel === 'storage' && (
-                            <Badge variant="secondary" className="text-xs py-0">
-                              Storage
-                            </Badge>
-                          )}
+                          {/* Fix the comparison for storage */}
                           {feed.outputConfig?.channel === 'both' && (
                             <>
                               <Badge variant="secondary" className="text-xs py-0">
@@ -143,7 +140,7 @@ const ManageFeeds: React.FC = () => {
                               </Badge>
                             </>
                           )}
-                          {feed.outputConfig?.channel === 'app' && (
+                          {!feed.outputConfig?.channel && (
                             <Badge variant="secondary" className="text-xs py-0">
                               App
                             </Badge>
