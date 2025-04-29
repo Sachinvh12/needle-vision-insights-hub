@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from '../components/Header';
@@ -8,11 +8,9 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '../context/AppContext';
 import { ChevronRight } from 'lucide-react';
 import CloudProviderIcon from '../components/CloudProviderIcon';
-import PersonaSection from '../components/personas/PersonaSection';
 import HeroSection from '../components/HeroSection';
 import AdvancedDataFlowVisualization from '../components/AdvancedDataFlowVisualization';
 
-// Improved component for the Landing page
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useApp();
@@ -117,9 +115,6 @@ const Landing: React.FC = () => {
             </motion.div>
           </div>
         </section>
-
-        {/* Personas Section */}
-        <PersonaSection />
       </main>
     </div>
   );

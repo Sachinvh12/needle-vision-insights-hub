@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { Menu, User, LogOut, Settings, ChevronDown, Bell } from 'lucide-react';
 import { AlertBadge } from './alerts/AlertBadge';
 import {
   DropdownMenu,
@@ -34,7 +34,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = false }) => {
   
   const handleLogout = () => {
     toast.success('Logged out successfully', {
-      description: 'You have been logged out of your account'
+      description: 'You have been logged out of your account',
+      dismissible: true,
+      closeButton: true
     });
     navigate('/login');
   };
@@ -77,7 +79,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = false }) => {
           <div className="flex items-center space-x-4">
             {showAlertIcon && (
               <div className="relative">
-                <AlertBadge />
+                <Link to="/intelligence-hub">
+                  <AlertBadge />
+                </Link>
               </div>
             )}
             
