@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -43,7 +44,7 @@ const Step3 = () => {
       }
     });
     
-    // Create a feed with the collected data
+    // Create a feed with the collected data - using the proper structure for Feed type
     addFeed({
       name: feedName,
       query: setupState.setupQuery || '',
@@ -53,8 +54,8 @@ const Step3 = () => {
         format: outputFormat,
         frequency: frequency as 'daily' | 'weekly' | 'monthly',
         channel: 'app'
-      },
-      connectedApps: connectedApps
+      }
+      // Removed connectedApps as it's not part of the Feed type
     });
     
     // Show success notification
