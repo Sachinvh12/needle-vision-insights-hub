@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -107,7 +108,7 @@ const FeedCard: React.FC<{ feed: Feed; onClick: () => void }> = ({ feed, onClick
             </div>
           )}
           
-          <p className="text-sm text-gray-600 line-clamp-2">{feed.snippet}</p>
+          <p className="text-sm text-gray-600 line-clamp-2">{feed.snippet || "No preview available"}</p>
         </CardContent>
         <CardFooter className="pt-0 pb-3 px-4">
           <div className="w-full flex justify-between items-center text-xs text-gray-500">
@@ -576,7 +577,7 @@ const Dashboard: React.FC = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => navigate('/alerts')}
+                      onClick={() => navigate('/dashboard')}
                       className="gap-2 text-xs"
                     >
                       <Bell className="h-3 w-3" />
@@ -611,7 +612,6 @@ const Dashboard: React.FC = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full"
-                        prefix={<Search className="h-4 w-4 text-gray-400" />}
                       />
                     </div>
                     
@@ -769,3 +769,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+
