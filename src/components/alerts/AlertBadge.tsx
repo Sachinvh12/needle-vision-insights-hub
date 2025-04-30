@@ -28,11 +28,9 @@ export const AlertBadge: React.FC = () => {
     markAlertRead(alertId);
     setOpen(false);
     
-    // Only use one toast notification
-    toast({
-      title: "Alert marked as read",
-      description: "You'll now be redirected to the corresponding intelligence feed",
-      closeButton: true
+    // Fix toast call syntax
+    toast.info("Alert marked as read", {
+      description: "You'll now be redirected to the corresponding intelligence feed"
     });
     
     navigate(`/battlecard/${feedId}`);
@@ -51,7 +49,7 @@ export const AlertBadge: React.FC = () => {
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="absolute -top-1.5 -right-1.5" // Adjusted positioning for better circle placement
+              className="absolute -top-1.5 -right-1.5" 
             >
               <Badge 
                 className="flex items-center justify-center bg-red-500 text-white text-xs min-w-[18px] h-[18px] px-1 rounded-full"

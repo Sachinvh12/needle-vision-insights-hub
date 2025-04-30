@@ -46,10 +46,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
   
   const handleLogout = () => {
     logout();
-    toast({
-      title: 'Logged out successfully',
-      description: 'You have been logged out of your account',
-      closeButton: true
+    // Fix toast call syntax
+    toast.success('Logged out successfully', {
+      description: 'You have been logged out of your account'
     });
     navigate('/login');
   };
@@ -104,18 +103,21 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
           
           {/* Right side - notifications, user menu */}
           <div className="flex items-center">
-            {/* Alert icon - fixed position and size */}
+            {/* Alert icon with increased spacing from profile */}
             {showAlertIcon && (
-              <div className="flex items-center mr-2">
+              <div className="flex items-center mr-5">
                 <AlertBadge />
               </div>
             )}
             
-            {/* User menu - ensure consistent rendering */}
-            <div>
+            {/* User menu - ensure consistent rendering with improved visibility */}
+            <div className="relative z-10">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200">
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200 bg-white shadow-sm"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="/placeholder.svg" alt="User" />
                       <AvatarFallback className="bg-needl-primary text-white">UN</AvatarFallback>

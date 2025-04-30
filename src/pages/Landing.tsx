@@ -41,6 +41,7 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Always showAlertIcon as true for consistency across pages */}
       <MainHeader showAlertIcon={true} />
       
       <main className="flex-1 relative overflow-hidden">
