@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User, LogOut, Settings, ChevronDown, Bell } from 'lucide-react';
+import { Menu, User, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { AlertBadge } from './alerts/AlertBadge';
 import {
   DropdownMenu,
@@ -14,28 +14,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import Logo from './Logo';
 
 interface MainHeaderProps {
   showAlertIcon?: boolean;
 }
 
-const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = false }) => {
+const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const isActive = (path: string) => {
     if (path === '/intelligence-hub' && location.pathname === '/dashboard') return true;
-    if (path === '/intelligence-hub' && location.pathname === '/alerts') return true;
     return location.pathname === path;
   };
   
   const handleLogout = () => {
     toast.success('Logged out successfully', {
       description: 'You have been logged out of your account',
-      dismissible: true,
       closeButton: true
     });
     navigate('/login');
@@ -78,10 +76,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = false }) => {
           {/* Right side - notifications, user menu */}
           <div className="flex items-center space-x-4">
             {showAlertIcon && (
-              <div className="relative">
-                <Link to="/intelligence-hub">
-                  <AlertBadge />
-                </Link>
+              <div className="flex items-center">
+                <AlertBadge />
               </div>
             )}
             

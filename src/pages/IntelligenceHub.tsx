@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   BarChart2,
@@ -16,7 +16,7 @@ import {
   X,
   AlertTriangle
 } from 'lucide-react';
-import Header from '../components/Header';
+import MainHeader from '../components/MainHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApp } from '../context/AppContext';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import AlertsList from '../components/alerts/AlertsList';
 import { 
   BarChart, LineChart, Pie, PieChart, Bar, XAxis, YAxis, 
@@ -47,12 +47,18 @@ import MetricCards from '../components/intelligence/MetricCards';
 
 const IntelligenceHub: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  
   const { state, markAllAlertsRead, selectFeed } = useApp();
   const { alerts, userFeeds } = state;
   
   const [filter, setFilter] = useState('all');
   const [importance, setImportance] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Determine which tab to show based on URL parameter
+  const defaultTab = tabFromUrl === 'alerts' ? 'alerts' : 'analytics';
 
   const unreadCount = alerts.filter(alert => !alert.read).length;
   const highImportanceCount = alerts.filter(alert => alert.importance === 'high').length;
@@ -81,7 +87,6 @@ const IntelligenceHub: React.FC = () => {
   const handleMarkAllRead = () => {
     markAllAlertsRead();
     toast.success("All alerts marked as read", {
-      dismissible: true,
       closeButton: true
     });
   };
@@ -124,7 +129,7 @@ const IntelligenceHub: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header showAlertIcon />
+      <MainHeader />
       
       <main className="flex-1 container py-8 px-4">
         <div className="flex items-center justify-between mb-6">
@@ -165,7 +170,7 @@ const IntelligenceHub: React.FC = () => {
           highImportanceAlerts={highImportanceCount} 
         />
         
-        <Tabs defaultValue="analytics" className="mb-6">
+        <Tabs defaultValue={defaultTab} className="mb-6">
           <TabsList className="bg-white shadow-sm border mb-4">
             <TabsTrigger value="analytics" className="data-[state=active]:bg-needl-primary data-[state=active]:text-white">
               Analytics Dashboard

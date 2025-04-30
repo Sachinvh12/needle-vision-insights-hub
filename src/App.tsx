@@ -95,6 +95,14 @@ const App = () => (
               } 
             />
             <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <Navigate to="/intelligence-hub?tab=alerts" />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/intelligence-hub" 
               element={
                 <ProtectedRoute>

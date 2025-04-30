@@ -28,13 +28,13 @@ export const AlertBadge: React.FC = () => {
     <Button
       variant="ghost"
       size="sm"
-      className="relative h-9 w-9 rounded-full"
-      onClick={() => navigate('/intelligence-hub')}
+      className="relative h-8 w-8 rounded-full" // Made slightly smaller (10%)
+      onClick={() => navigate('/intelligence-hub?tab=alerts')}
     >
-      <Bell className="h-5 w-5 text-gray-700" />
+      <Bell className="h-4.5 w-4.5 text-gray-700" /> {/* Made 10% smaller */}
       {unreadCount > 0 && (
         <Badge 
-          className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-red-500 text-white"
+          className="absolute -top-1 -right-1 w-4.5 h-4.5 p-0 flex items-center justify-center bg-red-500 text-white text-xs"
         >
           {unreadCount > 9 ? '9+' : unreadCount}
         </Badge>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Header from '../components/Header';
+import MainHeader from '../components/MainHeader';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { Button } from '@/components/ui/button';
 import { useApp } from '../context/AppContext';
@@ -42,7 +42,7 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header showLoginButton={!isLoggedIn} />
+      <MainHeader />
       
       <main className="flex-1 relative overflow-hidden">
         <AnimatedBackground variant="subtle" />
