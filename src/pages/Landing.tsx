@@ -42,7 +42,7 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <MainHeader />
+      <MainHeader showAlertIcon={true} />
       
       <main className="flex-1 relative overflow-hidden">
         <AnimatedBackground variant="subtle" />

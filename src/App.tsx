@@ -19,14 +19,21 @@ import Battlecard from "./pages/Battlecard";
 import ManageFeeds from "./pages/ManageFeeds";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
         <Toaster />
-        <Sonner position="top-right" />
+        <Sonner position="top-right" closeButton richColors />
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
