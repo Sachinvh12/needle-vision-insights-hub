@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { Menu, User, LogOut, Settings } from 'lucide-react';
 import { AlertBadge } from './alerts/AlertBadge';
 import {
   DropdownMenu,
@@ -46,7 +46,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
   
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully', {
+    toast({
+      title: 'Logged out successfully',
       description: 'You have been logged out of your account',
       closeButton: true
     });
@@ -102,52 +103,55 @@ const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
           </div>
           
           {/* Right side - notifications, user menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            {/* Alert icon - fixed position and size */}
             {showAlertIcon && (
-              <div className="flex items-center">
+              <div className="flex items-center mr-2">
                 <AlertBadge />
               </div>
             )}
             
-            {/* User menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg" alt="User" />
-                    <AvatarFallback className="bg-needl-primary text-white">UN</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-1 overflow-hidden">
-                <div className="bg-gradient-to-r from-needl-lighter to-blue-50 px-3 py-2 border-b">
-                  <DropdownMenuLabel className="p-0">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">User Name</p>
-                      <p className="text-xs text-gray-500">user@example.com</p>
-                    </div>
-                  </DropdownMenuLabel>
-                </div>
-                <div className="p-1">
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* User menu - ensure consistent rendering */}
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder.svg" alt="User" />
+                      <AvatarFallback className="bg-needl-primary text-white">UN</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-1 overflow-hidden">
+                  <div className="bg-gradient-to-r from-needl-lighter to-blue-50 px-3 py-2 border-b">
+                    <DropdownMenuLabel className="p-0">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium">User Name</p>
+                        <p className="text-xs text-gray-500">user@example.com</p>
+                      </div>
+                    </DropdownMenuLabel>
+                  </div>
+                  <div className="p-1">
+                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="md:hidden ml-2">
               <Button
                 variant="ghost"
                 size="sm"

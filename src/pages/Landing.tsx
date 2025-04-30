@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '../context/AppContext';
 import { ChevronRight } from 'lucide-react';
 import CloudProviderIcon from '../components/CloudProviderIcon';
-import HeroSection from '../components/HeroSection';
 import AdvancedDataFlowVisualization from '../components/AdvancedDataFlowVisualization';
 
 const Landing: React.FC = () => {
