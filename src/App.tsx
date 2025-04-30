@@ -26,7 +26,7 @@ const App = () => (
     <TooltipProvider>
       <AppProvider>
         <Toaster />
-        <Sonner closeButton position="top-right" />
+        <Sonner position="top-right" />
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -88,14 +88,6 @@ const App = () => (
             />
             <Route 
               path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/intelligence-hub" />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/alerts" 
               element={
                 <ProtectedRoute>
                   <Navigate to="/intelligence-hub" />

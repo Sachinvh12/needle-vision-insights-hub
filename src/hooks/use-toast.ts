@@ -4,8 +4,7 @@ import React from "react";
 
 // Define default toast options with close button
 const defaultOptions = {
-  closeButton: true,
-  dismissible: true
+  closeButton: true
 };
 
 // Enhance the default toast methods to include close buttons

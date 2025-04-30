@@ -15,8 +15,7 @@ export function Toaster() {
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
-        closeButton: true,
-        dismissible: true,
+        closeButton: true
       }}
     />
   );

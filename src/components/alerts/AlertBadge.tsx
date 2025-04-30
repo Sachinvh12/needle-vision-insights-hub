@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '../../context/AppContext';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 export const AlertBadge: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ export const AlertBadge: React.FC = () => {
     
     toast.success("Alert marked as read", {
       description: "You'll now be redirected to the corresponding intelligence feed",
-      dismissible: true,
       closeButton: true
     });
   };
