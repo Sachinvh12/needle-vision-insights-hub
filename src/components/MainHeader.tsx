@@ -92,7 +92,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           </div>
           
           {/* Right side - notifications, user menu */}
-          <div className="flex items-center">
+          <div className="flex items-center px-[5px]">
             {/* Alert icon with increased spacing from profile */}
             {showAlertIcon && <div className="flex items-center mr-5">
                 <AlertBadge />
