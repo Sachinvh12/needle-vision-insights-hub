@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Header from '../../components/Header';
+import MainHeader from '../../components/MainHeader';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -122,7 +122,7 @@ const Step2: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <MainHeader showAlertIcon={true} />
       
       <main className="flex-1 relative">
         <AnimatedBackground variant="subtle" />

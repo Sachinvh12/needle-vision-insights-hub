@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { useApp } from '../../context/AppContext';
 import PageTransition from '../../components/PageTransition';
-import Header from '../../components/Header';
+import MainHeader from '../../components/MainHeader';
 
 const Step3 = () => {
   const navigate = useNavigate();
@@ -77,7 +77,7 @@ const Step3 = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <MainHeader showAlertIcon={true} />
         
         <main className="flex-1 container py-8 px-4">
           <motion.div

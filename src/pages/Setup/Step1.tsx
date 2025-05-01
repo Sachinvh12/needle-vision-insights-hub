@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Header from '../../components/Header';
+import MainHeader from '../../components/MainHeader';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -69,7 +69,7 @@ const Step1: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <MainHeader showAlertIcon={true} />
       
       <main className="flex-1 relative">
         <AnimatedBackground variant="glitter" />
