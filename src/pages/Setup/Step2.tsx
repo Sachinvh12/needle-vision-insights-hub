@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -122,7 +121,7 @@ const Step2: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <MainHeader showAlertIcon={true} />
+      <MainHeader />
       
       <main className="flex-1 relative">
         <AnimatedBackground variant="subtle" />

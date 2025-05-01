@@ -2,22 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User, LogOut, Settings } from 'lucide-react';
+import { Menu, LogOut, Settings } from 'lucide-react';
 import { AlertBadge } from './alerts/AlertBadge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import Logo from './Logo';
 import { useApp } from '../context/AppContext';
 
-interface MainHeaderProps {
-  showAlertIcon?: boolean;
-}
-
-const MainHeader: React.FC<MainHeaderProps> = ({
-  showAlertIcon = true
-}) => {
+const MainHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -105,25 +98,20 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           
           {/* Right side - notifications, user menu */}
           <div className="flex items-center gap-8 px-[5px]">
-            {/* Alert icon with increased spacing from profile */}
-            {showAlertIcon && (
-              <div className="flex items-center">
-                <AlertBadge />
-              </div>
-            )}
+            {/* Alert icon */}
+            <div className="flex items-center">
+              <AlertBadge />
+            </div>
             
-            {/* User menu - ensure consistent rendering with improved visibility */}
+            {/* Email display instead of profile icon */}
             <div className="relative z-10">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant="ghost" 
-                    className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200 bg-white shadow-sm p-0"
+                    variant="outline" 
+                    className="px-3 py-1 h-9 text-sm font-medium bg-white border border-gray-200 hover:border-needl-primary hover:bg-gray-50 transition-all duration-200"
                   >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
-                      <AvatarFallback className="bg-needl-primary text-white">UN</AvatarFallback>
-                    </Avatar>
+                    user@example.com
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 mt-1 overflow-hidden">
@@ -136,10 +124,6 @@ const MainHeader: React.FC<MainHeaderProps> = ({
                     </DropdownMenuLabel>
                   </div>
                   <div className="p-1">
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>

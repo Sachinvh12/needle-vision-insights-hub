@@ -19,7 +19,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <MainHeader showAlertIcon={true} />
+      <MainHeader />
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-xl">Redirecting...</h1>

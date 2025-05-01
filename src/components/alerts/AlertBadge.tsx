@@ -52,7 +52,7 @@ export const AlertBadge: React.FC = () => {
               className="absolute -top-1 -right-1" 
             >
               <Badge 
-                className="flex items-center justify-center bg-red-500 text-white text-[8px] min-w-[14px] h-[14px] px-1 rounded-full"
+                className="flex items-center justify-center bg-red-500 text-white text-[7px] min-w-[12px] h-[12px] px-1 rounded-full"
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </Badge>
