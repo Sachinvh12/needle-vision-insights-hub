@@ -1,87 +1,233 @@
-import React from "react";
-import MainHeader from "../components/MainHeader";
-import { useApp } from "../context/AppContext";
-import { AnimatePresence, motion } from "framer-motion";
-import AnimatedBackground from "../components/AnimatedBackground";
-import { toast } from "@/hooks/use-toast";
-import { Feed } from "../types/feedTypes";
-import { Loader2, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Edit, Trash2, Play, Pause } from 'lucide-react';
+import MainHeader from '../components/MainHeader';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { useApp } from '../context/AppContext';
+import { toast } from 'sonner';
 
 const ManageFeeds: React.FC = () => {
-  const { state, createFeed, deleteFeed, updateFeedSettings } = useApp();
-  const { feeds, isLoading } = state;
-
-  // Mock handlers for feed management
-  const handleCreateFeed = () => {
-    const newFeed = {
-      id: `feed-${Date.now()}`,
-      name: "New Intelligence Feed",
-      description: "Start configuring this feed",
-      sources: [],
-      createdAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-      aiAnalysisEnabled: true,
-      alertsEnabled: true,
-      status: "idle",
-    } as Feed;
-
-    createFeed(newFeed);
-    toast.success("New feed created", {
-      description: "Your new intelligence feed has been created successfully.",
-    });
-  };
-
-  const handleDeleteFeed = (id: string) => {
-    deleteFeed(id);
-    toast.success("Feed deleted", {
-      description: "The intelligence feed has been permanently removed.",
-    });
-  };
-
-  const handleToggleAiAnalysis = (feed: Feed) => {
-    updateFeedSettings({
+  const navigate = useNavigate();
+  const { state, removeFeed, updateFeed } = useApp();
+  const { userFeeds } = state;
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deleteFeedId, setDeleteFeedId] = useState<string | null>(null);
+  
+  const filteredFeeds = searchTerm
+    ? userFeeds.filter(feed => 
+        feed.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feed.query.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : userFeeds;
+  
+  const handleToggleStatus = (feed: any) => {
+    const newStatus = feed.status === 'active' ? 'paused' : 'active';
+    updateFeed({
       ...feed,
-      aiAnalysisEnabled: !feed.aiAnalysisEnabled,
+      status: newStatus,
     });
-    toast.success("Settings updated", {
-      description: `AI analysis has been ${
-        !feed.aiAnalysisEnabled ? "enabled" : "disabled"
-      } for this feed.`,
+    
+    toast.success(`Feed ${newStatus === 'active' ? 'activated' : 'paused'}`, {
+      description: `Feed "${feed.name}" has been ${newStatus === 'active' ? 'activated' : 'paused'}.`
     });
   };
-
+  
+  const handleEditFeed = (feedId: string) => {
+    // In a real app, we would update the setup state and navigate to edit
+    navigate(`/setup/step1`);
+  };
+  
+  const handleDeleteFeed = () => {
+    if (deleteFeedId) {
+      removeFeed(deleteFeedId);
+      toast.success("Feed deleted", {
+        description: "The intelligence feed has been removed."
+      });
+      setDeleteFeedId(null);
+    }
+  };
+  
+  // Fixed comparisons for channel strings
   return (
     <div className="min-h-screen flex flex-col">
-      <MainHeader />
-      <AnimatedBackground variant="pulse" density="low" className="opacity-40" />
+      <MainHeader showAlertIcon />
       
-      {/* Content would continue here... */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Manage Intelligence Feeds</h1>
-          <Button 
-            onClick={handleCreateFeed} 
-            className="bg-needl-primary hover:bg-needl-dark"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Create New Feed
-          </Button>
+      <main className="flex-1 container py-8 px-4">
+        <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/intelligence-hub')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Intelligence Hub
+            </Button>
+          </div>
+          
+          <div className="sm:max-w-xs w-full">
+            <Input
+              placeholder="Search feeds..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
         
-        <div className="flex justify-center items-center h-64 text-center">
-          {isLoading ? (
-            <div className="flex flex-col items-center">
-              <Loader2 className="h-8 w-8 text-needl-primary animate-spin" />
-              <p className="mt-4 text-gray-600">Loading your intelligence feeds...</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h1 className="text-2xl font-bold mb-6">Manage Intelligence Feeds</h1>
+          
+          {userFeeds.length === 0 ? (
+            <div className="text-center py-12 border rounded-lg bg-gray-50">
+              <h3 className="text-xl font-medium mb-4">No Intelligence Feeds Yet</h3>
+              <p className="text-gray-600 mb-6">Create your first intelligence feed to start gathering insights</p>
+              <Button onClick={() => navigate('/landing')} className="bg-needl-primary hover:bg-needl-dark glaze">
+                Create New Feed
+              </Button>
             </div>
           ) : (
-            <div className="text-gray-500">
-              <p className="mb-2 text-lg">Your feeds will appear here</p>
-              <p className="text-sm">Click "Create New Feed" to get started</p>
+            <div className="border rounded-lg overflow-hidden shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[250px]">Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="hidden md:table-cell">Criteria</TableHead>
+                    <TableHead>Channels</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredFeeds.map((feed) => (
+                    <TableRow key={feed.id}>
+                      <TableCell className="font-medium">{feed.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {feed.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <span className="truncate block max-w-[300px]">
+                          {feed.query.length > 60 ? `${feed.query.substring(0, 60)}...` : feed.query}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-1">
+                          {feed.outputConfig?.channel === 'email' && (
+                            <Badge variant="secondary" className="text-xs py-0">
+                              Email
+                            </Badge>
+                          )}
+                          {/* Fixed comparison for app */}
+                          {feed.outputConfig?.channel === 'app' && (
+                            <Badge variant="secondary" className="text-xs py-0">
+                              App
+                            </Badge>
+                          )}
+                          {/* Fixed comparison for both */}
+                          {feed.outputConfig?.channel === 'both' && (
+                            <>
+                              <Badge variant="secondary" className="text-xs py-0">
+                                Email
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs py-0">
+                                App
+                              </Badge>
+                            </>
+                          )}
+                          {!feed.outputConfig?.channel && (
+                            <Badge variant="secondary" className="text-xs py-0">
+                              App
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={feed.status === 'active'}
+                            onCheckedChange={() => handleToggleStatus(feed)}
+                          />
+                          <span className={feed.status === 'active' ? 'text-green-600' : 'text-gray-500'}>
+                            {feed.status === 'active' ? 'Active' : 'Paused'}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditFeed(feed.id)}
+                            title="Edit Feed"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeleteFeedId(feed.id)}
+                            title="Delete Feed"
+                            className="text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
-        </div>
-      </div>
+          
+          {userFeeds.length > 0 && filteredFeeds.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No feeds match your search term</p>
+              <Button variant="link" onClick={() => setSearchTerm('')} className="mt-2">
+                Clear Search
+              </Button>
+            </div>
+          )}
+        </motion.div>
+      </main>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteFeedId} onOpenChange={() => setDeleteFeedId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <p className="py-4">
+            Are you sure you want to delete this intelligence feed? This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteFeedId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteFeed}
+            >
+              Delete Feed
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
