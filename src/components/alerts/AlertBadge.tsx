@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '../../context/AppContext';
@@ -28,7 +28,6 @@ export const AlertBadge: React.FC = () => {
     markAlertRead(alertId);
     setOpen(false);
     
-    // Using only one toast to prevent duplicates
     toast.info("Alert marked as read", {
       description: "You'll now be redirected to the corresponding intelligence feed"
     });
@@ -42,9 +41,9 @@ export const AlertBadge: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="relative h-8 w-8 rounded-full" 
+          className="relative h-8 w-8 rounded-full hover:bg-needl-lighter/30 transition-colors" 
         >
-          <Bell className="h-4.5 w-4.5 text-gray-700" />
+          <BellRing className="h-4.5 w-4.5 text-needl-primary" />
           {unreadCount > 0 && (
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -52,7 +51,7 @@ export const AlertBadge: React.FC = () => {
               className="absolute -top-1 -right-1" 
             >
               <Badge 
-                className="flex items-center justify-center bg-red-500 text-white text-[7px] min-w-[12px] h-[12px] px-1 rounded-full"
+                className="flex items-center justify-center bg-needl-primary text-white text-[5.5px] min-w-[10px] h-[10px] px-0.5 rounded-full"
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </Badge>
@@ -60,16 +59,16 @@ export const AlertBadge: React.FC = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="bg-white rounded-md shadow-md overflow-hidden">
+      <PopoverContent className="w-80 p-0" align="end" sideOffset={5}>
+        <div className="bg-white rounded-md shadow-md overflow-hidden border border-needl-lighter">
           <div className="bg-gradient-to-r from-needl-lighter to-blue-50 p-3 border-b">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-sm">Recent Notifications</h3>
+              <h3 className="font-medium text-sm text-needl-primary">Recent Notifications</h3>
               <Button 
                 variant="link" 
                 size="sm" 
                 onClick={() => navigate('/intelligence-hub?tab=alerts')} 
-                className="text-xs text-needl-primary px-0 h-auto"
+                className="text-xs text-needl-primary px-0 h-auto font-medium"
               >
                 View all
               </Button>
@@ -87,18 +86,18 @@ export const AlertBadge: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
-                      className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors ${!alert.read ? 'bg-blue-50/30' : ''}`}
+                      className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors ${!alert.read ? 'bg-needl-lighter/20' : ''}`}
                       onClick={() => handleAlertClick(alert.id, alert.feedId)}
                     >
-                      <div className="flex items-start gap-2">
-                        <div className={`w-2 h-2 mt-1.5 rounded-full ${!alert.read ? 'bg-blue-500' : 'bg-gray-300'}`} />
-                        <div>
+                      <div className="flex items-start gap-2.5">
+                        <div className={`w-2 h-2 mt-1.5 rounded-full ${!alert.read ? 'bg-needl-primary' : 'bg-gray-300'}`} />
+                        <div className="flex-1">
                           <p className="text-sm font-medium line-clamp-1">{alert.title}</p>
-                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{alert.summary}</p>
-                          <div className="flex items-center mt-1">
-                            <span className="text-xs text-gray-400">{alert.feedName}</span>
-                            <span className="mx-1 text-gray-300">•</span>
-                            <span className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{alert.summary}</p>
+                          <div className="flex items-center mt-1.5">
+                            <span className="text-[10px] text-needl-primary font-medium bg-needl-lighter/30 px-1.5 py-0.5 rounded">{alert.feedName}</span>
+                            <span className="mx-1.5 text-gray-300">•</span>
+                            <span className="text-[10px] text-gray-400">
                               {new Date(alert.timestamp).toLocaleDateString()}
                             </span>
                           </div>
@@ -108,8 +107,12 @@ export const AlertBadge: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="p-6 text-center">
+                <div className="p-8 text-center">
+                  <div className="bg-gray-50 rounded-full mx-auto h-10 w-10 flex items-center justify-center mb-2">
+                    <BellRing className="h-5 w-5 text-gray-400" />
+                  </div>
                   <p className="text-sm text-gray-500">No recent notifications</p>
+                  <p className="text-xs text-gray-400 mt-1">New alerts will appear here</p>
                 </div>
               )}
             </AnimatePresence>

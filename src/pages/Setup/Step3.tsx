@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -77,7 +76,7 @@ const Step3 = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <MainHeader showAlertIcon={true} />
+        <MainHeader />
         
         <main className="flex-1 container py-8 px-4">
           <motion.div
