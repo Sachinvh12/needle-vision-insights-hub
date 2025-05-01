@@ -90,13 +90,78 @@
   @apply fixed top-0 left-0 w-full h-full -z-10;
 }
 
+/* Glitter effect */
 .glitter-bg .pulse-dot {
   @apply w-[3px] h-[3px] rounded-full bg-needl-primary opacity-30;
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
+/* Gradient background */
 .gradient-bg {
   background: linear-gradient(135deg, rgba(54, 125, 141, 0.05) 0%, rgba(74, 142, 157, 0.03) 50%, rgba(208, 232, 236, 0.05) 100%);
+}
+
+/* Flow background */
+.flow-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.flow-line {
+  position: absolute;
+  height: 2px;
+  opacity: 0.2;
+  background: linear-gradient(90deg, transparent, #367d8d, transparent);
+  animation-name: flow-animation;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes flow-animation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+/* Nodes background */
+.node {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #4a8e9d, #367d8d);
+  box-shadow: 0 0 10px rgba(54, 125, 141, 0.5);
+  transform-origin: center center;
+}
+
+.node-connection {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(54, 125, 141, 0.2), rgba(208, 232, 236, 0.2));
+  transform-origin: left center;
+}
+
+/* Pulse effect */
+.pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(54, 125, 141, 0.3);
+  animation: pulse-ring-animation 4s linear infinite;
+  opacity: 0;
+}
+
+@keyframes pulse-ring-animation {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+  }
 }
 
 /* Enhanced pulsing animation for dots */
