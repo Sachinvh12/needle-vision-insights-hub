@@ -28,7 +28,6 @@ export const AlertBadge: React.FC = () => {
     markAlertRead(alertId);
     setOpen(false);
     
-    // Fix toast call syntax
     toast.info("Alert marked as read", {
       description: "You'll now be redirected to the corresponding intelligence feed"
     });
@@ -52,7 +51,7 @@ export const AlertBadge: React.FC = () => {
               className="absolute -top-1.5 -right-1.5" 
             >
               <Badge 
-                className="flex items-center justify-center bg-red-500 text-white text-xs min-w-[18px] h-[18px] px-1 rounded-full"
+                className="flex items-center justify-center bg-red-500 text-white text-[10px] min-w-[16px] h-[16px] px-1 rounded-full"
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </Badge>

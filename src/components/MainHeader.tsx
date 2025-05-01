@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,9 +10,11 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import Logo from './Logo';
 import { useApp } from '../context/AppContext';
+
 interface MainHeaderProps {
   showAlertIcon?: boolean;
 }
+
 const MainHeader: React.FC<MainHeaderProps> = ({
   showAlertIcon = true
 }) => {
@@ -32,18 +35,20 @@ const MainHeader: React.FC<MainHeaderProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
   const isActive = (path: string) => {
     if (path === '/intelligence-hub' && location.pathname === '/dashboard') return true;
     return location.pathname === path;
   };
+
   const handleLogout = () => {
     logout();
-    // Fix toast call syntax
     toast.success('Logged out successfully', {
       description: 'You have been logged out of your account'
     });
     navigate('/login');
   };
+
   const navigationItems = [{
     path: '/landing',
     label: 'Home'
@@ -54,6 +59,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
     path: '/manage-feeds',
     label: 'Manage Feeds'
   }];
+
   return <motion.header className={`sticky top-0 z-50 bg-white border-b border-gray-200 ${scrolled ? 'shadow-sm' : ''} transition-all duration-300`} initial={{
     y: -10,
     opacity: 0
@@ -92,9 +98,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           </div>
           
           {/* Right side - notifications, user menu */}
-          <div className="flex items-center px-[5px]">
+          <div className="flex items-center gap-5 px-[5px]">
             {/* Alert icon with increased spacing from profile */}
-            {showAlertIcon && <div className="flex items-center mr-5">
+            {showAlertIcon && <div className="flex items-center">
                 <AlertBadge />
               </div>}
             
@@ -102,9 +108,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             <div className="relative z-10">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200 bg-white shadow-sm">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border border-gray-200 hover:border-needl-primary hover:scale-105 transition-all duration-200 bg-white shadow-sm p-0">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
+                      <AvatarImage src="/placeholder.svg" alt="User" className="bg-white" />
                       <AvatarFallback className="bg-needl-primary text-white">UN</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -171,4 +177,5 @@ const MainHeader: React.FC<MainHeaderProps> = ({
       </AnimatePresence>
     </motion.header>;
 };
+
 export default MainHeader;
