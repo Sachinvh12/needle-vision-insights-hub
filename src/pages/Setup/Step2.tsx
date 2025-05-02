@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,12 +9,42 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ArrowRight, Check, Upload } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { mockConnectors } from '../../utils/mockData';
+import { useToast } from '@/hooks/use-toast';
+import CloudProviderIcon from '../../components/CloudProviderIcon';
 
 const Step2: React.FC = () => {
   const navigate = useNavigate();
   const { state, toggleConnectedApp } = useApp();
+  const { toast } = useToast();
   const { connectedApps } = state;
+  
+  // Custom connector data with updated copy
+  const connectors = [
+    {
+      id: 'google-drive',
+      name: 'Google Drive',
+      description: 'Connect your Google Drive to analyze stored files',
+      icon: <CloudProviderIcon provider="google-drive" className="w-6 h-6 text-needl-primary" />
+    },
+    {
+      id: 'dropbox',
+      name: 'Dropbox',
+      description: 'Connect your Dropbox to analyze stored files',
+      icon: <CloudProviderIcon provider="dropbox" className="w-6 h-6 text-needl-primary" />
+    },
+    {
+      id: 'onedrive',
+      name: 'OneDrive',
+      description: 'Connect your OneDrive to analyze stored files',
+      icon: <CloudProviderIcon provider="onedrive" className="w-6 h-6 text-needl-primary" />
+    },
+    {
+      id: 'upload',
+      name: 'File Upload',
+      description: 'Upload files to analyze your files in detail',
+      icon: <Upload className="w-6 h-6 text-needl-primary" />
+    }
+  ];
   
   // Animation variants
   const container = {
@@ -29,6 +60,13 @@ const Step2: React.FC = () => {
   const item = {
     hidden: { y: 20, opacity: 0 },
     show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } },
+  };
+  
+  // Handler for connecting apps
+  const handleConnectorClick = (connectorId: string) => {
+    toggleConnectedApp(connectorId);
+    const connector = connectors.find(c => c.id === connectorId);
+    toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
   };
   
   // Animation for document flow visualization
@@ -148,7 +186,7 @@ const Step2: React.FC = () => {
               animate="show"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
             >
-              {mockConnectors.map((connector) => {
+              {connectors.map((connector) => {
                 const isConnected = connectedApps.includes(connector.id);
                 
                 return (
@@ -157,7 +195,7 @@ const Step2: React.FC = () => {
                       className={`cursor-pointer transition-all duration-300 hover:shadow-md overflow-hidden ${
                         isConnected ? 'border-green-500 bg-green-50' : 'border-gray-200'
                       }`}
-                      onClick={() => toggleConnectedApp(connector.id)}
+                      onClick={() => handleConnectorClick(connector.id)}
                     >
                       <CardContent className="p-6 flex flex-col items-center justify-center">
                         <div 
@@ -165,11 +203,7 @@ const Step2: React.FC = () => {
                             isConnected ? 'bg-green-100' : 'bg-gray-100'
                           }`}
                         >
-                          {connector.id === 'upload' ? (
-                            <Upload className="w-6 h-6 text-needl-primary" />
-                          ) : (
-                            connector.icon
-                          )}
+                          {connector.icon}
                         </div>
                         
                         <h3 className="font-medium mb-1">{connector.name}</h3>
