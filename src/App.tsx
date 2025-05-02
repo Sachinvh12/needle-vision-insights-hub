@@ -1,10 +1,10 @@
-
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./context/AppContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AnimatedBackground from "./components/AnimatedBackground";
 
 // Pages
 import Index from "./pages/Index";
@@ -32,6 +32,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
+        {/* Global animated background */}
+        <AnimatedBackground variant="network" color="needl-primary" density="medium" />
+        
         {/* Single Toaster component for the entire app */}
         <Toaster position="top-right" closeButton richColors />
         <BrowserRouter>

@@ -148,6 +148,44 @@
   background-size: 20px 20px;
 }
 
+/* Network graph animation classes */
+.node {
+  @apply rounded-full bg-needl-primary/80 shadow-md;
+  transition: transform 0.3s ease;
+}
+
+.node:hover {
+  transform: scale(1.2);
+}
+
+.edge {
+  @apply stroke-needl-primary/30;
+  stroke-width: 1;
+}
+
+/* Data flow stream effect */
+.data-stream {
+  @apply absolute h-px bg-gradient-to-r from-needl-primary/10 via-needl-primary/50 to-needl-primary/10;
+  animation: data-stream 3s linear infinite;
+}
+
+@keyframes data-stream {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+}
+
 /* Feature animations */
 .feature-animation {
   position: relative;

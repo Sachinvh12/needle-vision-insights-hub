@@ -35,7 +35,7 @@ const Step2: React.FC = () => {
     {
       id: 'onedrive',
       name: 'OneDrive',
-      description: 'Connect your OneDrive to analyze stored files',
+      description: 'Connect your OneDrive to analyze files',
       icon: <CloudProviderIcon provider="onedrive" className="w-6 h-6 text-needl-primary" />
     },
     {

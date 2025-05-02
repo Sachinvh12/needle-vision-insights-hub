@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import MainHeader from '../components/MainHeader';
-import AnimatedBackground from '../components/AnimatedBackground';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50">
       <MainHeader showAlertIcon={true} />
-      <AnimatedBackground variant="gradient" />
       <div className="flex-1 flex items-center justify-center">
         <motion.div 
           className="text-center"
