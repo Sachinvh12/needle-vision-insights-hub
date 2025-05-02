@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, Trash2, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,9 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { useApp } from '../context/AppContext';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const ManageFeeds: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +55,6 @@ const ManageFeeds: React.FC = () => {
     }
   };
   
-  // Fixed comparisons for channel strings
   return (
     <div className="min-h-screen flex flex-col">
       <MainHeader showAlertIcon />
@@ -132,13 +130,11 @@ const ManageFeeds: React.FC = () => {
                               Email
                             </Badge>
                           )}
-                          {/* Fixed comparison for app */}
                           {feed.outputConfig?.channel === 'app' && (
                             <Badge variant="secondary" className="text-xs py-0">
                               App
                             </Badge>
                           )}
-                          {/* Fixed comparison for both */}
                           {feed.outputConfig?.channel === 'both' && (
                             <>
                               <Badge variant="secondary" className="text-xs py-0">

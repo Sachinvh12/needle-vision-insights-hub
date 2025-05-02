@@ -43,6 +43,12 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
     --sidebar-ring: 240 5.9% 10%;
+    
+    /* Needl.ai custom colors */
+    --needl-primary: 187 43% 38%; /* #367d8d */
+    --needl-dark: 187 60% 25%; /* #1e5663 */
+    --needl-light: 187 55% 75%; /* #9fcad3 */
+    --needl-lighter: 187 35% 95%; /* #f0f7f8 */
   }
 
   .dark {
@@ -87,7 +93,7 @@
 
 /* Animated Background Styles */
 .animated-bg {
-  @apply fixed top-0 left-0 w-full h-full -z-10;
+  @apply fixed top-0 left-0 w-full h-full -z-10 overflow-hidden;
 }
 
 .glitter-bg .pulse-dot {
@@ -188,3 +194,46 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Ensure animations run smoothly */
+@media (prefers-reduced-motion: no-preference) {
+  .animated-element {
+    transition-property: transform, opacity;
+    transition-timing-function: ease-out;
+    transition-duration: 0.3s;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .slide-in {
+    animation: slideIn 0.5s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Animation classes for framer-motion alternatives */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+/* Default animation delay classes */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
