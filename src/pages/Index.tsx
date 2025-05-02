@@ -26,8 +26,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50">
-      <MainHeader />
-      <AnimatedBackground variant="flow" />
+      <MainHeader showAlertIcon={true} />
+      <AnimatedBackground variant="gradient" />
       <div className="flex-1 flex items-center justify-center">
         <motion.div 
           className="text-center"

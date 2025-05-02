@@ -7,6 +7,7 @@ import { AppProvider } from "./context/AppContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
+import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import UseCases from "./pages/UseCases";
@@ -45,13 +46,13 @@ const App = () => (
               } 
             />
             
-            {/* Protected Routes */}
+            {/* Root Route */}
             <Route 
               path="/" 
-              element={
-                <Navigate to="/landing" />
-              } 
+              element={<Index />} 
             />
+            
+            {/* Protected Routes */}
             <Route 
               path="/landing" 
               element={

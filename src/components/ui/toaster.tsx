@@ -1,6 +1,7 @@
-
 import { Toaster as Sonner } from "sonner";
 
+// This component is not actively used in the app since we're using <Toaster /> directly in App.tsx
+// Keeping it for compatibility with any code that might reference it
 export function Toaster() {
   return (
     <Sonner 

@@ -17,7 +17,5 @@ export const toast = {
 
 // Export the useToast hook for consistent usage across the app
 export const useToast = () => {
-  return { 
-    toast
-  };
+  return { toast };
 };

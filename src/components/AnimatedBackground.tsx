@@ -3,20 +3,22 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 interface AnimatedBackgroundProps {
-  variant?: 'default' | 'subtle' | 'glitter' | 'wave' | 'gradient';
+  variant?: 'default' | 'subtle' | 'glitter' | 'wave' | 'gradient' | 'flow';
   className?: string;
   color?: string;
+  density?: 'low' | 'medium' | 'high';
 }
 
 const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ 
   variant = 'default',
   className = '',
-  color = 'needl-primary'
+  color = 'needl-primary',
+  density = 'medium'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
-    if (variant === 'wave' && canvasRef.current) {
+    if ((variant === 'wave' || variant === 'flow') && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
@@ -41,50 +43,125 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
       
       const selectedColor = colors[color as keyof typeof colors] || colors['needl-primary'];
       
-      // Waves configuration
-      const waves = [
-        { y: height * 0.6, length: 0.01, amplitude: 20, speed: 0.0015, color: selectedColor.start, opacity: 0.2 },
-        { y: height * 0.5, length: 0.012, amplitude: 15, speed: 0.002, color: selectedColor.mid, opacity: 0.15 },
-        { y: height * 0.7, length: 0.015, amplitude: 10, speed: 0.0025, color: selectedColor.end, opacity: 0.1 }
-      ];
-      
-      const drawWave = (time: number) => {
-        ctx.clearRect(0, 0, width, height);
+      if (variant === 'wave') {
+        // Waves configuration
+        const waves = [
+          { y: height * 0.6, length: 0.01, amplitude: 20, speed: 0.0015, color: selectedColor.start, opacity: 0.2 },
+          { y: height * 0.5, length: 0.012, amplitude: 15, speed: 0.002, color: selectedColor.mid, opacity: 0.15 },
+          { y: height * 0.7, length: 0.015, amplitude: 10, speed: 0.0025, color: selectedColor.end, opacity: 0.1 }
+        ];
         
-        waves.forEach(wave => {
-          ctx.beginPath();
-          ctx.moveTo(0, wave.y);
+        const drawWave = (time: number) => {
+          ctx.clearRect(0, 0, width, height);
           
-          for (let x = 0; x < width; x++) {
-            const dx = x * wave.length;
-            const dy = Math.sin(dx + time * wave.speed) * wave.amplitude;
-            ctx.lineTo(x, wave.y + dy);
+          waves.forEach(wave => {
+            ctx.beginPath();
+            ctx.moveTo(0, wave.y);
+            
+            for (let x = 0; x < width; x++) {
+              const dx = x * wave.length;
+              const dy = Math.sin(dx + time * wave.speed) * wave.amplitude;
+              ctx.lineTo(x, wave.y + dy);
+            }
+            
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+            
+            ctx.fillStyle = `${wave.color}${Math.round(wave.opacity * 255).toString(16).padStart(2, '0')}`;
+            ctx.fill();
+          });
+        };
+        
+        let time = 0;
+        const render = () => {
+          time += 1;
+          drawWave(time);
+          animationFrameId = requestAnimationFrame(render);
+        };
+        
+        render();
+      }
+      
+      if (variant === 'flow') {
+        // Particle system for flow visualization
+        const particleCount = density === 'low' ? 50 : density === 'medium' ? 100 : 150;
+        const particles: {x: number; y: number; vx: number; vy: number; size: number; color: string; opacity: number}[] = [];
+        
+        // Initialize particles
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5,
+            size: Math.random() * 3 + 1,
+            color: [selectedColor.start, selectedColor.mid, selectedColor.end][Math.floor(Math.random() * 3)],
+            opacity: Math.random() * 0.5 + 0.2
+          });
+        }
+        
+        const drawFlow = () => {
+          ctx.clearRect(0, 0, width, height);
+          
+          // Update and draw particles
+          particles.forEach(p => {
+            // Update position
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            // Bounce off edges
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+            
+            // Wrap around edges (alternative to bouncing)
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+            
+            // Draw particle
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color + Math.round(p.opacity * 255).toString(16).padStart(2, '0');
+            ctx.fill();
+          });
+          
+          // Draw connections between nearby particles
+          ctx.strokeStyle = selectedColor.mid + '40'; // Semi-transparent
+          ctx.lineWidth = 0.5;
+          
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              if (distance < 100) {
+                const opacity = 1 - distance / 100;
+                ctx.globalAlpha = opacity;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+              }
+            }
           }
           
-          ctx.lineTo(width, height);
-          ctx.lineTo(0, height);
-          ctx.closePath();
-          
-          ctx.fillStyle = `${wave.color}${Math.round(wave.opacity * 255).toString(16).padStart(2, '0')}`;
-          ctx.fill();
-        });
-      };
-      
-      let time = 0;
-      const render = () => {
-        time += 1;
-        drawWave(time);
-        animationFrameId = requestAnimationFrame(render);
-      };
-      
-      render();
+          ctx.globalAlpha = 1;
+        };
+        
+        const render = () => {
+          drawFlow();
+          animationFrameId = requestAnimationFrame(render);
+        };
+        
+        render();
+      }
       
       const handleResize = () => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        waves.forEach(wave => {
-          wave.y = height * (wave.y / height);
-        });
       };
       
       window.addEventListener('resize', handleResize);
@@ -94,9 +171,9 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
         cancelAnimationFrame(animationFrameId);
       };
     }
-  }, [variant, color]);
+  }, [variant, color, density]);
   
-  if (variant === 'wave') {
+  if (variant === 'wave' || variant === 'flow') {
     return (
       <canvas 
         ref={canvasRef} 

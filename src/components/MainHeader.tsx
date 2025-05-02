@@ -10,7 +10,11 @@ import { toast } from '@/hooks/use-toast';
 import Logo from './Logo';
 import { useApp } from '../context/AppContext';
 
-const MainHeader: React.FC = () => {
+interface MainHeaderProps {
+  showAlertIcon?: boolean;
+}
+
+const MainHeader: React.FC<MainHeaderProps> = ({ showAlertIcon = true }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -98,10 +102,12 @@ const MainHeader: React.FC = () => {
           
           {/* Right side - notifications, user menu */}
           <div className="flex items-center gap-8 px-[5px]">
-            {/* Alert icon */}
-            <div className="flex items-center">
-              <AlertBadge />
-            </div>
+            {/* Alert icon - conditionally rendered based on showAlertIcon prop */}
+            {showAlertIcon && (
+              <div className="flex items-center">
+                <AlertBadge />
+              </div>
+            )}
             
             {/* Email display instead of profile icon */}
             <div className="relative z-10">
