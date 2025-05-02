@@ -23,13 +23,13 @@ const Step2: React.FC = () => {
     {
       id: 'google-drive',
       name: 'Google Drive',
-      description: 'Connect your Google Drive to analyze stored files',
+      description: 'Connect your Google Drive to analyze files',
       icon: <CloudProviderIcon provider="google-drive" className="w-6 h-6 text-needl-primary" />
     },
     {
       id: 'dropbox',
       name: 'Dropbox',
-      description: 'Connect your Dropbox to analyze stored files',
+      description: 'Connect your DropBox to analyze files',
       icon: <CloudProviderIcon provider="dropbox" className="w-6 h-6 text-needl-primary" />
     },
     {
@@ -41,7 +41,7 @@ const Step2: React.FC = () => {
     {
       id: 'upload',
       name: 'File Upload',
-      description: 'Upload files to analyze your files in detail',
+      description: 'Upload files to analyze your them in detail',
       icon: <Upload className="w-6 h-6 text-needl-primary" />
     }
   ];
