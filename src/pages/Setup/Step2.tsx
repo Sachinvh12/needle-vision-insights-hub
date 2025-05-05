@@ -1,16 +1,18 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import MainHeader from '../../components/MainHeader';
-import AnimatedBackground from '../../components/AnimatedBackground';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Check, Upload } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ArrowRight, Check, Upload } from 'lucide-react';
+import { CardContent } from '@/components/ui/card';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '@/hooks/use-toast';
 import CloudProviderIcon from '../../components/CloudProviderIcon';
+import SetupPageWrapper from '../../components/setup/SetupPageWrapper';
+import SetupStepIndicator from '../../components/setup/SetupStepIndicator';
+import SetupTransition from '../../components/setup/SetupTransition';
+import SetupNavButtons from '../../components/setup/SetupNavButtons';
+import EnhancedCard from '../../components/setup/EnhancedCard';
 
 const Step2: React.FC = () => {
   const navigate = useNavigate();
@@ -24,43 +26,27 @@ const Step2: React.FC = () => {
       id: 'google-drive',
       name: 'Google Drive',
       description: 'Connect your Google Drive to analyze files',
-      icon: <CloudProviderIcon provider="google-drive" className="w-6 h-6 text-needl-primary" />
+      icon: <CloudProviderIcon provider="google-drive" className="w-7 h-7 text-needl-primary" />
     },
     {
       id: 'dropbox',
       name: 'Dropbox',
       description: 'Connect your DropBox to analyze files',
-      icon: <CloudProviderIcon provider="dropbox" className="w-6 h-6 text-needl-primary" />
+      icon: <CloudProviderIcon provider="dropbox" className="w-7 h-7 text-needl-primary" />
     },
     {
       id: 'onedrive',
       name: 'OneDrive',
       description: 'Connect your OneDrive to analyze files',
-      icon: <CloudProviderIcon provider="onedrive" className="w-6 h-6 text-needl-primary" />
+      icon: <CloudProviderIcon provider="onedrive" className="w-7 h-7 text-needl-primary" />
     },
     {
       id: 'upload',
       name: 'File Upload',
       description: 'Upload files to analyze your them in detail',
-      icon: <Upload className="w-6 h-6 text-needl-primary" />
+      icon: <Upload className="w-7 h-7 text-needl-primary" />
     }
   ];
-  
-  // Animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-  
-  const item = {
-    hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } },
-  };
   
   // Handler for connecting apps
   const handleConnectorClick = (connectorId: string) => {
@@ -72,11 +58,11 @@ const Step2: React.FC = () => {
   // Animation for document flow visualization
   const DocumentFlowAnimation = () => (
     <div className="relative w-full h-40 my-8 overflow-hidden">
-      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-needl-lighter flex items-center justify-center">
+      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-needl-lighter to-needl-primary/30 flex items-center justify-center shadow-lg border border-needl-primary/20">
         <img 
           src="/lovable-uploads/0a70d7fb-99b8-48e3-aee0-4b62df7703cc.png" 
           alt="Needl.ai" 
-          className="w-8 h-8 object-contain"
+          className="w-10 h-10 object-contain"
         />
       </div>
       
@@ -84,7 +70,7 @@ const Step2: React.FC = () => {
       {Array.from({ length: 5 }).map((_, index) => (
         <motion.div
           key={`doc-${index}`}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded shadow-sm border border-gray-200 w-10 h-12 flex items-center justify-center"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-md shadow-md border border-gray-200 w-10 h-12 flex items-center justify-center"
           initial={{ x: -50, opacity: 0 }}
           animate={{ 
             x: [null, 50, 120, 200],
@@ -111,7 +97,7 @@ const Step2: React.FC = () => {
       {Array.from({ length: 5 }).map((_, index) => (
         <motion.div
           key={`web-${index}`}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full shadow-sm border border-gray-200 w-10 h-10 flex items-center justify-center"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full shadow-md border border-gray-200 w-10 h-10 flex items-center justify-center"
           initial={{ x: 50, opacity: 0 }}
           animate={{ 
             x: [null, -50, -120, -200],
@@ -157,111 +143,78 @@ const Step2: React.FC = () => {
     </div>
   );
   
+  // Animation variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <MainHeader />
+    <SetupPageWrapper
+      title="Connect Document Sources"
+      subtitle="Connect your document repositories to enhance intelligence gathering"
+      backgroundVariant="network"
+    >
+      <SetupStepIndicator currentStep={2} />
       
-      <main className="flex-1 relative">
-        <AnimatedBackground variant="subtle" />
+      <SetupTransition>
+        <DocumentFlowAnimation />
         
-        <div className="container mx-auto py-12 px-4 relative z-10">
-          <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-8"
-            >
-              <h2 className="text-2xl font-bold mb-2">Connect Document Sources</h2>
-              <p className="text-gray-600">
-                Connect your document repositories to include them in intelligence gathering
-              </p>
-            </motion.div>
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+        >
+          {connectors.map((connector) => {
+            const isConnected = connectedApps.includes(connector.id);
             
-            <DocumentFlowAnimation />
-            
-            <motion.div
-              variants={container}
-              initial="hidden"
-              animate="show"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-            >
-              {connectors.map((connector) => {
-                const isConnected = connectedApps.includes(connector.id);
-                
-                return (
-                  <motion.div key={connector.id} variants={item}>
-                    <Card 
-                      className={`cursor-pointer transition-all duration-300 hover:shadow-md overflow-hidden ${
-                        isConnected ? 'border-green-500 bg-green-50' : 'border-gray-200'
-                      }`}
-                      onClick={() => handleConnectorClick(connector.id)}
-                    >
-                      <CardContent className="p-6 flex flex-col items-center justify-center">
-                        <div 
-                          className={`text-3xl mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
-                            isConnected ? 'bg-green-100' : 'bg-gray-100'
-                          }`}
-                        >
-                          {connector.icon}
-                        </div>
-                        
-                        <h3 className="font-medium mb-1">{connector.name}</h3>
-                        <p className="text-xs text-gray-500 text-center mb-3">{connector.description}</p>
-                        
-                        {isConnected ? (
-                          <Badge className="bg-green-500">
-                            <Check className="w-3 h-3 mr-1" /> Connected
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-needl-primary">
-                            Connect
-                          </Badge>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-            
-            <motion.div
-              className="flex justify-between"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Button
-                variant="outline"
-                onClick={() => navigate('/setup/step1')}
-                className="gap-2"
+            return (
+              <EnhancedCard
+                key={connector.id}
+                isSelected={isConnected}
+                onClick={() => handleConnectorClick(connector.id)}
+                glassmorphism
               >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-              
-              <div className="space-x-3">
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate('/setup/step3')}
-                  className="text-gray-500"
-                >
-                  Skip this step
-                </Button>
-                
-                <Button
-                  onClick={() => navigate('/setup/step3')}
-                  className="gap-2 bg-needl-primary hover:bg-needl-dark glaze"
-                >
-                  Continue
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </main>
-    </div>
+                <CardContent className="p-6 flex flex-col items-center justify-center">
+                  <div 
+                    className={`text-3xl mb-4 w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
+                      isConnected ? 'bg-green-100' : 'bg-gray-100'
+                    }`}
+                  >
+                    {connector.icon}
+                  </div>
+                  
+                  <h3 className="font-medium text-lg mb-1">{connector.name}</h3>
+                  <p className="text-sm text-gray-500 text-center mb-3">{connector.description}</p>
+                  
+                  {isConnected ? (
+                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 py-1 px-3">
+                      <Check className="w-3 h-3 mr-1" /> Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-needl-primary border-needl-primary/30 py-1 px-3">
+                      Connect
+                    </Badge>
+                  )}
+                </CardContent>
+              </EnhancedCard>
+            );
+          })}
+        </motion.div>
+        
+        <SetupNavButtons
+          onBack={() => navigate('/setup/step1')}
+          onNext={() => navigate('/setup/step3')}
+          onSkip={() => navigate('/setup/step3')}
+        />
+      </SetupTransition>
+    </SetupPageWrapper>
   );
 };
 

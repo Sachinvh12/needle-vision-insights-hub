@@ -1,17 +1,19 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Check } from 'lucide-react';
+import { ChevronLeft, Check, Bell, Clock, Calendar, FileText, BarChart3, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { useApp } from '../../context/AppContext';
-import PageTransition from '../../components/PageTransition';
-import MainHeader from '../../components/MainHeader';
+import SetupPageWrapper from '../../components/setup/SetupPageWrapper';
+import SetupStepIndicator from '../../components/setup/SetupStepIndicator';
+import SetupTransition from '../../components/setup/SetupTransition';
+import EnhancedCard from '../../components/setup/EnhancedCard';
 
 const Step3 = () => {
   const navigate = useNavigate();
@@ -28,239 +30,319 @@ const Step3 = () => {
   const [enableSummaries, setEnableSummaries] = useState(true);
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [lookbackRange, setLookbackRange] = useState(30);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Update the setup state with the final configuration
-    updateSetupState({
-      feedName,
-      outputConfig: {
-        alerts: enableAlerts,
-        summaries: enableSummaries,
-        frequency: frequency,
-        lookbackRange: lookbackRange
-      }
-    });
-    
-    // Create a feed with the collected data - using the proper structure for Feed type
-    addFeed({
-      name: feedName,
-      query: setupState.setupQuery || '',
-      type: setupState.selectedPersona || 'custom',
-      snippet: `Intelligence feed for ${setupState.setupQuery || 'custom search'}`,
-      outputConfig: {
-        format: outputFormat,
-        frequency: frequency as 'daily' | 'weekly' | 'monthly',
-        channel: 'app'
-      }
-      // Removed connectedApps as it's not part of the Feed type
-    });
-    
-    // Show success notification
-    toast.success("Intelligence Feed Created", {
-      description: `Your feed "${feedName}" has been created successfully.`
-    });
-    
-    // Reset setup state
-    resetSetupState();
-    
-    // Navigate to dashboard
-    navigate('/dashboard');
+    // Simulate a short delay for better UX
+    setTimeout(() => {
+      // Update the setup state with the final configuration
+      updateSetupState({
+        feedName,
+        outputConfig: {
+          alerts: enableAlerts,
+          summaries: enableSummaries,
+          frequency: frequency,
+          lookbackRange: lookbackRange
+        }
+      });
+      
+      // Create a feed with the collected data - using the proper structure for Feed type
+      addFeed({
+        name: feedName,
+        query: setupState.setupQuery || '',
+        type: setupState.selectedPersona || 'custom',
+        snippet: `Intelligence feed for ${setupState.setupQuery || 'custom search'}`,
+        outputConfig: {
+          format: outputFormat,
+          frequency: frequency as 'daily' | 'weekly' | 'monthly',
+          channel: 'app'
+        }
+      });
+      
+      // Show success notification
+      toast.success("Intelligence Feed Created", {
+        description: `Your feed "${feedName}" has been created successfully.`
+      });
+      
+      // Reset setup state
+      resetSetupState();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    }, 1500);
   };
   
   const handleBack = () => {
     navigate('/setup/step2');
   };
   
+  const outputFormatOptions = [
+    { 
+      value: 'dashboard', 
+      label: 'Dashboard', 
+      description: 'View insights in app',
+      icon: <BarChart3 className="w-5 h-5 text-needl-primary" />
+    },
+    { 
+      value: 'report', 
+      label: 'Summary Report', 
+      description: 'Daily/Weekly digest',
+      icon: <FileText className="w-5 h-5 text-blue-600" />
+    },
+    { 
+      value: 'alert', 
+      label: 'Real-time Alerts', 
+      description: 'Get notified immediately',
+      icon: <Zap className="w-5 h-5 text-amber-500" /> 
+    }
+  ];
+  
   return (
-    <PageTransition>
-      <div className="min-h-screen flex flex-col">
-        <MainHeader />
-        
-        <main className="flex-1 container py-8 px-4">
+    <SetupPageWrapper
+      title="Configure Your Intelligence Feed"
+      subtitle="Set up how you want to receive insights and alerts from your feed"
+      backgroundVariant="pulse"
+    >
+      <SetupStepIndicator currentStep={3} />
+      
+      <SetupTransition>
+        <form onSubmit={handleSubmit}>
           <motion.div
+            className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-gray-100/80 p-8 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8"
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold mb-2">Configure Your Intelligence Feed</h1>
-              <p className="text-gray-600">
-                Set up how you want to receive insights and alerts from your feed.
-              </p>
-            </div>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                {/* Feed Name Field */}
-                <div>
-                  <Label htmlFor="feedName" className="text-base">Feed Name</Label>
-                  <Input
-                    id="feedName"
-                    value={feedName}
-                    onChange={(e) => updateSetupState({ feedName: e.target.value })}
-                    placeholder="My Intelligence Feed"
-                    className="mt-2"
-                    required
-                  />
-                </div>
+            <div className="space-y-6">
+              {/* Feed Name Field */}
+              <div className="space-y-2">
+                <Label htmlFor="feedName" className="text-base font-medium">Feed Name</Label>
+                <Input
+                  id="feedName"
+                  value={feedName}
+                  onChange={(e) => updateSetupState({ feedName: e.target.value })}
+                  placeholder="My Intelligence Feed"
+                  className="text-base"
+                  required
+                />
+              </div>
+              
+              {/* Output Format Selection */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Output Format</Label>
                 
-                {/* Output Format Selection */}
-                <div>
-                  <Label className="text-base">Output Format</Label>
-                  <RadioGroup
-                    value={outputFormat}
-                    onValueChange={(value) => updateSetupState({ outputFormat: value })}
-                    className="mt-2 flex flex-col space-y-1"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="dashboard" id="dashboard" />
-                      <Label htmlFor="dashboard" className="font-normal cursor-pointer">
-                        Dashboard (View in app)
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="report" id="report" />
-                      <Label htmlFor="report" className="font-normal cursor-pointer">
-                        Summary Report (Daily/Weekly digest)
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="alert" id="alert" />
-                      <Label htmlFor="alert" className="font-normal cursor-pointer">
-                        Real-time Alerts (Get notified immediately)
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                {/* Alert Settings */}
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                  <h3 className="font-medium mb-3">Notification Settings</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="alerts" className="font-normal">Enable Alerts</Label>
-                        <p className="text-sm text-gray-500">Get notified about important events</p>
-                      </div>
-                      <Switch 
-                        id="alerts"
-                        checked={enableAlerts}
-                        onCheckedChange={setEnableAlerts}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="summaries" className="font-normal">Enable Summaries</Label>
-                        <p className="text-sm text-gray-500">Receive periodic intelligence summaries</p>
-                      </div>
-                      <Switch 
-                        id="summaries"
-                        checked={enableSummaries}
-                        onCheckedChange={setEnableSummaries}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="frequency" className="font-normal">Update Frequency</Label>
-                      <RadioGroup
-                        id="frequency"
-                        value={frequency}
-                        onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setFrequency(value)}
-                        className="mt-2 flex flex-col space-y-1"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="daily" id="daily-option" />
-                          <Label htmlFor="daily-option" className="font-normal text-sm cursor-pointer">
-                            Daily (Once per day)
-                          </Label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {outputFormatOptions.map((option) => (
+                    <EnhancedCard
+                      key={option.value}
+                      isSelected={outputFormat === option.value}
+                      onClick={() => updateSetupState({ outputFormat: option.value })}
+                      className="p-0 overflow-hidden"
+                    >
+                      <div className="p-4 flex items-center">
+                        <div className="mr-3">
+                          <RadioGroupItem 
+                            value={option.value} 
+                            id={option.value} 
+                            className="sr-only"
+                            checked={outputFormat === option.value}
+                          />
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            outputFormat === option.value 
+                              ? 'bg-needl-lighter' 
+                              : 'bg-gray-100'
+                          }`}>
+                            {option.icon}
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="weekly" id="weekly" />
-                          <Label htmlFor="weekly" className="font-normal text-sm cursor-pointer">
-                            Weekly (Once per week)
+                        
+                        <div>
+                          <Label 
+                            htmlFor={option.value} 
+                            className="font-medium cursor-pointer block"
+                          >
+                            {option.label}
                           </Label>
+                          <span className="text-xs text-gray-500">{option.description}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="monthly" id="monthly" />
-                          <Label htmlFor="monthly" className="font-normal text-sm cursor-pointer">
-                            Monthly (Once per month)
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="lookback" className="font-normal">Lookback Range</Label>
-                        <span className="text-sm text-gray-700 font-medium">{lookbackRange} days</span>
                       </div>
-                      <Slider
-                        id="lookback"
-                        value={[lookbackRange]}
-                        min={7}
-                        max={90}
-                        step={1}
-                        onValueChange={(values) => setLookbackRange(values[0])}
-                        className="py-4"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>7 days</span>
-                        <span>30 days</span>
-                        <span>90 days</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Connected Data Sources */}
-                <div>
-                  <Label className="text-base mb-2 block">Connected Data Sources</Label>
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    {connectedApps.length > 0 ? (
-                      <ul className="space-y-2">
-                        {connectedApps.map((app) => (
-                          <li key={app} className="flex items-center">
-                            <Check className="h-4 w-4 text-green-500 mr-2" />
-                            <span className="text-sm">{app.charAt(0).toUpperCase() + app.slice(1)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-gray-500">No data sources connected</p>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Form Actions */}
-                <div className="flex justify-between pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleBack}
-                    className="gap-2"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-needl-primary hover:bg-needl-dark gap-2"
-                  >
-                    Create Feed
-                    <Check className="h-4 w-4" />
-                  </Button>
+                    </EnhancedCard>
+                  ))}
                 </div>
               </div>
-            </form>
+              
+              {/* Alert Settings */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 p-6 rounded-lg border border-gray-100">
+                <div className="flex items-center mb-5">
+                  <Bell className="w-5 h-5 text-needl-primary mr-2" />
+                  <h3 className="font-medium text-lg">Notification Settings</h3>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="alerts" className="font-medium">Enable Alerts</Label>
+                      <p className="text-sm text-gray-500">Get notified about important events</p>
+                    </div>
+                    <Switch 
+                      id="alerts"
+                      checked={enableAlerts}
+                      onCheckedChange={setEnableAlerts}
+                      className="data-[state=checked]:bg-needl-primary"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="summaries" className="font-medium">Enable Summaries</Label>
+                      <p className="text-sm text-gray-500">Receive periodic intelligence summaries</p>
+                    </div>
+                    <Switch 
+                      id="summaries"
+                      checked={enableSummaries}
+                      onCheckedChange={setEnableSummaries}
+                      className="data-[state=checked]:bg-needl-primary"
+                    />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <Clock className="w-5 h-5 text-needl-primary mr-2" />
+                      <Label htmlFor="frequency" className="font-medium">Update Frequency</Label>
+                    </div>
+                    
+                    <RadioGroup
+                      id="frequency"
+                      value={frequency}
+                      onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setFrequency(value)}
+                      className="flex justify-between space-x-2"
+                    >
+                      <div className="flex-1">
+                        <div className={`border ${frequency === 'daily' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                             onClick={() => setFrequency('daily')}>
+                          <RadioGroupItem value="daily" id="daily-option" className="sr-only" />
+                          <Label htmlFor="daily-option" className="cursor-pointer">
+                            <Calendar className="w-5 h-5 mx-auto mb-1" />
+                            <span className="text-sm font-medium block">Daily</span>
+                          </Label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className={`border ${frequency === 'weekly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                             onClick={() => setFrequency('weekly')}>
+                          <RadioGroupItem value="weekly" id="weekly" className="sr-only" />
+                          <Label htmlFor="weekly" className="cursor-pointer">
+                            <Calendar className="w-5 h-5 mx-auto mb-1" />
+                            <span className="text-sm font-medium block">Weekly</span>
+                          </Label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className={`border ${frequency === 'monthly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                             onClick={() => setFrequency('monthly')}>
+                          <RadioGroupItem value="monthly" id="monthly" className="sr-only" />
+                          <Label htmlFor="monthly" className="cursor-pointer">
+                            <Calendar className="w-5 h-5 mx-auto mb-1" />
+                            <span className="text-sm font-medium block">Monthly</span>
+                          </Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="lookback" className="font-medium">Lookback Range</Label>
+                      <span className="text-sm font-medium px-2 py-1 bg-needl-lighter text-needl-primary rounded-full">{lookbackRange} days</span>
+                    </div>
+                    <Slider
+                      id="lookback"
+                      value={[lookbackRange]}
+                      min={7}
+                      max={90}
+                      step={1}
+                      onValueChange={(values) => setLookbackRange(values[0])}
+                      className="py-4"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>7 days</span>
+                      <span>30 days</span>
+                      <span>90 days</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Connected Data Sources */}
+              <div>
+                <Label className="text-base font-medium block mb-3">Connected Data Sources</Label>
+                <div className="bg-gray-50/80 p-4 rounded-lg border border-gray-100">
+                  {connectedApps.length > 0 ? (
+                    <ul className="space-y-2">
+                      {connectedApps.map((app) => (
+                        <li key={app} className="flex items-center bg-white p-2 rounded-md border border-gray-100">
+                          <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                            <Check className="h-3 w-3 text-green-600" />
+                          </div>
+                          <span className="text-sm">{app.charAt(0).toUpperCase() + app.slice(1).replace('-', ' ')}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-500">No data sources connected</p>
+                      <button 
+                        type="button" 
+                        className="text-needl-primary text-sm mt-2 underline hover:text-needl-dark"
+                        onClick={() => navigate('/setup/step2')}
+                      >
+                        Go back to connect sources
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </motion.div>
-        </main>
-      </div>
-    </PageTransition>
+          
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleBack}
+              className="gap-2 text-gray-600 hover:text-gray-900"
+              disabled={isSubmitting}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </Button>
+            
+            <Button
+              type="submit"
+              disabled={!feedName.trim() || isSubmitting}
+              className="bg-gradient-to-r from-needl-primary to-needl-dark hover:from-needl-dark hover:to-needl-primary text-white transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  Creating Feed...
+                </>
+              ) : (
+                <>
+                  Create Intelligence Feed
+                  <Check className="h-4 w-4 ml-2" />
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </SetupTransition>
+    </SetupPageWrapper>
   );
 };
 
