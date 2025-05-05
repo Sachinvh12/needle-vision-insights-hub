@@ -20,50 +20,48 @@ const MetricCards: React.FC<MetricCardsProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-center hover:shadow-md transition-all duration-300"
+        transition={{ duration: 0.4, delay: 0.1 }}
+        whileHover={{ y: -3, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+        className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 rounded-xl border border-blue-100 flex items-center transition-all duration-300"
       >
-        <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-sm">
-          <Badge className="h-6 w-6 flex items-center justify-center rounded-full text-white bg-blue-500">
-            {totalAlerts}
-          </Badge>
+        <div className="bg-white w-14 h-14 rounded-full flex items-center justify-center mr-4 shadow-md">
+          <Bell className="h-6 w-6 text-blue-500" />
         </div>
         <div>
-          <p className="text-sm text-blue-700">Total Alerts</p>
-          <p className="text-xl font-semibold text-blue-900">{totalAlerts}</p>
+          <p className="text-sm font-medium text-blue-700 mb-1">Total Alerts</p>
+          <p className="text-2xl font-semibold text-blue-900">{totalAlerts}</p>
         </div>
       </motion.div>
       
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className="bg-amber-50 p-4 rounded-lg border border-amber-100 flex items-center hover:shadow-md transition-all duration-300"
+        transition={{ duration: 0.4, delay: 0.2 }}
+        whileHover={{ y: -3, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+        className="bg-gradient-to-br from-amber-50 to-amber-100/50 p-4 rounded-xl border border-amber-100 flex items-center transition-all duration-300"
       >
-        <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-sm">
+        <div className="bg-white w-14 h-14 rounded-full flex items-center justify-center mr-4 shadow-md">
           <Info className="h-6 w-6 text-amber-500" />
         </div>
         <div>
-          <p className="text-sm text-amber-700">Unread Alerts</p>
-          <p className="text-xl font-semibold text-amber-900">{unreadAlerts}</p>
+          <p className="text-sm font-medium text-amber-700 mb-1">Unread Alerts</p>
+          <p className="text-2xl font-semibold text-amber-900">{unreadAlerts}</p>
         </div>
       </motion.div>
       
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className="bg-red-50 p-4 rounded-lg border border-red-100 flex items-center hover:shadow-md transition-all duration-300"
+        transition={{ duration: 0.4, delay: 0.3 }}
+        whileHover={{ y: -3, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+        className="bg-gradient-to-br from-red-50 to-red-100/50 p-4 rounded-xl border border-red-100 flex items-center transition-all duration-300"
       >
-        <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-sm">
+        <div className="bg-white w-14 h-14 rounded-full flex items-center justify-center mr-4 shadow-md">
           <AlertTriangle className="h-6 w-6 text-red-500" />
         </div>
         <div>
-          <p className="text-sm text-red-700">High Importance</p>
-          <p className="text-xl font-semibold text-red-900">{highImportanceAlerts}</p>
+          <p className="text-sm font-medium text-red-700 mb-1">High Importance</p>
+          <p className="text-2xl font-semibold text-red-900">{highImportanceAlerts}</p>
         </div>
       </motion.div>
     </div>

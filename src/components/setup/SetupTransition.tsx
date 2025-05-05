@@ -19,7 +19,7 @@ const SetupTransition: React.FC<SetupTransitionProps> = ({ children }) => {
       initial="initial"
       animate="animate"
       exit="exit"
-      transition={{ duration: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       className="w-full"
     >
       {children}
