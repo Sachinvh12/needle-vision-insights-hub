@@ -26,25 +26,25 @@ const Step2: React.FC = () => {
       id: 'google-drive',
       name: 'Google Drive',
       description: 'Connect your Google Drive to analyze files',
-      icon: <CloudProviderIcon provider="google-drive" className="w-7 h-7 text-needl-primary" />
+      icon: <CloudProviderIcon provider="google-drive" className="w-6 h-6 text-needl-primary" />
     },
     {
       id: 'dropbox',
       name: 'Dropbox',
       description: 'Connect your DropBox to analyze files',
-      icon: <CloudProviderIcon provider="dropbox" className="w-7 h-7 text-needl-primary" />
+      icon: <CloudProviderIcon provider="dropbox" className="w-6 h-6 text-needl-primary" />
     },
     {
       id: 'onedrive',
       name: 'OneDrive',
       description: 'Connect your OneDrive to analyze files',
-      icon: <CloudProviderIcon provider="onedrive" className="w-7 h-7 text-needl-primary" />
+      icon: <CloudProviderIcon provider="onedrive" className="w-6 h-6 text-needl-primary" />
     },
     {
       id: 'upload',
       name: 'File Upload',
       description: 'Upload files to analyze your them in detail',
-      icon: <Upload className="w-7 h-7 text-needl-primary" />
+      icon: <Upload className="w-6 h-6 text-needl-primary" />
     }
   ];
   
@@ -55,14 +55,14 @@ const Step2: React.FC = () => {
     toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
   };
   
-  // Animation for document flow visualization
+  // Animation for document flow visualization - made more compact
   const DocumentFlowAnimation = () => (
-    <div className="relative w-full h-40 my-8 overflow-hidden">
-      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-needl-lighter to-needl-primary/30 flex items-center justify-center shadow-lg border border-needl-primary/20">
+    <div className="relative w-full h-32 my-4 overflow-hidden">
+      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-gradient-to-br from-needl-lighter to-needl-primary/30 flex items-center justify-center shadow-lg border border-needl-primary/20">
         <img 
           src="/lovable-uploads/0a70d7fb-99b8-48e3-aee0-4b62df7703cc.png" 
           alt="Needl.ai" 
-          className="w-10 h-10 object-contain"
+          className="w-8 h-8 object-contain"
         />
       </div>
       
@@ -70,22 +70,22 @@ const Step2: React.FC = () => {
       {Array.from({ length: 5 }).map((_, index) => (
         <motion.div
           key={`doc-${index}`}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-md shadow-md border border-gray-200 w-10 h-12 flex items-center justify-center"
-          initial={{ x: -50, opacity: 0 }}
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-md shadow-md border border-gray-200 w-8 h-10 flex items-center justify-center"
+          initial={{ x: -30, opacity: 0 }}
           animate={{ 
-            x: [null, 50, 120, 200],
+            x: [null, 40, 95, 150],
             opacity: [0, 1, 1, 0],
             scale: [0.8, 1, 1, 0.8],
           }}
           transition={{ 
-            duration: 4, 
+            duration: 3, 
             repeat: Infinity, 
             repeatType: "loop", 
-            delay: index * 0.8,
+            delay: index * 0.6,
             times: [0, 0.2, 0.5, 1]
           }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 3v4a1 1 0 001 1h4" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M9 9h1M9 13h6M9 17h6" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -97,22 +97,22 @@ const Step2: React.FC = () => {
       {Array.from({ length: 5 }).map((_, index) => (
         <motion.div
           key={`web-${index}`}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full shadow-md border border-gray-200 w-10 h-10 flex items-center justify-center"
-          initial={{ x: 50, opacity: 0 }}
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full shadow-md border border-gray-200 w-8 h-8 flex items-center justify-center"
+          initial={{ x: 30, opacity: 0 }}
           animate={{ 
-            x: [null, -50, -120, -200],
+            x: [null, -40, -95, -150],
             opacity: [0, 1, 1, 0],
             scale: [0.8, 1, 1, 0.8],
           }}
           transition={{ 
-            duration: 4, 
+            duration: 3, 
             repeat: Infinity, 
             repeatType: "loop", 
-            delay: index * 0.8,
+            delay: index * 0.6,
             times: [0, 0.2, 0.5, 1]
           }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10" stroke="#367d8d" strokeWidth="2" />
             <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="#367d8d" strokeWidth="2" />
           </svg>
@@ -124,19 +124,19 @@ const Step2: React.FC = () => {
         <motion.div
           key={`pulse-${index}`}
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-needl-primary"
-          initial={{ width: 16, height: 16, opacity: 0.8 }}
+          initial={{ width: 14, height: 14, opacity: 0.8 }}
           animate={{ 
-            width: [16, 120], 
-            height: [16, 120], 
+            width: [14, 100], 
+            height: [14, 100], 
             opacity: [0.8, 0],
             x: ['-50%', '-50%'],
             y: ['-50%', '-50%'],
           }}
           transition={{ 
-            duration: 2, 
+            duration: 1.5, 
             repeat: Infinity, 
             repeatType: "loop", 
-            delay: index * 0.7 
+            delay: index * 0.5 
           }}
         />
       ))}
@@ -169,7 +169,7 @@ const Step2: React.FC = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"
         >
           {connectors.map((connector) => {
             const isConnected = connectedApps.includes(connector.id);
@@ -181,24 +181,24 @@ const Step2: React.FC = () => {
                 onClick={() => handleConnectorClick(connector.id)}
                 glassmorphism
               >
-                <CardContent className="p-6 flex flex-col items-center justify-center">
+                <CardContent className="p-3 flex flex-col items-center justify-center">
                   <div 
-                    className={`text-3xl mb-4 w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
+                    className={`text-2xl mb-2 w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
                       isConnected ? 'bg-green-100' : 'bg-gray-100'
                     }`}
                   >
                     {connector.icon}
                   </div>
                   
-                  <h3 className="font-medium text-lg mb-1">{connector.name}</h3>
-                  <p className="text-sm text-gray-500 text-center mb-3">{connector.description}</p>
+                  <h3 className="font-medium text-base mb-0.5">{connector.name}</h3>
+                  <p className="text-xs text-gray-500 text-center mb-2">{connector.description}</p>
                   
                   {isConnected ? (
-                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 py-1 px-3">
+                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 py-0.5 px-2 text-xs">
                       <Check className="w-3 h-3 mr-1" /> Connected
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-needl-primary border-needl-primary/30 py-1 px-3">
+                    <Badge variant="outline" className="text-needl-primary border-needl-primary/30 py-0.5 px-2 text-xs">
                       Connect
                     </Badge>
                   )}

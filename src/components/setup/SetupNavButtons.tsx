@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 interface SetupNavButtonsProps {
   onBack?: () => void;
-  onNext?: () => void;
+  onNext?: () => void; // Changed type to not require parameters
   onSkip?: () => void;
   isLastStep?: boolean;
   isNextDisabled?: boolean;
@@ -23,49 +23,49 @@ const SetupNavButtons: React.FC<SetupNavButtonsProps> = ({
 }) => {
   return (
     <motion.div 
-      className="flex justify-between mt-6"
+      className="flex justify-between mt-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 0.3 }}
+      transition={{ delay: 0.2 }}
     >
       {onBack ? (
         <Button
           variant="ghost"
           onClick={onBack}
-          className="gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          className="gap-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm py-1 h-auto"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3 w-3" />
           Back
         </Button>
       ) : (
         <div></div>
       )}
       
-      <div className="space-x-3">
+      <div className="space-x-2">
         {onSkip && !isLastStep && (
           <Button
             variant="outline"
             onClick={onSkip}
-            className="text-gray-500"
+            className="text-gray-500 text-sm py-1 h-auto"
           >
-            Skip this step
+            Skip
           </Button>
         )}
         
         <Button
           onClick={onNext}
           disabled={isNextDisabled || isSubmitting}
-          className="gap-2 bg-gradient-to-r from-needl-primary to-needl-dark hover:from-needl-dark hover:to-needl-primary text-white transition-all duration-300 shadow-md hover:shadow-lg"
+          className="gap-1 bg-gradient-to-r from-needl-primary to-needl-dark hover:from-needl-dark hover:to-needl-primary text-white transition-all duration-300 shadow-md hover:shadow-lg text-sm py-1 h-auto"
         >
           {isSubmitting ? (
             <>
-              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+              <div className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full mr-1"></div>
               Processing...
             </>
           ) : (
             <>
               {isLastStep ? 'Complete Setup' : 'Continue'}
-              {isLastStep ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+              {isLastStep ? <Check className="h-3 w-3" /> : <ArrowRight className="h-3 w-3" />}
             </>
           )}
         </Button>

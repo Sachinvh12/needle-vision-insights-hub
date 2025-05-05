@@ -10,10 +10,10 @@ interface PageTransitionProps {
 const PageTransition: React.FC<PageTransitionProps> = ({ children, className = '' }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      exit={{ opacity: 0, y: -5 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
       className={`w-full ${className}`}
     >
       {children}
