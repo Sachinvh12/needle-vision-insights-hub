@@ -26,19 +26,19 @@ const SetupPageWrapper: React.FC<SetupPageWrapperProps> = ({
         <AnimatedBackground variant={backgroundVariant} />
         
         <ScrollArea className="h-full w-full">
-          <div className="container mx-auto py-6 px-4 relative z-10">
+          <div className="container mx-auto py-4 px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="max-w-3xl mx-auto"
             >
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold mb-1 bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
                   {title}
                 </h2>
                 {subtitle && (
-                  <p className="text-slate-600 max-w-xl mx-auto">
+                  <p className="text-slate-600 max-w-xl mx-auto text-sm">
                     {subtitle}
                   </p>
                 )}

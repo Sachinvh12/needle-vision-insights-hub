@@ -9,12 +9,13 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button'; // Added Button import
+import { Button } from '@/components/ui/button';
 import { useApp } from '../../context/AppContext';
 import SetupPageWrapper from '../../components/setup/SetupPageWrapper';
 import SetupStepIndicator from '../../components/setup/SetupStepIndicator';
 import SetupTransition from '../../components/setup/SetupTransition';
 import EnhancedCard from '../../components/setup/EnhancedCard';
+import SetupNavButtons from '../../components/setup/SetupNavButtons';
 
 const Step3 = () => {
   const navigate = useNavigate();
@@ -110,14 +111,14 @@ const Step3 = () => {
       <SetupStepIndicator currentStep={3} />
       
       <SetupTransition>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="pb-6">
           <motion.div
-            className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-gray-100/80 p-8 mb-8"
+            className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-gray-100/80 p-6 mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Feed Name Field */}
               <div className="space-y-2">
                 <Label htmlFor="feedName" className="text-base font-medium">Feed Name</Label>
@@ -135,54 +136,54 @@ const Step3 = () => {
               <div className="space-y-3">
                 <Label className="text-base font-medium">Output Format</Label>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <RadioGroup 
+                  value={outputFormat} 
+                  onValueChange={(value) => updateSetupState({ outputFormat: value })}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-3"
+                >
                   {outputFormatOptions.map((option) => (
-                    <EnhancedCard
-                      key={option.value}
-                      isSelected={outputFormat === option.value}
-                      onClick={() => updateSetupState({ outputFormat: option.value })}
-                      className="p-0 overflow-hidden"
-                    >
-                      <div className="p-4 flex items-center">
-                        <div className="mr-3">
-                          <RadioGroupItem 
-                            value={option.value} 
-                            id={option.value} 
-                            className="sr-only"
-                            checked={outputFormat === option.value}
-                          />
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            outputFormat === option.value 
-                              ? 'bg-needl-lighter' 
-                              : 'bg-gray-100'
-                          }`}>
-                            {option.icon}
+                    <div key={option.value}>
+                      <RadioGroupItem value={option.value} id={option.value} className="sr-only" />
+                      <EnhancedCard
+                        isSelected={outputFormat === option.value}
+                        onClick={() => updateSetupState({ outputFormat: option.value })}
+                        className="p-0 overflow-hidden"
+                      >
+                        <div className="p-4 flex items-center">
+                          <div className="mr-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              outputFormat === option.value 
+                                ? 'bg-needl-lighter' 
+                                : 'bg-gray-100'
+                            }`}>
+                              {option.icon}
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label 
+                              htmlFor={option.value} 
+                              className="font-medium cursor-pointer block"
+                            >
+                              {option.label}
+                            </Label>
+                            <span className="text-xs text-gray-500">{option.description}</span>
                           </div>
                         </div>
-                        
-                        <div>
-                          <Label 
-                            htmlFor={option.value} 
-                            className="font-medium cursor-pointer block"
-                          >
-                            {option.label}
-                          </Label>
-                          <span className="text-xs text-gray-500">{option.description}</span>
-                        </div>
-                      </div>
-                    </EnhancedCard>
+                      </EnhancedCard>
+                    </div>
                   ))}
-                </div>
+                </RadioGroup>
               </div>
               
               {/* Alert Settings */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 p-6 rounded-lg border border-gray-100">
-                <div className="flex items-center mb-5">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 p-5 rounded-lg border border-gray-100">
+                <div className="flex items-center mb-4">
                   <Bell className="w-5 h-5 text-needl-primary mr-2" />
                   <h3 className="font-medium text-lg">Notification Settings</h3>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="alerts" className="font-medium">Enable Alerts</Label>
@@ -216,15 +217,16 @@ const Step3 = () => {
                     </div>
                     
                     <RadioGroup
-                      id="frequency"
                       value={frequency}
                       onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setFrequency(value)}
                       className="flex justify-between space-x-2"
                     >
                       <div className="flex-1">
-                        <div className={`border ${frequency === 'daily' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
-                             onClick={() => setFrequency('daily')}>
-                          <RadioGroupItem value="daily" id="daily-option" className="sr-only" />
+                        <RadioGroupItem value="daily" id="daily-option" className="sr-only" />
+                        <div 
+                          className={`border ${frequency === 'daily' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                          onClick={() => setFrequency('daily')}
+                        >
                           <Label htmlFor="daily-option" className="cursor-pointer">
                             <Calendar className="w-5 h-5 mx-auto mb-1" />
                             <span className="text-sm font-medium block">Daily</span>
@@ -233,10 +235,12 @@ const Step3 = () => {
                       </div>
                       
                       <div className="flex-1">
-                        <div className={`border ${frequency === 'weekly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
-                             onClick={() => setFrequency('weekly')}>
-                          <RadioGroupItem value="weekly" id="weekly" className="sr-only" />
-                          <Label htmlFor="weekly" className="cursor-pointer">
+                        <RadioGroupItem value="weekly" id="weekly-option" className="sr-only" />
+                        <div 
+                          className={`border ${frequency === 'weekly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                          onClick={() => setFrequency('weekly')}
+                        >
+                          <Label htmlFor="weekly-option" className="cursor-pointer">
                             <Calendar className="w-5 h-5 mx-auto mb-1" />
                             <span className="text-sm font-medium block">Weekly</span>
                           </Label>
@@ -244,10 +248,12 @@ const Step3 = () => {
                       </div>
                       
                       <div className="flex-1">
-                        <div className={`border ${frequency === 'monthly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
-                             onClick={() => setFrequency('monthly')}>
-                          <RadioGroupItem value="monthly" id="monthly" className="sr-only" />
-                          <Label htmlFor="monthly" className="cursor-pointer">
+                        <RadioGroupItem value="monthly" id="monthly-option" className="sr-only" />
+                        <div 
+                          className={`border ${frequency === 'monthly' ? 'border-needl-primary bg-needl-lighter/30' : 'border-gray-200'} rounded-lg p-3 text-center cursor-pointer transition-all hover:bg-gray-50`}
+                          onClick={() => setFrequency('monthly')}
+                        >
+                          <Label htmlFor="monthly-option" className="cursor-pointer">
                             <Calendar className="w-5 h-5 mx-auto mb-1" />
                             <span className="text-sm font-medium block">Monthly</span>
                           </Label>
@@ -282,7 +288,7 @@ const Step3 = () => {
               {/* Connected Data Sources */}
               <div>
                 <Label className="text-base font-medium block mb-3">Connected Data Sources</Label>
-                <div className="bg-gray-50/80 p-4 rounded-lg border border-gray-100">
+                <div className="bg-gray-50/80 p-4 rounded-lg border border-gray-100 max-h-[120px] overflow-y-auto">
                   {connectedApps.length > 0 ? (
                     <ul className="space-y-2">
                       {connectedApps.map((app) => (
@@ -311,36 +317,13 @@ const Step3 = () => {
             </div>
           </motion.div>
           
-          <div className="flex justify-between">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleBack}
-              className="gap-2 text-gray-600 hover:text-gray-900"
-              disabled={isSubmitting}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Back
-            </Button>
-            
-            <Button
-              type="submit"
-              disabled={!feedName.trim() || isSubmitting}
-              className="bg-gradient-to-r from-needl-primary to-needl-dark hover:from-needl-dark hover:to-needl-primary text-white transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                  Creating Feed...
-                </>
-              ) : (
-                <>
-                  Create Intelligence Feed
-                  <Check className="h-4 w-4 ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
+          <SetupNavButtons 
+            onBack={handleBack}
+            onNext={handleSubmit}
+            isLastStep={true}
+            isNextDisabled={!feedName.trim()}
+            isSubmitting={isSubmitting}
+          />
         </form>
       </SetupTransition>
     </SetupPageWrapper>
