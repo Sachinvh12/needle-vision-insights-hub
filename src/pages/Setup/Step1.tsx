@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -78,8 +77,8 @@ const Step1: React.FC = () => {
       
       <SetupTransition>
         <motion.div
-          className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl border border-gray-100/80 p-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
+          className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100/80 p-5 mb-6"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
@@ -92,19 +91,19 @@ const Step1: React.FC = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="E.g., Track TechCorp's product launches, market share changes, and competitive positioning in the AI software industry"
-            className="h-32 resize-none mb-6 focus:border-needl-primary focus:ring focus:ring-needl-lighter text-base"
+            className="h-28 resize-none mb-5 focus:border-needl-primary focus:ring focus:ring-needl-lighter text-base"
           />
           
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 rounded-full bg-needl-lighter flex items-center justify-center mr-2">
+              <div className="flex items-center mb-2">
+                <div className="w-7 h-7 rounded-full bg-needl-lighter flex items-center justify-center mr-2">
                   <Target className="w-4 h-4 text-needl-primary" />
                 </div>
                 <span className="font-medium text-gray-800">Target Entities</span>
               </div>
               
-              <div className="min-h-[50px] p-3 rounded-lg bg-gray-50/80 border border-gray-100">
+              <div className="min-h-[45px] p-3 rounded-lg bg-gray-50/80 border border-gray-100">
                 <AnimatePresence>
                   {isProcessing ? (
                     <motion.div
@@ -139,14 +138,14 @@ const Step1: React.FC = () => {
             </div>
             
             <div>
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+              <div className="flex items-center mb-2">
+                <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center mr-2">
                   <Crosshair className="w-4 h-4 text-blue-600" />
                 </div>
                 <span className="font-medium text-gray-800">Tracking Criteria</span>
               </div>
               
-              <div className="min-h-[50px] p-3 rounded-lg bg-gray-50/80 border border-gray-100">
+              <div className="min-h-[45px] p-3 rounded-lg bg-gray-50/80 border border-gray-100">
                 <AnimatePresence>
                   {isProcessing ? (
                     <motion.div

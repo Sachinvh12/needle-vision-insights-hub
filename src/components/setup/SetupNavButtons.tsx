@@ -23,7 +23,7 @@ const SetupNavButtons: React.FC<SetupNavButtonsProps> = ({
 }) => {
   return (
     <motion.div 
-      className="flex justify-between mt-8"
+      className="flex justify-between mt-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.3 }}
