@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -26,7 +25,7 @@ const Battlecard: React.FC = () => {
   });
 
   // Get the feed data based on the ID parameter
-  const feed = state.feeds.find(feed => feed.id === id);
+  const feed = state.userFeeds.find(feed => feed.id === id);
   const feedType = feed?.type || 'competitor';
 
   // Redirect if feed not found
@@ -85,17 +84,15 @@ const Battlecard: React.FC = () => {
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save(`battlecard-${feed.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
       
-      toast({
-        title: "Success!",
-        description: "Battlecard downloaded as PDF",
-        variant: "success",
+      // Fix: Use toast.success instead of toast directly
+      toast.success("Success!", {
+        description: "Battlecard downloaded as PDF"
       });
     } catch (error) {
       console.error("PDF generation error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF",
-        variant: "destructive",
+      // Fix: Use toast.error instead of toast directly
+      toast.error("Error", {
+        description: "Failed to generate PDF"
       });
     } finally {
       setLoading(prev => ({ ...prev, pdf: false }));
@@ -111,10 +108,9 @@ const Battlecard: React.FC = () => {
       const body = encodeURIComponent(`I'd like to share this intelligence battlecard on ${feed.name} with you.`);
       window.open(`mailto:?subject=${subject}&body=${body}`);
       
-      toast({
-        title: "Email client opened",
-        description: "Ready to share your battlecard",
-        variant: "success"
+      // Fix: Use toast.success instead of toast directly
+      toast.success("Email client opened", {
+        description: "Ready to share your battlecard"
       });
       
       setLoading(prev => ({ ...prev, email: false }));

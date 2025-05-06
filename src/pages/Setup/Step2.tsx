@@ -60,11 +60,16 @@ const Step2: React.FC = () => {
   const handleConnectorClick = (connectorId: string) => {
     toggleConnectedApp(connectorId);
     const connector = connectors.find(c => c.id === connectorId);
-    toast({
-      title: connector?.name,
-      description: `${connectedApps.includes(connectorId) ? 'Disconnected' : 'Connected'} successfully`,
-      variant: connectedApps.includes(connectorId) ? "destructive" : "success"
-    });
+    // Fix: Use toast.success or toast.error instead of toast directly
+    if (connectedApps.includes(connectorId)) {
+      toast.error(connector?.name || "Connector", {
+        description: "Disconnected successfully"
+      });
+    } else {
+      toast.success(connector?.name || "Connector", {
+        description: "Connected successfully"
+      });
+    }
   };
   
   // Animation for document flow visualization - made more compact
