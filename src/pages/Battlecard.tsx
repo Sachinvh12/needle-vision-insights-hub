@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Download, Link as LinkIcon, Copy, Mail, ChevronRight, ChevronDown, Info, FileText, Globe } from 'lucide-react';
+import { Download, Link as LinkIcon, Copy, Mail, ChevronRight, ChevronDown, Info, FileText, Globe, ArrowLeft } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import PageTransition from '../components/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,10 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApp } from '../context/AppContext';
 import { mockBattlecard } from '../utils/mockData';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { BattlecardPDF } from '@/components/battlecard/BattlecardPDF';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const Battlecard: React.FC = () => {
   const { feedId } = useParams<{ feedId: string }>();
@@ -22,6 +25,8 @@ const Battlecard: React.FC = () => {
   const [expandedSources, setExpandedSources] = useState<string[]>([]);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const { toast } = useToast();
+  const battlecardRef = useRef<HTMLDivElement>(null);
   
   const feed = userFeeds.find(f => f.id === feedId);
   
@@ -82,21 +87,55 @@ const Battlecard: React.FC = () => {
     }, 1500);
   };
   
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    if (!battlecardRef.current) return;
+    
     setDownloading(true);
     
-    // Simulate downloading process
-    setTimeout(() => {
-      setDownloading(false);
+    try {
+      // Create a PDF document
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
       
-      // In a real implementation, we would generate a PDF and download it
-      // For now, we'll just show a toast
+      // Convert the HTML element to a canvas
+      const canvas = await html2canvas(battlecardRef.current, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+      
+      // Convert canvas to image data
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculate the PDF dimensions to maintain aspect ratio
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Add the image to the PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Save the PDF
+      pdf.save(`${feed.name.replace(/\s+/g, '_')}_battlecard.pdf`);
+      
       toast({
         title: "Download complete",
         description: `${feed.name} battlecard has been downloaded.`,
         variant: "default",
       });
-    }, 1500);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Download failed",
+        description: "There was an error generating the PDF. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
   };
   
   const getImportanceBadge = (importance: string) => {
@@ -169,6 +208,50 @@ const Battlecard: React.FC = () => {
   const customizedFindings = getFeedSpecificFindings();
   const customizedTakeaways = getFeedSpecificTakeaways();
   
+  // Generate more actionable insights based on feed type
+  const getActionableInsights = () => {
+    const insights = [];
+    
+    if (feed.type === 'competitor') {
+      insights.push({
+        title: "Strategic Opportunity",
+        content: "Launch targeted campaign highlighting our superior customer retention features within the next 30 days to capture churning customers.",
+        priority: "high"
+      });
+      insights.push({
+        title: "Defensive Action",
+        content: "Prepare counter-messaging for their upcoming product release in Q3 by emphasizing our established market reliability.",
+        priority: "medium"
+      });
+    } else if (feed.type === 'market') {
+      insights.push({
+        title: "Growth Initiative",
+        content: "Accelerate enterprise sales team expansion by 15% to capitalize on projected market growth in this segment.",
+        priority: "high"
+      });
+      insights.push({
+        title: "Risk Mitigation",
+        content: "Develop compliance automation tools for smaller clients to protect market share against regulatory changes.",
+        priority: "medium"
+      });
+    } else if (feed.type === 'trend') {
+      insights.push({
+        title: "First-Mover Advantage",
+        content: "Integrate this technology into our core product within 60 days to establish market leadership before competitor adoption.",
+        priority: "high"
+      });
+      insights.push({
+        title: "Marketing Opportunity",
+        content: "Create thought leadership content series on this trend to position as industry experts during adoption acceleration.",
+        priority: "medium"
+      });
+    }
+    
+    return insights;
+  };
+  
+  const actionableInsights = getActionableInsights();
+  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
       <MainHeader showAlertIcon />
@@ -229,204 +312,288 @@ const Battlecard: React.FC = () => {
             </motion.div>
           </div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mb-6"
-          >
-            <Card className="overflow-hidden border-none shadow-md">
-              <div className={`h-1.5 w-full ${feed.type === 'competitor' ? 'bg-red-500' : feed.type === 'market' ? 'bg-blue-500' : feed.type === 'trend' ? 'bg-amber-500' : 'bg-purple-500'}`} />
-              <CardHeader className="pb-3 bg-white flex flex-col md:flex-row md:items-center md:justify-between space-y-0">
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <Badge 
-                      variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
-                      className={feed.status === 'active' ? 'bg-green-500 text-xs h-5' : 'text-xs h-5'}
-                    >
-                      {feed.status === 'active' ? 'Active' : feed.status === 'paused' ? 'Paused' : 'Error'}
-                    </Badge>
-                    <span className="capitalize">{feed.type} Intelligence</span>
-                  </div>
-                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
-                    {feed.name}
-                  </CardTitle>
-                </div>
-                <div className="text-sm text-gray-500 mt-0">
-                  <div className="flex items-center bg-gray-50 py-1 px-3 rounded-full">
-                    <span className="mr-2">Updated:</span>
-                    <span className="font-medium">{new Date(feed.lastActivity || feed.createdAt).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0 pb-4 bg-white">
-                <p className="text-gray-600">{feed.query}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-          
-          <Tabs defaultValue="findings" className="mb-8">
-            <TabsList className="bg-white shadow-sm border mb-4 rounded-xl overflow-hidden">
-              <TabsTrigger value="findings" className="px-8 data-[state=active]:bg-needl-primary data-[state=active]:text-white transition-all duration-300">
-                Key Findings
-              </TabsTrigger>
-              <TabsTrigger value="takeaways" className="px-8 data-[state=active]:bg-needl-primary data-[state=active]:text-white transition-all duration-300">
-                Key Takeaways
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="findings" className="pt-2 space-y-6">
-              {customizedFindings.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Card className="overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <div className={`h-1 w-full ${finding.importance === 'high' ? 'bg-red-500' : finding.importance === 'medium' ? 'bg-amber-500' : 'bg-green-500'}`} />
-                    <div className="flex items-center justify-between p-4 border-b bg-white">
-                      <h3 className="font-semibold text-lg">{finding.title}</h3>
-                      {getImportanceBadge(finding.importance)}
+          <div ref={battlecardRef}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mb-6"
+            >
+              <Card className="overflow-hidden border-none shadow-md">
+                <div className={`h-1.5 w-full ${feed.type === 'competitor' ? 'bg-gradient-to-r from-red-500 to-red-400' : feed.type === 'market' ? 'bg-gradient-to-r from-blue-500 to-blue-400' : feed.type === 'trend' ? 'bg-gradient-to-r from-amber-500 to-amber-400' : 'bg-gradient-to-r from-purple-500 to-purple-400'}`} />
+                <CardHeader className="pb-3 bg-white flex flex-col md:flex-row md:items-center md:justify-between space-y-0">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                      <Badge 
+                        variant={feed.status === 'active' ? 'default' : feed.status === 'paused' ? 'outline' : 'destructive'}
+                        className={feed.status === 'active' ? 'bg-green-500 text-xs h-5' : 'text-xs h-5'}
+                      >
+                        {feed.status === 'active' ? 'Active' : feed.status === 'paused' ? 'Paused' : 'Error'}
+                      </Badge>
+                      <span className="capitalize">{feed.type} Intelligence</span>
                     </div>
-                    <CardContent className="pt-4 bg-white">
-                      <p className="text-gray-700 mb-6 text-base leading-relaxed">{finding.summary}</p>
-                      
-                      <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-500 flex items-center gap-1">
-                          <Info className="h-4 w-4" />
-                          Sources:
-                        </h4>
-                        <div className="space-y-2">
-                          {finding.sources.map((source, idx) => {
-                            const isExpanded = expandedSources.includes(`${finding.id}-${idx}`);
-                            
-                            return (
-                              <Card key={idx} className="border border-gray-200 overflow-hidden hover:border-needl-primary/30 transition-colors">
-                                <div 
-                                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
-                                  onClick={() => toggleSourceExpansion(`${finding.id}-${idx}`)}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {source.type === 'web' ? (
-                                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <Globe className="h-4 w-4 text-blue-600" />
-                                      </div>
-                                    ) : (
-                                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                                        <FileText className="h-4 w-4 text-amber-600" />
-                                      </div>
-                                    )}
-                                    <div>
-                                      <p className="text-sm font-medium">{source.name}</p>
-                                      <p className="text-xs text-gray-500">{source.type === 'web' ? 'Web Source' : 'Document'}</p>
-                                    </div>
-                                  </div>
-                                  <motion.div
-                                    animate={{ rotate: isExpanded ? 90 : 0 }}
-                                    transition={{ duration: 0.2 }}
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
+                      {feed.name}
+                    </CardTitle>
+                  </div>
+                  <div className="text-sm text-gray-500 mt-0">
+                    <div className="flex items-center bg-gray-50 py-1 px-3 rounded-full">
+                      <span className="mr-2">Updated:</span>
+                      <span className="font-medium">{new Date(feed.lastActivity || feed.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4 bg-white">
+                  <p className="text-gray-600">{feed.query}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            <Tabs defaultValue="findings" className="mb-8">
+              <TabsList className="bg-white shadow-sm border mb-4 rounded-xl overflow-hidden">
+                <TabsTrigger value="findings" className="px-8 data-[state=active]:bg-needl-primary data-[state=active]:text-white transition-all duration-300">
+                  Key Findings
+                </TabsTrigger>
+                <TabsTrigger value="takeaways" className="px-8 data-[state=active]:bg-needl-primary data-[state=active]:text-white transition-all duration-300">
+                  Key Takeaways
+                </TabsTrigger>
+                <TabsTrigger value="actions" className="px-8 data-[state=active]:bg-needl-primary data-[state=active]:text-white transition-all duration-300">
+                  Action Plan
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="findings" className="pt-2 space-y-6">
+                {customizedFindings.map((finding, index) => (
+                  <motion.div
+                    key={finding.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    <Card className="overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+                      <div className={`h-1 w-full ${finding.importance === 'high' ? 'bg-gradient-to-r from-red-500 to-red-400' : finding.importance === 'medium' ? 'bg-gradient-to-r from-amber-500 to-amber-400' : 'bg-gradient-to-r from-green-500 to-green-400'}`} />
+                      <div className="flex items-center justify-between p-4 border-b bg-white">
+                        <h3 className="font-semibold text-lg">{finding.title}</h3>
+                        {getImportanceBadge(finding.importance)}
+                      </div>
+                      <CardContent className="pt-4 bg-white">
+                        <p className="text-gray-700 mb-6 text-base leading-relaxed">{finding.summary}</p>
+                        
+                        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                          <h4 className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                            <Info className="h-4 w-4" />
+                            Sources:
+                          </h4>
+                          <div className="space-y-2">
+                            {finding.sources.map((source, idx) => {
+                              const isExpanded = expandedSources.includes(`${finding.id}-${idx}`);
+                              
+                              return (
+                                <Card key={idx} className="border border-gray-200 overflow-hidden hover:border-needl-primary/30 transition-colors">
+                                  <div 
+                                    className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                                    onClick={() => toggleSourceExpansion(`${finding.id}-${idx}`)}
                                   >
-                                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                                  </motion.div>
-                                </div>
-                                
-                                <AnimatePresence>
-                                  {isExpanded && (
-                                    <motion.div 
-                                      initial={{ opacity: 0, height: 0 }}
-                                      animate={{ opacity: 1, height: 'auto' }}
-                                      exit={{ opacity: 0, height: 0 }}
-                                      transition={{ duration: 0.2 }}
-                                      className="border-t"
-                                    >
-                                      <div className="p-3 bg-gray-50">
-                                        <p className="text-sm text-gray-600 mb-3 italic border-l-2 border-needl-primary/30 pl-3 py-1">
-                                          "{finding.summary.substring(0, 120)}..."
-                                        </p>
-                                        
-                                        {source.type === 'web' ? (
-                                          <a 
-                                            href={source.url || '#'} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="text-needl-primary hover:underline flex items-center gap-1 text-sm"
-                                          >
-                                            <LinkIcon className="h-3 w-3" /> View Original Source
-                                          </a>
-                                        ) : (
-                                          <span 
-                                            className="text-needl-primary hover:underline flex items-center gap-1 cursor-pointer text-sm"
-                                            onClick={() => toast({
-                                              title: "Opening Document",
-                                              description: `Opening ${source.name} in document viewer`,
-                                            })}
-                                          >
-                                            <LinkIcon className="h-3 w-3" /> View Document
-                                          </span>
-                                        )}
+                                    <div className="flex items-center gap-2">
+                                      {source.type === 'web' ? (
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                          <Globe className="h-4 w-4 text-blue-600" />
+                                        </div>
+                                      ) : (
+                                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                                          <FileText className="h-4 w-4 text-amber-600" />
+                                        </div>
+                                      )}
+                                      <div>
+                                        <p className="text-sm font-medium">{source.name}</p>
+                                        <p className="text-xs text-gray-500">{source.type === 'web' ? 'Web Source' : 'Document'}</p>
                                       </div>
+                                    </div>
+                                    <motion.div
+                                      animate={{ rotate: isExpanded ? 90 : 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <ChevronRight className="h-5 w-5 text-gray-400" />
                                     </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </Card>
-                            );
-                          })}
+                                  </div>
+                                  
+                                  <AnimatePresence>
+                                    {isExpanded && (
+                                      <motion.div 
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="border-t"
+                                      >
+                                        <div className="p-3 bg-gray-50">
+                                          <p className="text-sm text-gray-600 mb-3 italic border-l-2 border-needl-primary/30 pl-3 py-1">
+                                            "{finding.summary.substring(0, 120)}..."
+                                          </p>
+                                          
+                                          {source.type === 'web' ? (
+                                            <a 
+                                              href={source.url || '#'} 
+                                              target="_blank" 
+                                              rel="noopener noreferrer"
+                                              className="text-needl-primary hover:underline flex items-center gap-1 text-sm"
+                                            >
+                                              <LinkIcon className="h-3 w-3" /> View Original Source
+                                            </a>
+                                          ) : (
+                                            <span 
+                                              className="text-needl-primary hover:underline flex items-center gap-1 cursor-pointer text-sm"
+                                              onClick={() => toast({
+                                                title: "Opening Document",
+                                                description: `Opening ${source.name} in document viewer`,
+                                              })}
+                                            >
+                                              <LinkIcon className="h-3 w-3" /> View Document
+                                            </span>
+                                          )}
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </Card>
+                              );
+                            })}
+                          </div>
                         </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </TabsContent>
+              
+              <TabsContent value="takeaways" className="pt-2">
+                <Card className="border-none shadow-md">
+                  <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50/50 pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Badge className="bg-needl-primary h-6 px-3">Key</Badge>
+                      <span className="bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
+                        Strategic Takeaways for {feed.name}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="bg-white pt-4">
+                    <ul className="space-y-4">
+                      {customizedTakeaways.map((takeaway, index) => (
+                        <motion.li
+                          key={index}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.1 }}
+                          className="flex items-start gap-3 p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors rounded-md"
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-needl-primary/20 text-needl-primary flex items-center justify-center mt-0.5">
+                            <span className="text-sm font-semibold">{index + 1}</span>
+                          </div>
+                          <p className="text-gray-700">{takeaway}</p>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="bg-white flex justify-end pt-0 pb-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 border-needl-primary/20 hover:bg-needl-lighter hover:border-needl-primary"
+                      onClick={handleCopyToClipboard}
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy Takeaways
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="actions" className="pt-2 space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Card className="border-none shadow-md overflow-hidden">
+                    <CardHeader className="pb-3 bg-gradient-to-r from-gray-50 to-blue-50/50">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Badge className="bg-needl-primary h-6 px-3">Priority</Badge>
+                        <span className="bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
+                          Recommended Next Steps
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 bg-white">
+                      <div className="space-y-6">
+                        {actionableInsights.map((insight, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.15 }}
+                            className="rounded-lg border border-gray-200 overflow-hidden"
+                          >
+                            <div className={`flex items-center justify-between p-3 ${insight.priority === 'high' ? 'bg-red-50' : 'bg-amber-50'}`}>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${insight.priority === 'high' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+                                  {index + 1}
+                                </div>
+                                <h3 className="font-medium">{insight.title}</h3>
+                              </div>
+                              <Badge 
+                                className={`${insight.priority === 'high' ? 'bg-red-500' : 'bg-amber-500'}`}
+                              >
+                                {insight.priority === 'high' ? 'High Priority' : 'Medium Priority'}
+                              </Badge>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-gray-700">{insight.content}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                      
+                      <div className="mt-8 bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-medium mb-2 text-gray-700">Success Metrics:</h4>
+                        <ul className="space-y-2">
+                          <li className="flex items-start gap-2">
+                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                              <span className="text-xs text-green-600">✓</span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              {feed.type === 'competitor' 
+                                ? "Increase customer acquisition from competitor by 15% within 90 days" 
+                                : feed.type === 'market' 
+                                  ? "Achieve 25% revenue growth in enterprise segment by Q4" 
+                                  : "Reduce time-to-market by 30% through technology adoption"}
+                            </p>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                              <span className="text-xs text-green-600">✓</span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              {feed.type === 'competitor' 
+                                ? "Decrease competitive loss rate by 20% in head-to-head sales situations" 
+                                : feed.type === 'market' 
+                                  ? "Launch compliance solution before regulatory deadline to capture 35% of affected customers" 
+                                  : "Establish thought leadership position with 3 high-profile industry publications"}
+                            </p>
+                          </li>
+                        </ul>
                       </div>
                     </CardContent>
                   </Card>
                 </motion.div>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="takeaways" className="pt-2">
-              <Card className="border-none shadow-md">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50/50 pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Badge className="bg-needl-primary h-6 px-3">Key</Badge>
-                    <span className="bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent">
-                      Strategic Takeaways for {feed.name}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="bg-white pt-4">
-                  <ul className="space-y-4">
-                    {customizedTakeaways.map((takeaway, index) => (
-                      <motion.li
-                        key={index}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className="flex items-start gap-3 p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors rounded-md"
-                      >
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-needl-primary/20 text-needl-primary flex items-center justify-center mt-0.5">
-                          <span className="text-sm font-semibold">{index + 1}</span>
-                        </div>
-                        <p className="text-gray-700">{takeaway}</p>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter className="bg-white flex justify-end pt-0 pb-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2 border-needl-primary/20 hover:bg-needl-lighter hover:border-needl-primary"
-                    onClick={handleCopyToClipboard}
-                  >
-                    <Copy className="h-4 w-4" />
-                    Copy Takeaways
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </div>
         </main>
       </PageTransition>
     </div>
