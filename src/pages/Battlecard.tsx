@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Link as LinkIcon, Copy, Mail, ChevronRight, ChevronDown, Info, FileText, Globe, ArrowLeft } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
@@ -15,7 +14,7 @@ import { mockBattlecard } from '../utils/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { BattlecardPDF } from '@/components/battlecard/BattlecardPDF';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 const Battlecard: React.FC = () => {
   const { feedId } = useParams<{ feedId: string }>();
@@ -66,10 +65,8 @@ const Battlecard: React.FC = () => {
     `;
     
     navigator.clipboard.writeText(battlecardText);
-    toast({
-      title: "Copied to clipboard",
-      description: "Battlecard content has been copied to your clipboard.",
-      variant: "default",
+    toast.success("Copied to clipboard", {
+      description: "Battlecard content has been copied to your clipboard."
     });
   };
   
@@ -79,10 +76,8 @@ const Battlecard: React.FC = () => {
     // Simulate email sending process
     setTimeout(() => {
       setSharing(false);
-      toast({
-        title: "Shared successfully",
-        description: "Battlecard has been sent to your email.",
-        variant: "default",
+      toast.success("Shared successfully", {
+        description: "Battlecard has been sent to your email."
       });
     }, 1500);
   };
@@ -121,17 +116,13 @@ const Battlecard: React.FC = () => {
       // Save the PDF
       pdf.save(`${feed.name.replace(/\s+/g, '_')}_battlecard.pdf`);
       
-      toast({
-        title: "Download complete",
-        description: `${feed.name} battlecard has been downloaded.`,
-        variant: "default",
+      toast.success("Download complete", {
+        description: `${feed.name} battlecard has been downloaded.`
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast({
-        title: "Download failed",
-        description: "There was an error generating the PDF. Please try again.",
-        variant: "destructive",
+      toast.error("Download failed", {
+        description: "There was an error generating the PDF. Please try again."
       });
     } finally {
       setDownloading(false);

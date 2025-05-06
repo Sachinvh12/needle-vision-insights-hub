@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, View, Text, StyleSheet, Image } from '@react-pdf/renderer';
 
 interface BattlecardPDFProps {
   feedName: string;
@@ -105,47 +105,127 @@ const styles = StyleSheet.create({
     color: '#999999',
     textAlign: 'center',
   },
+  actionSection: {
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 5,
+    border: '1 solid #EEEEEE',
+    backgroundColor: '#F8F9FA',
+  },
+  actionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#444444',
+  },
+  actionItem: {
+    marginBottom: 8,
+    paddingLeft: 10,
+  },
+  priorityTag: {
+    fontSize: 9,
+    padding: 2,
+    borderRadius: 2,
+    color: '#FFFFFF',
+    marginBottom: 4,
+    alignSelf: 'flex-start',
+  },
+  highPriority: {
+    backgroundColor: '#EF4444',
+  },
+  mediumPriority: {
+    backgroundColor: '#F59E0B',
+  },
+  logo: {
+    width: 100,
+    height: 30,
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+  },
+  colorBar: {
+    height: 3,
+    marginBottom: 10,
+  },
+  redGradient: {
+    backgroundColor: '#EF4444',
+  },
+  blueGradient: {
+    backgroundColor: '#3B82F6',
+  },
+  amberGradient: {
+    backgroundColor: '#F59E0B',
+  },
+  purpleGradient: {
+    backgroundColor: '#8B5CF6',
+  },
 });
 
-export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings, takeaways }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{feedName} Battlecard</Text>
-        <Text style={styles.subtitle}>Intelligence Report | Generated on {new Date().toLocaleDateString()}</Text>
-      </View>
+export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings, takeaways }) => {
+  // Add actions for the PDF
+  const actions = [
+    { title: "Strategic Opportunity", content: "Launch targeted campaign highlighting our superior features within 30 days", priority: "high" },
+    { title: "Risk Mitigation", content: "Develop compliance automation tools to protect market share against regulatory changes", priority: "medium" },
+  ];
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Key Findings</Text>
-        {findings.map((finding, index) => (
-          <View key={finding.id} style={styles.findingCard}>
-            <Text style={styles.findingTitle}>{finding.title}</Text>
-            <Text 
-              style={[
-                styles.findingImportance,
-                finding.importance === 'high' ? styles.importanceHigh : 
-                finding.importance === 'medium' ? styles.importanceMedium : 
-                styles.importanceLow
-              ]}
-            >
-              {finding.importance.toUpperCase()} IMPORTANCE
-            </Text>
-            <Text style={styles.text}>{finding.summary}</Text>
-          </View>
-        ))}
-      </View>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <View style={[styles.colorBar, styles.blueGradient]} />
+          <Text style={styles.title}>{feedName} Battlecard</Text>
+          <Text style={styles.subtitle}>Intelligence Report | Generated on {new Date().toLocaleDateString()}</Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Key Takeaways</Text>
-        {takeaways.map((takeaway, index) => (
-          <View key={index} style={styles.takeawayItem}>
-            <Text style={styles.takeawayBullet}>• </Text>
-            <Text style={styles.takeawayText}>{takeaway}</Text>
-          </View>
-        ))}
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Findings</Text>
+          {findings.map((finding, index) => (
+            <View key={finding.id} style={styles.findingCard}>
+              <Text style={styles.findingTitle}>{finding.title}</Text>
+              <Text 
+                style={[
+                  styles.findingImportance,
+                  finding.importance === 'high' ? styles.importanceHigh : 
+                  finding.importance === 'medium' ? styles.importanceMedium : 
+                  styles.importanceLow
+                ]}
+              >
+                {finding.importance.toUpperCase()} IMPORTANCE
+              </Text>
+              <Text style={styles.text}>{finding.summary}</Text>
+            </View>
+          ))}
+        </View>
 
-      <Text style={styles.footer}>Confidential and Proprietary | For Internal Use Only</Text>
-    </Page>
-  </Document>
-);
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Takeaways</Text>
+          {takeaways.map((takeaway, index) => (
+            <View key={index} style={styles.takeawayItem}>
+              <Text style={styles.takeawayBullet}>• </Text>
+              <Text style={styles.takeawayText}>{takeaway}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recommended Actions</Text>
+          {actions.map((action, index) => (
+            <View key={index} style={styles.actionItem}>
+              <Text 
+                style={[
+                  styles.priorityTag,
+                  action.priority === 'high' ? styles.highPriority : styles.mediumPriority
+                ]}
+              >
+                {action.priority.toUpperCase()} PRIORITY
+              </Text>
+              <Text style={styles.actionTitle}>{action.title}</Text>
+              <Text style={styles.text}>{action.content}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.footer}>Confidential and Proprietary | For Internal Use Only</Text>
+      </Page>
+    </Document>
+  );
+};
