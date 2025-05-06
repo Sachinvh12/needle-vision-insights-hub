@@ -15,24 +15,8 @@ export interface Feed {
   type: 'competitor' | 'market' | 'trend' | 'custom';
   status: 'active' | 'paused' | 'error';
   createdAt: string;
-  lastActivity: string;
+  lastActivity: string; // Changed from optional to required to match feedTypes.ts
   snippet?: string;
-  description?: string;
-  tags?: string[];
-  updateFrequency?: string;
-  insights?: Array<{
-    title: string;
-    description: string;
-    category?: string;
-    confidence?: string;
-  }>;
-  sources?: Array<{
-    name: string;
-    type: string;
-    url?: string;
-    date?: string;
-    description?: string;
-  }>;
   sourceMix?: {
     web: number;
     docs: number;

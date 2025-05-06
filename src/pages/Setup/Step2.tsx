@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
@@ -16,17 +16,9 @@ import EnhancedCard from '../../components/setup/EnhancedCard';
 
 const Step2: React.FC = () => {
   const navigate = useNavigate();
-  const { state, toggleConnectedApp, updateSetupState } = useApp();
+  const { state, toggleConnectedApp } = useApp();
   const { toast } = useToast();
   const { connectedApps } = state;
-  
-  // Ensure the connectedApps state persists to the setup state
-  useEffect(() => {
-    // Update the setup state with connectedApps to ensure it's available in later steps
-    updateSetupState({
-      connectedSources: connectedApps
-    });
-  }, [connectedApps, updateSetupState]);
   
   // Custom connector data with updated copy
   const connectors = [
@@ -60,16 +52,7 @@ const Step2: React.FC = () => {
   const handleConnectorClick = (connectorId: string) => {
     toggleConnectedApp(connectorId);
     const connector = connectors.find(c => c.id === connectorId);
-    // Fix: Use toast.success or toast.error instead of toast directly
-    if (connectedApps.includes(connectorId)) {
-      toast.error(connector?.name || "Connector", {
-        description: "Disconnected successfully"
-      });
-    } else {
-      toast.success(connector?.name || "Connector", {
-        description: "Connected successfully"
-      });
-    }
+    toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
   };
   
   // Animation for document flow visualization - made more compact
