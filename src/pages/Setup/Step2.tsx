@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
@@ -16,9 +16,17 @@ import EnhancedCard from '../../components/setup/EnhancedCard';
 
 const Step2: React.FC = () => {
   const navigate = useNavigate();
-  const { state, toggleConnectedApp } = useApp();
+  const { state, toggleConnectedApp, updateSetupState } = useApp();
   const { toast } = useToast();
   const { connectedApps } = state;
+  
+  // Ensure the connectedApps state persists to the setup state
+  useEffect(() => {
+    // Update the setup state with connectedApps to ensure it's available in later steps
+    updateSetupState({
+      connectedSources: connectedApps
+    });
+  }, [connectedApps, updateSetupState]);
   
   // Custom connector data with updated copy
   const connectors = [
@@ -52,7 +60,11 @@ const Step2: React.FC = () => {
   const handleConnectorClick = (connectorId: string) => {
     toggleConnectedApp(connectorId);
     const connector = connectors.find(c => c.id === connectorId);
-    toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
+    toast({
+      title: connector?.name,
+      description: `${connectedApps.includes(connectorId) ? 'Disconnected' : 'Connected'} successfully`,
+      variant: connectedApps.includes(connectorId) ? "destructive" : "success"
+    });
   };
   
   // Animation for document flow visualization - made more compact
