@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -26,7 +27,8 @@ const Battlecard: React.FC = () => {
 
   // Get the feed data based on the ID parameter
   const feed = state.userFeeds.find(feed => feed.id === id);
-  const feedType = feed?.type || 'competitor';
+  // Ensure feedType is one of the allowed types
+  const feedType = feed?.type as 'competitor' | 'market' | 'trend' | 'custom' || 'competitor';
 
   // Redirect if feed not found
   useEffect(() => {
@@ -84,13 +86,13 @@ const Battlecard: React.FC = () => {
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save(`battlecard-${feed.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
       
-      // Fix: Use toast.success instead of toast directly
+      // Use toast.success instead of toast directly
       toast.success("Success!", {
         description: "Battlecard downloaded as PDF"
       });
     } catch (error) {
       console.error("PDF generation error:", error);
-      // Fix: Use toast.error instead of toast directly
+      // Use toast.error instead of toast directly
       toast.error("Error", {
         description: "Failed to generate PDF"
       });
@@ -108,7 +110,7 @@ const Battlecard: React.FC = () => {
       const body = encodeURIComponent(`I'd like to share this intelligence battlecard on ${feed.name} with you.`);
       window.open(`mailto:?subject=${subject}&body=${body}`);
       
-      // Fix: Use toast.success instead of toast directly
+      // Use toast.success instead of toast directly
       toast.success("Email client opened", {
         description: "Ready to share your battlecard"
       });
@@ -181,21 +183,21 @@ const Battlecard: React.FC = () => {
             }
           ]
         };
-      case 'product':
+      case 'trend':
         return {
-          title: 'Product Intelligence',
+          title: 'Trend Intelligence',
           sections: [
             {
-              title: 'Feature Analysis',
-              content: 'Detailed breakdown of capabilities and unique selling points'
+              title: 'Trend Analysis',
+              content: 'Detailed breakdown of emerging patterns and their implications'
             },
             {
-              title: 'User Feedback',
-              content: 'Aggregated insights from customer reviews and satisfaction metrics'
+              title: 'User Impact',
+              content: 'How these trends affect user behavior and expectations'
             },
             {
-              title: 'Development Roadmap',
-              content: 'Upcoming features and strategic product direction'
+              title: 'Future Outlook',
+              content: 'Projected evolution and strategic importance'
             }
           ]
         };
@@ -316,7 +318,7 @@ const Battlecard: React.FC = () => {
                         <div className="flex flex-wrap gap-3 mb-4">
                           <Badge variant="outline" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200">
                             <Target className="w-3 h-3" />
-                            {feedType === 'competitor' ? 'Competitor' : feedType === 'market' ? 'Market' : 'Product'}
+                            {feedType === 'competitor' ? 'Competitor' : feedType === 'market' ? 'Market' : feedType === 'trend' ? 'Trend' : 'Custom'}
                           </Badge>
                           <Badge variant="outline" className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200">
                             <Calendar className="w-3 h-3" />
@@ -324,16 +326,16 @@ const Battlecard: React.FC = () => {
                           </Badge>
                           <Badge variant="outline" className="flex items-center gap-1 bg-purple-50 text-purple-700 border-purple-200">
                             <Tag className="w-3 h-3" />
-                            {feed.tags?.[0] || 'Intelligence'}
+                            {feedType}
                           </Badge>
                           <Badge variant="outline" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200">
                             <Clock className="w-3 h-3" />
-                            {feed.updateFrequency || 'Daily'} updates
+                            Daily updates
                           </Badge>
                         </div>
                         
                         <div className="prose prose-sm max-w-none text-gray-700">
-                          <p className="mb-3">{feed.description || `This battlecard provides comprehensive intelligence on ${feed.name}, offering strategic insights and actionable recommendations based on our continuous monitoring and analysis.`}</p>
+                          <p className="mb-3">{`This battlecard provides comprehensive intelligence on ${feed.name}, offering strategic insights and actionable recommendations based on our continuous monitoring and analysis.`}</p>
                           
                           <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Key Focus Areas</h3>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -406,49 +408,34 @@ const Battlecard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {feed.insights?.map((insight, index) => (
+                      {Array.from({ length: 4 }).map((_, index) => (
                         <div key={index} className="border-b border-gray-100 last:border-0 pb-5 last:pb-0">
-                          <h3 className="font-semibold text-gray-900 mb-2">{insight.title}</h3>
-                          <p className="text-gray-600 mb-3">{insight.description}</p>
+                          <h3 className="font-semibold text-gray-900 mb-2">
+                            {[
+                              "Market Positioning Strategy",
+                              "Product Development Focus",
+                              "Customer Acquisition Approach",
+                              "Competitive Advantage Analysis"
+                            ][index]}
+                          </h3>
+                          <p className="text-gray-600 mb-3">
+                            {[
+                              `${feed.name} is targeting the enterprise segment with a renewed focus on security and compliance features.`,
+                              `Their R&D investments are heavily weighted toward AI integration and automation capabilities.`,
+                              `They've pivoted to a product-led growth strategy with extended free trials and transparent pricing.`,
+                              `Their main differentiation comes from specialized industry-specific solutions rather than competing on price.`
+                            ][index]}
+                          </p>
                           <div className="flex flex-wrap gap-2">
                             <Badge className="bg-needl-lighter text-needl-primary">
-                              {insight.category || 'Strategic'}
+                              {["Strategy", "R&D", "Marketing", "Competitive"][index]}
                             </Badge>
                             <Badge variant="outline" className="text-gray-500">
-                              {insight.confidence || 'High'} confidence
+                              {["High", "Medium", "Very High", "High"][index]} confidence
                             </Badge>
                           </div>
                         </div>
-                      )) || (
-                        Array.from({ length: 4 }).map((_, index) => (
-                          <div key={index} className="border-b border-gray-100 last:border-0 pb-5 last:pb-0">
-                            <h3 className="font-semibold text-gray-900 mb-2">
-                              {[
-                                "Market Positioning Strategy",
-                                "Product Development Focus",
-                                "Customer Acquisition Approach",
-                                "Competitive Advantage Analysis"
-                              ][index]}
-                            </h3>
-                            <p className="text-gray-600 mb-3">
-                              {[
-                                `${feed.name} is targeting the enterprise segment with a renewed focus on security and compliance features.`,
-                                `Their R&D investments are heavily weighted toward AI integration and automation capabilities.`,
-                                `They've pivoted to a product-led growth strategy with extended free trials and transparent pricing.`,
-                                `Their main differentiation comes from specialized industry-specific solutions rather than competing on price.`
-                              ][index]}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge className="bg-needl-lighter text-needl-primary">
-                                {["Strategy", "R&D", "Marketing", "Competitive"][index]}
-                              </Badge>
-                              <Badge variant="outline" className="text-gray-500">
-                                {["High", "Medium", "Very High", "High"][index]} confidence
-                              </Badge>
-                            </div>
-                          </div>
-                        ))
-                      )}
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -463,7 +450,7 @@ const Battlecard: React.FC = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {feed.sources?.map((source, index) => (
+                    {Array.from({ length: 5 }).map((_, index) => (
                       <div 
                         key={index}
                         className="mb-4 border border-gray-100 rounded-lg overflow-hidden transition-all duration-300"
@@ -477,8 +464,18 @@ const Battlecard: React.FC = () => {
                               <ExternalLink className="w-4 h-4 text-needl-primary" />
                             </div>
                             <div>
-                              <h3 className="font-medium text-gray-900">{source.name || `Source ${index + 1}`}</h3>
-                              <p className="text-xs text-gray-500">{source.type || 'External Reference'}</p>
+                              <h3 className="font-medium text-gray-900">
+                                {[
+                                  "Quarterly Report Analysis",
+                                  "Product Launch Press Release",
+                                  "Industry Conference Presentation",
+                                  "Social Media Sentiment Analysis",
+                                  "Customer Feedback Aggregation"
+                                ][index]}
+                              </h3>
+                              <p className="text-xs text-gray-500">
+                                {["Financial Document", "Press Release", "Presentation", "Social Listening", "Customer Feedback"][index]}
+                              </p>
                             </div>
                           </div>
                           <div>
@@ -492,17 +489,25 @@ const Battlecard: React.FC = () => {
                         
                         {activeSources.includes(index) && (
                           <div className="p-4 border-t border-gray-100">
-                            <p className="text-gray-600 mb-3">{source.description || 'Detailed intelligence from this source provides context for our analysis and recommendations.'}</p>
+                            <p className="text-gray-600 mb-3">
+                              {[
+                                `Detailed analysis of ${feed.name}'s latest quarterly financial performance, highlighting revenue streams, growth areas, and strategic investments.`,
+                                `Official announcement of their new flagship product, including key features, target market, and competitive positioning.`,
+                                `Presentation slides and recorded insights from their keynote at the annual industry conference, revealing roadmap and strategic vision.`,
+                                `Aggregated sentiment analysis from Twitter, LinkedIn, and other platforms regarding recent product changes and company announcements.`,
+                                `Synthesis of customer feedback from review sites, support tickets, and satisfaction surveys, identifying pain points and improvement areas.`
+                              ][index]}
+                            </p>
                             <div className="flex justify-between items-center">
                               <div className="text-xs text-gray-500">
-                                {source.date || new Date().toLocaleDateString('en-US', { 
+                                {new Date(Date.now() - index * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
                                   year: 'numeric', 
                                   month: 'short', 
                                   day: 'numeric' 
                                 })}
                               </div>
                               <a 
-                                href={source.url || '#'} 
+                                href="#" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="text-sm text-needl-primary hover:underline flex items-center"
@@ -514,78 +519,7 @@ const Battlecard: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    )) || (
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <div 
-                          key={index}
-                          className="mb-4 border border-gray-100 rounded-lg overflow-hidden transition-all duration-300"
-                        >
-                          <div 
-                            className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
-                            onClick={() => toggleSource(index)}
-                          >
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 rounded-full bg-needl-lighter flex items-center justify-center mr-3">
-                                <ExternalLink className="w-4 h-4 text-needl-primary" />
-                              </div>
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  {[
-                                    "Quarterly Report Analysis",
-                                    "Product Launch Press Release",
-                                    "Industry Conference Presentation",
-                                    "Social Media Sentiment Analysis",
-                                    "Customer Feedback Aggregation"
-                                  ][index]}
-                                </h3>
-                                <p className="text-xs text-gray-500">
-                                  {["Financial Document", "Press Release", "Presentation", "Social Listening", "Customer Feedback"][index]}
-                                </p>
-                              </div>
-                            </div>
-                            <div>
-                              {activeSources.includes(index) ? (
-                                <ChevronUp className="w-5 h-5 text-gray-400" />
-                              ) : (
-                                <ChevronDown className="w-5 h-5 text-gray-400" />
-                              )}
-                            </div>
-                          </div>
-                          
-                          {activeSources.includes(index) && (
-                            <div className="p-4 border-t border-gray-100">
-                              <p className="text-gray-600 mb-3">
-                                {[
-                                  `Detailed analysis of ${feed.name}'s latest quarterly financial performance, highlighting revenue streams, growth areas, and strategic investments.`,
-                                  `Official announcement of their new flagship product, including key features, target market, and competitive positioning.`,
-                                  `Presentation slides and recorded insights from their keynote at the annual industry conference, revealing roadmap and strategic vision.`,
-                                  `Aggregated sentiment analysis from Twitter, LinkedIn, and other platforms regarding recent product changes and company announcements.`,
-                                  `Synthesis of customer feedback from review sites, support tickets, and satisfaction surveys, identifying pain points and improvement areas.`
-                                ][index]}
-                              </p>
-                              <div className="flex justify-between items-center">
-                                <div className="text-xs text-gray-500">
-                                  {new Date(Date.now() - index * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                                    year: 'numeric', 
-                                    month: 'short', 
-                                    day: 'numeric' 
-                                  })}
-                                </div>
-                                <a 
-                                  href="#" 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-needl-primary hover:underline flex items-center"
-                                >
-                                  View Source
-                                  <ExternalLink className="w-3 h-3 ml-1" />
-                                </a>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
+                    ))}
                   </CardContent>
                 </Card>
               </TabsContent>
