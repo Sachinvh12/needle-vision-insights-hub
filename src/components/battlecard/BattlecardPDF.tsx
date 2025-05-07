@@ -11,6 +11,7 @@ interface BattlecardPDFProps {
     importance: string;
   }>;
   takeaways: string[];
+  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
 }
 
 // Create styles
@@ -35,6 +36,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 15,
     color: '#555555',
+  },
+  personaBadge: {
+    fontSize: 10,
+    backgroundColor: '#F3F4F6',
+    color: '#4B5563',
+    padding: 5,
+    borderRadius: 3,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  investorBadge: {
+    backgroundColor: '#DCFCE7',
+    color: '#166534',
+  },
+  productBadge: {
+    backgroundColor: '#DBEAFE',
+    color: '#1E40AF',
+  },
+  salesBadge: {
+    backgroundColor: '#F3E8FF',
+    color: '#6B21A8',
+  },
+  researcherBadge: {
+    backgroundColor: '#FEF3C7',
+    color: '#92400E',
   },
   section: {
     marginBottom: 15,
@@ -158,14 +184,151 @@ const styles = StyleSheet.create({
   purpleGradient: {
     backgroundColor: '#8B5CF6',
   },
+  metricsSection: {
+    marginTop: 10,
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 5,
+  },
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+    padding: 5,
+  },
+  metricLabel: {
+    fontSize: 10,
+    color: '#6B7280',
+    width: '50%',
+  },
+  metricValue: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  personaInsightsSection: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 5,
+  },
+  personaInsightTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#374151',
+    marginBottom: 8,
+  },
 });
 
-export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings, takeaways }) => {
+export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings, takeaways, personaType }) => {
   // Add actions for the PDF
   const actions = [
     { title: "Strategic Opportunity", content: "Launch targeted campaign highlighting our superior features within 30 days", priority: "high" },
     { title: "Risk Mitigation", content: "Develop compliance automation tools to protect market share against regulatory changes", priority: "medium" },
   ];
+
+  // Add persona-specific insights based on personaType
+  const getPersonaInsights = () => {
+    switch (personaType) {
+      case 'investor':
+        return {
+          title: "Investment Insights",
+          metrics: [
+            { label: "Market Share Growth", value: "+4.2% QoQ" },
+            { label: "Competitor Valuation", value: "$3.8B (-2.1% YoY)" },
+            { label: "Risk Assessment", value: "Medium-Low" },
+            { label: "Market Penetration", value: "23.7%" },
+          ],
+          recommendations: [
+            "Prioritize long-term stability over short-term gains",
+            "Consider strategic partnerships to offset competitive threats",
+            "Monitor regulatory changes closely as they impact valuation"
+          ]
+        };
+      case 'product':
+        return {
+          title: "Product Strategy Insights",
+          metrics: [
+            { label: "Feature Gap Analysis", value: "8 missing features" },
+            { label: "Customer Sentiment", value: "7.8/10 (+0.5)" },
+            { label: "Time to Market", value: "3.2 months" },
+            { label: "Product-Market Fit", value: "High (85%)" },
+          ],
+          recommendations: [
+            "Focus on UX improvements in core workflows",
+            "Accelerate roadmap for API integrations",
+            "Consider pricing simplification to compete effectively"
+          ]
+        };
+      case 'sales':
+        return {
+          title: "Sales Enablement Insights",
+          metrics: [
+            { label: "Competitive Win Rate", value: "62% (+5%)" },
+            { label: "Avg. Deal Value", value: "$86K" },
+            { label: "Sales Cycle", value: "47 days (-3)" },
+            { label: "Objection Frequency", value: "-12% MoM" },
+          ],
+          recommendations: [
+            "Emphasize our superior support in competitive deals",
+            "Highlight security certifications when displacing Competitor A",
+            "Leverage implementation speed as key differentiator"
+          ]
+        };
+      case 'researcher':
+        return {
+          title: "Market Research Insights",
+          metrics: [
+            { label: "Data Points Analyzed", value: "47,200+" },
+            { label: "Trend Confidence", value: "92%" },
+            { label: "Segment Growth", value: "Enterprise: +18%" },
+            { label: "Market Maturity", value: "Early Majority" },
+          ],
+          recommendations: [
+            "Focus research on emerging Eastern European markets",
+            "Conduct detailed analysis of SMB adoption patterns",
+            "Investigate correlation between pricing models and retention"
+          ]
+        };
+      default:
+        return null;
+    }
+  };
+
+  const personaInsights = getPersonaInsights();
+
+  // Define badge style based on persona type
+  const getBadgeStyle = () => {
+    switch (personaType) {
+      case 'investor':
+        return styles.investorBadge;
+      case 'product':
+        return styles.productBadge;
+      case 'sales':
+        return styles.salesBadge;
+      case 'researcher':
+        return styles.researcherBadge;
+      default:
+        return {};
+    }
+  };
+
+  // Get persona badge text
+  const getPersonaBadgeText = () => {
+    switch (personaType) {
+      case 'investor':
+        return "Investment Analysis";
+      case 'product':
+        return "Product Strategy";
+      case 'sales':
+        return "Sales Intelligence";
+      case 'researcher':
+        return "Market Research";
+      default:
+        return "";
+    }
+  };
 
   return (
     <Document>
@@ -173,8 +336,35 @@ export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings
         <View style={styles.header}>
           <View style={[styles.colorBar, styles.blueGradient]} />
           <Text style={styles.title}>{feedName} Battlecard</Text>
+          {personaType && (
+            <Text style={[styles.personaBadge, getBadgeStyle()]}>
+              {getPersonaBadgeText()}
+            </Text>
+          )}
           <Text style={styles.subtitle}>Intelligence Report | Generated on {new Date().toLocaleDateString()}</Text>
         </View>
+
+        {personaType && personaInsights && (
+          <View style={styles.personaInsightsSection}>
+            <Text style={styles.personaInsightTitle}>{personaInsights.title}</Text>
+            <View style={styles.metricsSection}>
+              {personaInsights.metrics.map((metric, idx) => (
+                <View key={idx} style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>{metric.label}:</Text>
+                  <Text style={styles.metricValue}>{metric.value}</Text>
+                </View>
+              ))}
+            </View>
+            
+            <Text style={[styles.sectionTitle, { backgroundColor: '#E5E7EB' }]}>Tailored Recommendations</Text>
+            {personaInsights.recommendations.map((rec, idx) => (
+              <View key={idx} style={styles.takeawayItem}>
+                <Text style={styles.takeawayBullet}>• </Text>
+                <Text style={styles.takeawayText}>{rec}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Findings</Text>

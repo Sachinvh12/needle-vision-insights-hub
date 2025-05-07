@@ -22,6 +22,7 @@ export type Feed = {
     channel?: string;
   };
   connectedApps?: string[];
+  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
 };
 
 export type Alert = {
@@ -47,6 +48,7 @@ export type SetupState = {
   outputFormat?: string;
   feedName?: string;
   connectedApps?: string[];
+  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
   outputConfig?: {
     alerts?: boolean;
     summaries?: boolean;
@@ -66,4 +68,16 @@ export type SavedView = {
   id: string;
   name: string;
   filters: FilterOptions;
+};
+
+export type PersonaInsight = {
+  title: string;
+  description: string;
+  actionItems: string[];
+  metrics: {
+    label: string;
+    value: string;
+    trend?: 'up' | 'down' | 'neutral';
+  }[];
+  recommendations: string[];
 };

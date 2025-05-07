@@ -15,7 +15,7 @@ export interface Feed {
   type: 'competitor' | 'market' | 'trend' | 'custom';
   status: 'active' | 'paused' | 'error';
   createdAt: string;
-  lastActivity: string; // Changed from optional to required to match feedTypes.ts
+  lastActivity: string; 
   snippet?: string;
   sourceMix?: {
     web: number;
@@ -29,6 +29,7 @@ export interface Feed {
     frequency: 'daily' | 'weekly' | 'monthly';
     channel: 'email' | 'app' | 'both';
   };
+  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
 }
 
 export interface Alert {
@@ -56,6 +57,17 @@ export interface SavedView {
     company?: string;
     [key: string]: any;
   };
+}
+
+export interface PersonaInsight {
+  title: string;
+  description: string;
+  actionItems: string[];
+  metrics: {
+    label: string;
+    value: string;
+    trend?: 'up' | 'down' | 'neutral';
+  }[];
 }
 
 export interface AppState {

@@ -1,29 +1,124 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, BarChart2, TrendingUp, FileSearch, Info } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useApp } from '../context/AppContext';
 import { mockPersonas } from '../utils/mockData';
+import { PersonaInsight } from '@/types/appTypes';
+
 const UseCases: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const {
     updateSetupState
   } = useApp();
+  
+  const personaInsights: Record<string, PersonaInsight> = {
+    'persona-1': {
+      title: "Investment Analysis",
+      description: "Comprehensive financial metrics with market impact assessments",
+      actionItems: [
+        "Compare valuation metrics across competitors",
+        "Track regulatory changes affecting investments",
+        "Monitor market sentiment for risk assessment"
+      ],
+      metrics: [
+        {
+          label: "Market Share",
+          value: "23.5%",
+          trend: "up"
+        },
+        {
+          label: "Valuation",
+          value: "$4.2B",
+          trend: "up"
+        }
+      ]
+    },
+    'persona-2': {
+      title: "Product Strategy",
+      description: "Feature comparison and user sentiment analytics",
+      actionItems: [
+        "Analyze competitor product releases",
+        "Track user sentiment across features",
+        "Identify market gaps for roadmap planning"
+      ],
+      metrics: [
+        {
+          label: "Feature Parity",
+          value: "87%",
+          trend: "up"
+        },
+        {
+          label: "Sentiment",
+          value: "8.2/10",
+          trend: "neutral"
+        }
+      ]
+    },
+    'persona-3': {
+      title: "Sales Intelligence",
+      description: "Competitive insights for better deal conversion",
+      actionItems: [
+        "Create customized value propositions",
+        "Track competitor pricing changes",
+        "Develop objection handling strategies"
+      ],
+      metrics: [
+        {
+          label: "Win Rate",
+          value: "68%",
+          trend: "up"
+        },
+        {
+          label: "Deal Size",
+          value: "+12%",
+          trend: "up"
+        }
+      ]
+    },
+    'persona-4': {
+      title: "Market Research",
+      description: "Advanced trend analysis and segment insights",
+      actionItems: [
+        "Generate custom reports by segment",
+        "Track correlation between market variables",
+        "Monitor early adoption indicators"
+      ],
+      metrics: [
+        {
+          label: "Data Points",
+          value: "28.3K",
+          trend: "up"
+        },
+        {
+          label: "Accuracy",
+          value: "94%",
+          trend: "neutral"
+        }
+      ]
+    },
+  };
+
   const handlePersonaSelect = (personaId: string) => {
     const persona = mockPersonas.find(p => p.id === personaId);
     if (persona) {
       updateSetupState({
         selectedPersona: personaId,
-        setupQuery: persona.defaultQuery
+        setupQuery: persona.defaultQuery,
+        personaType: personaId === 'persona-1' ? 'investor' : 
+                     personaId === 'persona-2' ? 'product' : 
+                     personaId === 'persona-3' ? 'sales' : 'researcher'
       });
       navigate('/setup/step1');
     }
   };
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -46,6 +141,7 @@ const UseCases: React.FC = () => {
       }
     }
   };
+  
   const item = {
     hidden: {
       y: 20,
@@ -136,6 +232,7 @@ const UseCases: React.FC = () => {
         {iconContent}
       </div>;
   };
+  
   return <div className="min-h-screen flex flex-col">
       <MainHeader />
       
@@ -143,29 +240,42 @@ const UseCases: React.FC = () => {
         <AnimatedBackground variant="subtle" />
         
         <div className="container mx-auto py-16 px-4 relative z-10">
-          <motion.h1 className="text-3xl font-bold text-center mb-8" initial={{
-          opacity: 0,
-          y: -20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5
-        }}>Select a Profile or Type Your Intelligence Needs Below</motion.h1>
+          <motion.h1 
+            className="text-3xl font-bold text-center mb-3" 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            Intelligence for Every Role
+          </motion.h1>
           
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5,
-          delay: 0.2
-        }} className="max-w-2xl mx-auto mb-12">
+          <motion.p
+            className="text-center text-gray-600 max-w-2xl mx-auto mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Select your role to get intelligence specifically tailored to your needs, or describe your custom intelligence requirements below.
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }} 
+            className="max-w-2xl mx-auto mb-12"
+          >
             <form onSubmit={handleSearch} className="relative">
-              <Input type="text" placeholder="Describe what you want to track (e.g., competitor product launches, market trends...)" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pr-10 py-6 text-lg rounded-lg border-needl-lighter focus:border-needl-primary focus:ring focus:ring-needl-lighter transition-all duration-300" />
-              <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-needl-primary hover:text-needl-dark transition-colors">
+              <Input 
+                type="text" 
+                placeholder="Describe what you want to track (e.g., competitor product launches, market trends...)" 
+                value={searchQuery} 
+                onChange={e => setSearchQuery(e.target.value)} 
+                className="pr-10 py-6 text-lg rounded-lg border-needl-lighter focus:border-needl-primary focus:ring focus:ring-needl-lighter transition-all duration-300" 
+              />
+              <button 
+                type="submit" 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-needl-primary hover:text-needl-dark transition-colors"
+              >
                 <Search className="w-5 h-5" />
               </button>
               
@@ -175,26 +285,97 @@ const UseCases: React.FC = () => {
             </form>
           </motion.div>
           
-          <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {mockPersonas.map(persona => <motion.div key={persona.id} variants={item} whileHover={{
-            y: -5,
-            transition: {
-              duration: 0.2
-            }
-          }} className="h-full">
-                <Card className="cursor-pointer h-full transition-all duration-300 hover:shadow-lg border-needl-lighter hover:border-needl-primary glaze" onClick={() => handlePersonaSelect(persona.id)}>
-                  <CardHeader className="flex flex-col items-center pb-4">
-                    <PersonaIcon iconType={persona.id} />
-                    <h3 className="text-xl font-semibold mt-4 text-needl-dark">{persona.title}</h3>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 text-center">{persona.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>)}
+          <motion.div 
+            variants={container} 
+            initial="hidden" 
+            animate="show" 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {mockPersonas.map((persona, index) => {
+              const insight = personaInsights[persona.id];
+              
+              return (
+                <motion.div 
+                  key={persona.id} 
+                  variants={item} 
+                  whileHover={{
+                    y: -5,
+                    transition: {
+                      duration: 0.2
+                    }
+                  }} 
+                  className="h-full"
+                >
+                  <Card 
+                    className="cursor-pointer h-full transition-all duration-300 hover:shadow-lg border-needl-lighter hover:border-needl-primary glaze" 
+                    onClick={() => handlePersonaSelect(persona.id)}
+                  >
+                    <CardHeader className="flex flex-col items-center pb-4">
+                      <PersonaIcon iconType={persona.id} />
+                      <div className="mt-4 flex items-center gap-2">
+                        <h3 className="text-xl font-semibold text-needl-dark">{persona.title}</h3>
+                        {insight && (
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                            <TrendingUp className="mr-1 h-3 w-3" />
+                            AI Enhanced
+                          </span>
+                        )}
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <p className="text-gray-600 text-center mb-4">{persona.description}</p>
+                      
+                      {insight && (
+                        <div className="mt-2 pt-3 border-t border-gray-100">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="text-xs uppercase text-gray-500 font-medium flex items-center gap-1">
+                              <Info className="h-3 w-3" />
+                              Key Focus Areas
+                            </h4>
+                          </div>
+                          
+                          <ul className="text-xs text-gray-600 space-y-1 mb-3">
+                            {insight.actionItems.map((item, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-needl-primary flex-shrink-0"></span>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          
+                          <div className="grid grid-cols-2 gap-2 mt-3">
+                            {insight.metrics.map((metric, idx) => (
+                              <div key={idx} className="bg-gray-50 rounded p-2">
+                                <div className="text-xs text-gray-500 mb-1">{metric.label}</div>
+                                <div className="flex items-center justify-between">
+                                  <div className="font-semibold text-sm">{metric.value}</div>
+                                  {metric.trend && (
+                                    <div>
+                                      {metric.trend === 'up' ? (
+                                        <TrendingUp className="h-3 w-3 text-green-500" />
+                                      ) : metric.trend === 'down' ? (
+                                        <BarChart2 className="h-3 w-3 text-red-500" />
+                                      ) : (
+                                        <FileSearch className="h-3 w-3 text-blue-500" />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </main>
     </div>;
 };
+
 export default UseCases;
