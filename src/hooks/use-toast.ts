@@ -6,7 +6,7 @@ const defaultOptions = {
   closeButton: true
 };
 
-// Enhance the default toast methods to include close buttons
+// Create properly typed toast methods
 export const toast = {
   success: (message: string, options = {}) => sonnerToast.success(message, { ...defaultOptions, ...options }),
   error: (message: string, options = {}) => sonnerToast.error(message, { ...defaultOptions, ...options }),
@@ -17,5 +17,5 @@ export const toast = {
 
 // Export the useToast hook for consistent usage across the app
 export const useToast = () => {
-  return { toast };
+  return toast;
 };

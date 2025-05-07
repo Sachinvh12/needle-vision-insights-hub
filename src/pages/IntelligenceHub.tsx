@@ -6,14 +6,17 @@ import {
   BarChart2,
   BellRing,
   Check,
-  ChevronRight,
   Filter,
   Grid2x2,
   Info,
-  Mail,
   Plus,
   Search,
-  X
+  X,
+  TrendingUp,
+  FileText,
+  BarChart,
+  ChevronRight,
+  Globe
 } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import { Button } from '@/components/ui/button';
@@ -26,6 +29,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useApp } from '../context/AppContext';
 import { toast } from '@/hooks/use-toast';
 import AlertsList from '../components/alerts/AlertsList';
@@ -33,6 +38,8 @@ import MetricCards from '../components/intelligence/MetricCards';
 import AnalyticsCharts from '../components/intelligence/AnalyticsCharts';
 import FeedCard from '../components/intelligence/FeedCard';
 import PageTransition from '../components/PageTransition';
+import PersonaCard from '../components/personas/PersonaCard';
+import { Feed } from '@/types/appTypes';
 
 const IntelligenceHub: React.FC = () => {
   const navigate = useNavigate();
@@ -45,6 +52,7 @@ const IntelligenceHub: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [importance, setImportance] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
 
   // Determine which tab to show based on URL parameter
   const defaultTab = tabFromUrl === 'alerts' ? 'alerts' : 'analytics';
@@ -73,11 +81,14 @@ const IntelligenceHub: React.FC = () => {
     );
   }
 
+  // Filter feeds by persona type if selected
+  const filteredFeeds = selectedPersona 
+    ? userFeeds.filter(feed => feed.personaType === selectedPersona)
+    : userFeeds;
+
   const handleMarkAllRead = () => {
     markAllAlertsRead();
-    toast.success("All alerts marked as read", {
-      closeButton: true
-    });
+    toast.success("All alerts marked as read");
   };
 
   const handleFeedClick = (feedId: string) => {
@@ -85,10 +96,24 @@ const IntelligenceHub: React.FC = () => {
     navigate(`/battlecard/${feedId}`);
   };
 
+  const handlePersonaSelect = (persona: string | null) => {
+    setSelectedPersona(persona === selectedPersona ? null : persona);
+  };
+
   // Recent feeds section
-  const recentFeeds = [...userFeeds]
+  const recentFeeds = [...filteredFeeds]
     .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
     .slice(0, 3);
+    
+  // Group feeds by persona type
+  const feedsByPersona = userFeeds.reduce((acc, feed) => {
+    const personaType = feed.personaType || 'other';
+    if (!acc[personaType]) {
+      acc[personaType] = [];
+    }
+    acc[personaType].push(feed);
+    return acc;
+  }, {} as Record<string, Feed[]>);
   
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
@@ -145,6 +170,291 @@ const IntelligenceHub: React.FC = () => {
             unreadAlerts={unreadCount} 
             highImportanceAlerts={highImportanceCount} 
           />
+          
+          {/* Persona Filter Cards */}
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <motion.div 
+              whileHover={{ y: -3 }}
+              onClick={() => handlePersonaSelect('investor')}
+              className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                selectedPersona === 'investor' ? 
+                'border-amber-500 bg-amber-50 shadow-md' : 
+                'border-gray-200 bg-white hover:border-amber-300 hover:bg-amber-50/50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${
+                  selectedPersona === 'investor' ? 'bg-amber-500' : 'bg-amber-100'
+                }`}>
+                  <TrendingUp className={`h-5 w-5 ${
+                    selectedPersona === 'investor' ? 'text-white' : 'text-amber-500'
+                  }`} />
+                </div>
+                <div>
+                  <h3 className="font-medium">Energy Trader</h3>
+                  <p className="text-xs text-gray-500">Commodity prices, market volatility</p>
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              whileHover={{ y: -3 }}
+              onClick={() => handlePersonaSelect('product')}
+              className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                selectedPersona === 'product' ? 
+                'border-blue-500 bg-blue-50 shadow-md' : 
+                'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${
+                  selectedPersona === 'product' ? 'bg-blue-500' : 'bg-blue-100'
+                }`}>
+                  <BarChart className={`h-5 w-5 ${
+                    selectedPersona === 'product' ? 'text-white' : 'text-blue-500'
+                  }`} />
+                </div>
+                <div>
+                  <h3 className="font-medium">Junior Analyst</h3>
+                  <p className="text-xs text-gray-500">Financial metrics, analyst ratings</p>
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              whileHover={{ y: -3 }}
+              onClick={() => handlePersonaSelect('researcher')}
+              className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                selectedPersona === 'researcher' ? 
+                'border-purple-500 bg-purple-50 shadow-md' : 
+                'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${
+                  selectedPersona === 'researcher' ? 'bg-purple-500' : 'bg-purple-100'
+                }`}>
+                  <Globe className={`h-5 w-5 ${
+                    selectedPersona === 'researcher' ? 'text-white' : 'text-purple-500'
+                  }`} />
+                </div>
+                <div>
+                  <h3 className="font-medium">Researcher</h3>
+                  <p className="text-xs text-gray-500">Industry trends, regulatory changes</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+          {selectedPersona && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-white p-4 rounded-xl border shadow-sm"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  {selectedPersona === 'investor' && (
+                    <>
+                      <TrendingUp className="h-5 w-5 text-amber-500" />
+                      <h2 className="font-semibold text-lg">Energy Trader Dashboard</h2>
+                    </>
+                  )}
+                  {selectedPersona === 'product' && (
+                    <>
+                      <BarChart className="h-5 w-5 text-blue-500" />
+                      <h2 className="font-semibold text-lg">Junior Analyst Dashboard</h2>
+                    </>
+                  )}
+                  {selectedPersona === 'researcher' && (
+                    <>
+                      <Globe className="h-5 w-5 text-purple-500" />
+                      <h2 className="font-semibold text-lg">Researcher Dashboard</h2>
+                    </>
+                  )}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setSelectedPersona(null)}
+                  className="text-gray-500"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Persona-specific content */}
+              <div className="space-y-4">
+                {selectedPersona === 'investor' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <h3 className="font-medium text-amber-800 mb-2">Market Volatility</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">30-Day</span>
+                          <Badge className="bg-amber-500">High</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">90-Day</span>
+                          <Badge variant="outline" className="text-amber-600 border-amber-300">Moderate</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <h3 className="font-medium text-amber-800 mb-2">Supply/Demand Status</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Crude Oil</span>
+                          <Badge variant="destructive">Supply Deficit</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Natural Gas</span>
+                          <Badge variant="outline" className="text-green-600 border-green-300">Surplus</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <h3 className="font-medium text-amber-800 mb-2">Geopolitical Risk Alert</h3>
+                      <div className="text-sm text-amber-800">
+                        <p className="mb-2">Middle East tensions escalating - potential impact on shipping routes.</p>
+                        <Button variant="link" className="text-amber-600 p-0 h-auto">View Analysis</Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {selectedPersona === 'product' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                      <h3 className="font-medium text-blue-800 mb-2">Recent Ratings Changes</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Morgan Stanley</span>
+                          <Badge className="bg-green-500">Upgrade to Buy</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Goldman Sachs</span>
+                          <Badge variant="outline" className="text-blue-600 border-blue-300">Maintain Hold</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                      <h3 className="font-medium text-blue-800 mb-2">Earnings Performance</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Q1 2024</span>
+                          <Badge className="bg-green-500">Beat by 15%</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Q4 2023</span>
+                          <Badge variant="destructive">Missed by 3%</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                      <h3 className="font-medium text-blue-800 mb-2">Key Financial Metrics</h3>
+                      <div className="text-sm text-blue-800 space-y-1">
+                        <div className="flex justify-between">
+                          <span>P/E Ratio</span>
+                          <span className="font-medium">22.5x</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Revenue Growth</span>
+                          <span className="font-medium">+18% YoY</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Debt to Equity</span>
+                          <span className="font-medium">0.78</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {selectedPersona === 'researcher' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                      <h3 className="font-medium text-purple-800 mb-2">Regulatory Updates</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">SEC Filing Requirements</span>
+                          <Badge className="bg-purple-500">New Policy</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">EU Data Privacy</span>
+                          <Badge variant="outline" className="text-purple-600 border-purple-300">Pending</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                      <h3 className="font-medium text-purple-800 mb-2">Technology Adoption</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">AI/ML Solutions</span>
+                          <Badge className="bg-green-500">Rapid Growth</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Quantum Computing</span>
+                          <Badge variant="outline" className="text-purple-600 border-purple-300">Early Stage</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                      <h3 className="font-medium text-purple-800 mb-2">Recent Academic Research</h3>
+                      <div className="text-sm text-purple-800">
+                        <p className="mb-2">New findings on sustainability metrics impact on long-term market valuation.</p>
+                        <Button variant="link" className="text-purple-600 p-0 h-auto">View Studies</Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="font-medium text-gray-700">Relevant Intelligence Feeds</h3>
+                    <Button 
+                      variant="link" 
+                      className="text-needl-primary p-0 h-auto text-sm flex items-center gap-1"
+                      onClick={() => navigate('/use-cases')}
+                    >
+                      <Plus className="h-3 w-3" />
+                      <span>Add Feed</span>
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {feedsByPersona[selectedPersona]?.length > 0 ? (
+                      feedsByPersona[selectedPersona].slice(0, 3).map(feed => (
+                        <FeedCard 
+                          key={feed.id} 
+                          feed={feed} 
+                          onClick={() => handleFeedClick(feed.id)} 
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-3 py-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                        <p className="text-gray-500 mb-3">No feeds found for this persona</p>
+                        <Button 
+                          onClick={() => navigate('/use-cases')}
+                          className="bg-needl-primary hover:bg-needl-dark"
+                          size="sm"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Create First Feed
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
           
           <Tabs defaultValue={defaultTab} className="mb-6">
             <TabsList className="bg-white shadow-sm border mb-4 p-1 rounded-xl">
