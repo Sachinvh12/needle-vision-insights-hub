@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Check, Bell, Clock, Calendar, FileText, BarChart3, Zap } from 'lucide-react';
-import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -11,16 +9,19 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { useApp } from '../../context/AppContext';
+import { useToast } from '@/hooks/use-toast';
 import SetupPageWrapper from '../../components/setup/SetupPageWrapper';
 import SetupStepIndicator from '../../components/setup/SetupStepIndicator';
 import SetupTransition from '../../components/setup/SetupTransition';
 import EnhancedCard from '../../components/setup/EnhancedCard';
 import SetupNavButtons from '../../components/setup/SetupNavButtons';
+import { CustomToaster } from '@/components/ui/custom-toaster';
 
 const Step3 = () => {
   const navigate = useNavigate();
   const { state, updateSetupState, addFeed, resetSetupState } = useApp();
   const { setupState } = state;
+  const { toast } = useToast();
   
   // Default values for the form - ensuring we use the correct type properties
   const feedName = setupState.feedName || '';
@@ -331,6 +332,9 @@ const Step3 = () => {
             isSubmitting={isSubmitting}
           />
         </form>
+        
+        {/* Add the CustomToaster component */}
+        <CustomToaster />
       </SetupTransition>
     </SetupPageWrapper>
   );

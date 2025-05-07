@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -47,13 +46,6 @@ const Step2: React.FC = () => {
       icon: <Upload className="w-6 h-6 text-needl-primary" />
     }
   ];
-  
-  // Handler for connecting apps
-  const handleConnectorClick = (connectorId: string) => {
-    toggleConnectedApp(connectorId);
-    const connector = connectors.find(c => c.id === connectorId);
-    toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
-  };
   
   // Animation for document flow visualization - made more compact
   const DocumentFlowAnimation = () => (
@@ -142,6 +134,13 @@ const Step2: React.FC = () => {
       ))}
     </div>
   );
+  
+  // Handler for connecting apps
+  const handleConnectorClick = (connectorId: string) => {
+    toggleConnectedApp(connectorId);
+    const connector = connectors.find(c => c.id === connectorId);
+    toast.success(`${connector?.name} ${connectedApps.includes(connectorId) ? 'disconnected' : 'connected'} successfully`);
+  };
   
   // Animation variants
   const container = {

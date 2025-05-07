@@ -17,30 +17,18 @@ export function CustomToaster() {
           fontSize: '14px',
           borderRadius: '8px',
         },
-        success: {
-          style: {
-            borderLeft: '4px solid #10B981',
-          },
-          icon: '✓',
+        classNames: {
+          success: "border-l-4 border-l-green-500",
+          error: "border-l-4 border-l-red-500",
+          warning: "border-l-4 border-l-amber-500",
+          info: "border-l-4 border-l-blue-500",
         },
-        error: {
-          style: {
-            borderLeft: '4px solid #EF4444',
-          },
-          icon: '✗',
-        },
-        warning: {
-          style: {
-            borderLeft: '4px solid #F59E0B',
-          },
-          icon: '⚠',
-        },
-        info: {
-          style: {
-            borderLeft: '4px solid #3B82F6',
-          },
-          icon: 'ℹ',
-        },
+        icons: {
+          success: '✓',
+          error: '✗',
+          warning: '⚠',
+          info: 'ℹ',
+        }
       }}
       theme={theme as "light" | "dark" | "system"}
       className="toaster-improved"
@@ -48,4 +36,4 @@ export function CustomToaster() {
       closeButton
     />
   );
-};
+}

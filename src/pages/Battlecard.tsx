@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,8 +65,7 @@ const Battlecard: React.FC = () => {
     `;
     
     navigator.clipboard.writeText(battlecardText);
-    toast({
-      title: "Copied to clipboard",
+    toast.success("Copied to clipboard", {
       description: "Battlecard content has been copied to your clipboard."
     });
   };
@@ -78,8 +76,7 @@ const Battlecard: React.FC = () => {
     // Simulate email sending process
     setTimeout(() => {
       setSharing(false);
-      toast({
-        title: "Shared successfully",
+      toast.success("Shared successfully", {
         description: "Battlecard has been sent to your email."
       });
     }, 1500);
@@ -119,15 +116,12 @@ const Battlecard: React.FC = () => {
       // Save the PDF
       pdf.save(`${feed.name.replace(/\s+/g, '_')}_battlecard.pdf`);
       
-      toast({
-        title: "Download complete",
+      toast.success("Download complete", {
         description: `${feed.name} battlecard has been downloaded.`
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast({
-        variant: "destructive",
-        title: "Download failed",
+      toast.error("Download failed", {
         description: "There was an error generating the PDF. Please try again."
       });
     } finally {

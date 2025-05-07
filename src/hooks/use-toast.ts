@@ -1,20 +1,28 @@
 
 import { toast as sonnerToast } from "sonner";
+import { ReactNode } from "react";
 
-// Define default toast options with close button
-const defaultOptions = {
-  closeButton: true
+// Define types for our toast options
+type ToastOptions = {
+  closeButton?: boolean;
+  [key: string]: any;
 };
 
 // Create properly typed toast methods
 export const toast = {
-  success: (message: string, options = {}) => sonnerToast.success(message, { ...defaultOptions, ...options }),
-  error: (message: string, options = {}) => sonnerToast.error(message, { ...defaultOptions, ...options }),
-  info: (message: string, options = {}) => sonnerToast.info(message, { ...defaultOptions, ...options }),
-  warning: (message: string, options = {}) => sonnerToast.warning(message, { ...defaultOptions, ...options }),
-  custom: (message: React.ReactNode, options = {}) => sonnerToast(message, { ...defaultOptions, ...options }),
+  success: (message: string, options: ToastOptions = {}) => 
+    sonnerToast.success(message, { closeButton: true, ...options }),
+  error: (message: string, options: ToastOptions = {}) => 
+    sonnerToast.error(message, { closeButton: true, ...options }),
+  info: (message: string, options: ToastOptions = {}) => 
+    sonnerToast.info(message, { closeButton: true, ...options }),
+  warning: (message: string, options: ToastOptions = {}) => 
+    sonnerToast.warning(message, { closeButton: true, ...options }),
+  custom: (message: ReactNode, options: ToastOptions = {}) => 
+    sonnerToast(message, { closeButton: true, ...options }),
   // Adding direct access to the toast function for compatibility
-  toast: (message: React.ReactNode, options = {}) => sonnerToast(message, { ...defaultOptions, ...options }),
+  toast: (message: ReactNode, options: ToastOptions = {}) => 
+    sonnerToast(message, { closeButton: true, ...options }),
 };
 
 // Export the useToast hook for consistent usage across the app
