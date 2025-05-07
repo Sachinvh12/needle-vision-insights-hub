@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Link as LinkIcon, Copy, Mail, ChevronRight, ChevronDown, Info, FileText, Globe, ArrowLeft } from 'lucide-react';
+import { Download, Link as LinkIcon, Copy, Mail, ChevronRight, Info, FileText, Globe, ArrowLeft } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import PageTransition from '../components/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -27,7 +28,7 @@ const Battlecard: React.FC = () => {
   const { toast } = useToast();
   const battlecardRef = useRef<HTMLDivElement>(null);
   
-  const feed = userFeeds.find(f => f.id === feedId);
+  const feed = userFeeds?.find(f => f.id === feedId);
   
   if (!feed) {
     return (
@@ -65,7 +66,8 @@ const Battlecard: React.FC = () => {
     `;
     
     navigator.clipboard.writeText(battlecardText);
-    toast.success("Copied to clipboard", {
+    toast({
+      title: "Copied to clipboard",
       description: "Battlecard content has been copied to your clipboard."
     });
   };
@@ -76,7 +78,8 @@ const Battlecard: React.FC = () => {
     // Simulate email sending process
     setTimeout(() => {
       setSharing(false);
-      toast.success("Shared successfully", {
+      toast({
+        title: "Shared successfully",
         description: "Battlecard has been sent to your email."
       });
     }, 1500);
@@ -116,12 +119,15 @@ const Battlecard: React.FC = () => {
       // Save the PDF
       pdf.save(`${feed.name.replace(/\s+/g, '_')}_battlecard.pdf`);
       
-      toast.success("Download complete", {
+      toast({
+        title: "Download complete",
         description: `${feed.name} battlecard has been downloaded.`
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast.error("Download failed", {
+      toast({
+        variant: "destructive",
+        title: "Download failed",
         description: "There was an error generating the PDF. Please try again."
       });
     } finally {

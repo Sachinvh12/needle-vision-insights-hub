@@ -2,14 +2,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, BarChart2, TrendingUp, FileSearch, Info } from 'lucide-react';
+import { Search, BarChart2, TrendingUp, FileSearch, Info, Calendar, BookOpen, Globe } from 'lucide-react';
 import MainHeader from '../components/MainHeader';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useApp } from '../context/AppContext';
-import { mockPersonas } from '../utils/mockData';
-import { PersonaInsight } from '@/types/appTypes';
+import { PersonaInsight } from '@/types/feedTypes';
 
 const UseCases: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,100 +19,160 @@ const UseCases: React.FC = () => {
   
   const personaInsights: Record<string, PersonaInsight> = {
     'persona-1': {
-      title: "Investment Analysis",
-      description: "Comprehensive financial metrics with market impact assessments",
+      title: "Energy Trading Intelligence",
+      description: "Real-time market signals with predictive supply-demand modeling",
       actionItems: [
-        "Compare valuation metrics across competitors",
-        "Track regulatory changes affecting investments",
-        "Monitor market sentiment for risk assessment"
+        "Track price volatility across energy futures markets",
+        "Monitor geopolitical events affecting supply chains",
+        "Analyze regulatory changes impacting energy trading",
+        "Evaluate storage level reports and seasonal forecasts"
       ],
       metrics: [
         {
-          label: "Market Share",
-          value: "23.5%",
+          label: "WTI Crude",
+          value: "$72.18",
           trend: "up"
         },
         {
-          label: "Valuation",
-          value: "$4.2B",
+          label: "Volatility",
+          value: "32%",
           trend: "up"
-        }
-      ]
-    },
-    'persona-2': {
-      title: "Product Strategy",
-      description: "Feature comparison and user sentiment analytics",
-      actionItems: [
-        "Analyze competitor product releases",
-        "Track user sentiment across features",
-        "Identify market gaps for roadmap planning"
-      ],
-      metrics: [
+        },
         {
-          label: "Feature Parity",
-          value: "87%",
-          trend: "up"
+          label: "Supply Risk",
+          value: "Moderate",
+          trend: "neutral"
         },
         {
           label: "Sentiment",
-          value: "8.2/10",
-          trend: "neutral"
+          value: "Bullish",
+          trend: "up"
         }
+      ],
+      recommendations: [
+        "Set up real-time alerts for OPEC+ production announcements",
+        "Configure price movement notifications for key energy futures",
+        "Establish geopolitical risk monitoring for major producing regions"
       ]
     },
-    'persona-3': {
-      title: "Sales Intelligence",
-      description: "Competitive insights for better deal conversion",
+    'persona-2': {
+      title: "Financial Analysis Suite",
+      description: "Comprehensive financial metrics with earnings sentiment analysis",
       actionItems: [
-        "Create customized value propositions",
-        "Track competitor pricing changes",
-        "Develop objection handling strategies"
+        "Analyze quarterly earnings reports and transcripts",
+        "Track analyst ratings and price targets",
+        "Compare valuation metrics across peer companies",
+        "Monitor institutional ownership changes"
       ],
       metrics: [
         {
-          label: "Win Rate",
-          value: "68%",
-          trend: "up"
-        },
-        {
-          label: "Deal Size",
-          value: "+12%",
-          trend: "up"
-        }
-      ]
-    },
-    'persona-4': {
-      title: "Market Research",
-      description: "Advanced trend analysis and segment insights",
-      actionItems: [
-        "Generate custom reports by segment",
-        "Track correlation between market variables",
-        "Monitor early adoption indicators"
-      ],
-      metrics: [
-        {
-          label: "Data Points",
-          value: "28.3K",
+          label: "Coverage",
+          value: "421 Companies",
           trend: "up"
         },
         {
           label: "Accuracy",
-          value: "94%",
+          value: "92%",
+          trend: "up"
+        },
+        {
+          label: "Sentiment",
+          value: "Neutral",
           trend: "neutral"
+        },
+        {
+          label: "Earnings Beat",
+          value: "73%",
+          trend: "up"
         }
+      ],
+      recommendations: [
+        "Create custom alerts for earnings surprises exceeding 10%",
+        "Set up monitoring for insider trading patterns",
+        "Configure comparative analysis for key financial ratios"
       ]
     },
+    'persona-4': {
+      title: "Market Research Intelligence",
+      description: "Advanced trend analysis and regulatory insight platform",
+      actionItems: [
+        "Monitor regulatory developments across global markets",
+        "Track patent filings and emerging technology trends",
+        "Analyze academic and research publications",
+        "Study market adoption rates and diffusion patterns"
+      ],
+      metrics: [
+        {
+          label: "Data Sources",
+          value: "2,340+",
+          trend: "up"
+        },
+        {
+          label: "Coverage",
+          value: "86%",
+          trend: "neutral"
+        },
+        {
+          label: "Update Freq",
+          value: "4.2 hrs",
+          trend: "neutral"
+        },
+        {
+          label: "AI Analysis",
+          value: "Enabled",
+          trend: "up"
+        }
+      ],
+      recommendations: [
+        "Configure specialized alerts for regulatory changes in key markets",
+        "Establish technology trend tracking for emerging innovations",
+        "Set up competitive intelligence monitoring for patent activities"
+      ]
+    }
   };
+
+  // Simplified persona data focused on our three key personas
+  const mockPersonas = [
+    {
+      id: 'persona-1',
+      title: 'Energy Trader',
+      description: 'Track market movements, price trends, regulatory shifts, and supply-demand dynamics for energy investment decisions.',
+      icon: <TrendingUp className="h-6 w-6 text-amber-500" />,
+      personaType: 'trader',
+      defaultQuery: 'Energy futures price movements, supply-demand dynamics, and regulatory impacts on energy markets',
+    },
+    {
+      id: 'persona-2',
+      title: 'Junior Analyst',
+      description: 'Monitor company financials, earnings reports, analyst ratings, and market performance for comprehensive portfolio analysis.',
+      icon: <BarChart2 className="h-6 w-6 text-blue-500" />,
+      personaType: 'analyst',
+      defaultQuery: 'Financial statements, earnings transcripts, analyst ratings, and valuation metrics',
+    },
+    {
+      id: 'persona-4',
+      title: 'Researcher',
+      description: 'Access comprehensive data on market trends, emerging technologies, competitive intelligence, and regulatory developments.',
+      icon: <Globe className="h-6 w-6 text-purple-500" />,
+      personaType: 'researcher',
+      defaultQuery: 'Regulatory changes, emerging technologies, academic publications, and market trends',
+    }
+  ];
 
   const handlePersonaSelect = (personaId: string) => {
     const persona = mockPersonas.find(p => p.id === personaId);
     if (persona) {
+      // Map our new personas to the existing persona types in the system
+      const personaTypeMap: {[key: string]: string} = {
+        'persona-1': 'investor',
+        'persona-2': 'product',
+        'persona-4': 'researcher'
+      };
+      
       updateSetupState({
         selectedPersona: personaId,
         setupQuery: persona.defaultQuery,
-        personaType: personaId === 'persona-1' ? 'investor' : 
-                     personaId === 'persona-2' ? 'product' : 
-                     personaId === 'persona-3' ? 'sales' : 'researcher'
+        personaType: personaTypeMap[personaId] as 'investor' | 'product' | 'researcher'
       });
       navigate('/setup/step1');
     }
@@ -161,73 +220,61 @@ const UseCases: React.FC = () => {
   // Custom icons with animation/glitter effect for each persona
   const PersonaIcon: React.FC<{
     iconType: string;
+    personaType: string;
   }> = ({
-    iconType
+    iconType,
+    personaType
   }) => {
     let iconContent;
     let bgColor;
-    switch (iconType) {
-      case 'persona-1':
-        // Investment Analyst
+    
+    switch (personaType) {
+      case 'trader':
+        // Energy Trader
         iconContent = <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17L9 11L13 15L21 7" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-shimmer" />
-                <circle cx="20" cy="8" r="2" fill="#367d8d" className="animate-pulse-glow" />
-              </svg>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-needl-lighter bg-opacity-50"></div>
-          </div>;
-        bgColor = "bg-green-50";
-        break;
-      case 'persona-2':
-        // Product Manager
-        iconContent = <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 16L4 8L12 4L20 8L12 16Z" fill="#367d8d" fillOpacity="0.3" />
-                <path d="M4 8L12 4L20 8L12 12L4 8Z" fill="#367d8d" fillOpacity="0.5" className="animate-pulse-glow" />
-                <path d="M12 12L12 20" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-blue-50"></div>
-          </div>;
-        bgColor = "bg-blue-50";
-        break;
-      case 'persona-3':
-        // Sales Development
-        iconContent = <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="8" cy="8" r="4" fill="#367d8d" fillOpacity="0.3" />
-                <circle cx="16" cy="16" r="4" fill="#367d8d" fillOpacity="0.3" />
-                <path d="M5 11L19 11" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" className="animate-shimmer" />
-                <path d="M11 5L11 19" stroke="#367d8d" strokeWidth="2" strokeLinecap="round" className="animate-shimmer" />
-              </svg>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-purple-50"></div>
-          </div>;
-        bgColor = "bg-purple-50";
-        break;
-      case 'persona-4':
-        // Market Researcher
-        iconContent = <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="4" width="6" height="7" rx="1" fill="#367d8d" fillOpacity="0.3" />
-                <rect x="14" y="4" width="6" height="7" rx="1" fill="#367d8d" fillOpacity="0.5" className="animate-pulse-glow" />
-                <rect x="4" y="13" width="6" height="7" rx="1" fill="#367d8d" fillOpacity="0.7" />
-                <rect x="14" y="13" width="6" height="7" rx="1" fill="#367d8d" fillOpacity="0.3" />
+                <path d="M3 17L9 11L13 15L21 7" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-shimmer" />
+                <circle cx="20" cy="8" r="2" fill="#B45309" className="animate-pulse-glow" />
               </svg>
             </div>
             <div className="w-12 h-12 rounded-full bg-amber-50"></div>
           </div>;
         bgColor = "bg-amber-50";
         break;
+      case 'analyst':
+        // Financial Analyst
+        iconContent = <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="12" width="4" height="8" rx="1" fill="#2563EB" fillOpacity="0.3" />
+                <rect x="10" y="8" width="4" height="12" rx="1" fill="#2563EB" fillOpacity="0.5" className="animate-pulse-glow" />
+                <rect x="17" y="4" width="4" height="16" rx="1" fill="#2563EB" fillOpacity="0.7" />
+              </svg>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-50"></div>
+          </div>;
+        bgColor = "bg-blue-50";
+        break;
+      case 'researcher':
+        // Market Researcher
+        iconContent = <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="7" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="1 3" className="animate-spin-slow" />
+                <path d="M12 3V5M12 19V21M3 12H5M19 12H21M18.364 5.636L16.95 7.05M7.05 16.95L5.636 18.364M18.364 18.364L16.95 16.95M7.05 7.05L5.636 5.636" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="12" cy="12" r="3" fill="#7C3AED" fillOpacity="0.3" />
+              </svg>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-purple-50"></div>
+          </div>;
+        bgColor = "bg-purple-50";
+        break;
       default:
         iconContent = <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">{mockPersonas.find(p => p.id === iconType)?.icon}</div>;
         bgColor = "bg-gray-50";
     }
+    
     return <div className={`p-3 rounded-full ${bgColor} flex items-center justify-center shiny-border overflow-hidden`}>
         {iconContent}
       </div>;
@@ -267,7 +314,7 @@ const UseCases: React.FC = () => {
             <form onSubmit={handleSearch} className="relative">
               <Input 
                 type="text" 
-                placeholder="Describe what you want to track (e.g., competitor product launches, market trends...)" 
+                placeholder="Describe what you want to track (e.g., energy markets, financial metrics, regulatory changes...)" 
                 value={searchQuery} 
                 onChange={e => setSearchQuery(e.target.value)} 
                 className="pr-10 py-6 text-lg rounded-lg border-needl-lighter focus:border-needl-primary focus:ring focus:ring-needl-lighter transition-all duration-300" 
@@ -289,10 +336,11 @@ const UseCases: React.FC = () => {
             variants={container} 
             initial="hidden" 
             animate="show" 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
             {mockPersonas.map((persona, index) => {
               const insight = personaInsights[persona.id];
+              const personaType = persona.personaType;
               
               return (
                 <motion.div 
@@ -311,7 +359,7 @@ const UseCases: React.FC = () => {
                     onClick={() => handlePersonaSelect(persona.id)}
                   >
                     <CardHeader className="flex flex-col items-center pb-4">
-                      <PersonaIcon iconType={persona.id} />
+                      <PersonaIcon iconType={persona.id} personaType={personaType} />
                       <div className="mt-4 flex items-center gap-2">
                         <h3 className="text-xl font-semibold text-needl-dark">{persona.title}</h3>
                         {insight && (
@@ -330,7 +378,9 @@ const UseCases: React.FC = () => {
                         <div className="mt-2 pt-3 border-t border-gray-100">
                           <div className="flex justify-between items-center mb-2">
                             <h4 className="text-xs uppercase text-gray-500 font-medium flex items-center gap-1">
-                              <Info className="h-3 w-3" />
+                              {personaType === 'trader' && <Calendar className="h-3 w-3" />}
+                              {personaType === 'analyst' && <BarChart2 className="h-3 w-3" />}
+                              {personaType === 'researcher' && <BookOpen className="h-3 w-3" />}
                               Key Focus Areas
                             </h4>
                           </div>
@@ -345,7 +395,7 @@ const UseCases: React.FC = () => {
                           </ul>
                           
                           <div className="grid grid-cols-2 gap-2 mt-3">
-                            {insight.metrics.map((metric, idx) => (
+                            {insight.metrics.slice(0, 4).map((metric, idx) => (
                               <div key={idx} className="bg-gray-50 rounded p-2">
                                 <div className="text-xs text-gray-500 mb-1">{metric.label}</div>
                                 <div className="flex items-center justify-between">

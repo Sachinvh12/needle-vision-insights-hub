@@ -29,7 +29,7 @@ export interface Feed {
     frequency: 'daily' | 'weekly' | 'monthly';
     channel: 'email' | 'app' | 'both';
   };
-  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
+  personaType?: 'investor' | 'product' | 'researcher';
 }
 
 export interface Alert {
@@ -68,6 +68,7 @@ export interface PersonaInsight {
     value: string;
     trend?: 'up' | 'down' | 'neutral';
   }[];
+  recommendations?: string[];
 }
 
 export interface AppState {
@@ -87,4 +88,62 @@ export interface AppState {
   isAlertsModalOpen: boolean;
   setupState: any;
   connectedApps: string[];
+}
+
+// Persona-specific insight types for enhancing the user experience
+export interface TraderInsight extends PersonaInsight {
+  marketConditions: {
+    volatility: string;
+    sentiment: string;
+    momentum: string;
+  };
+  tradingOpportunities: {
+    type: string;
+    timeframe: string;
+    confidence: number;
+    expectedReturn: string;
+  }[];
+  riskAssessment: {
+    level: 'low' | 'moderate' | 'high';
+    factors: string[];
+  };
+}
+
+export interface AnalystInsight extends PersonaInsight {
+  financialHighlights: {
+    metric: string;
+    value: string;
+    yearOverYear: string;
+    industryComparison: string;
+  }[];
+  catalysts: {
+    event: string;
+    expectedImpact: 'positive' | 'negative' | 'neutral';
+    probability: string;
+    timeline: string;
+  }[];
+  valuation: {
+    current: string;
+    target: string;
+    rationale: string;
+  };
+}
+
+export interface ResearcherInsight extends PersonaInsight {
+  trendAnalysis: {
+    phase: string;
+    adoption: string;
+    momentum: string;
+    timeToMainstream: string;
+  };
+  marketImpact: {
+    sector: string;
+    disruptionLevel: 'low' | 'moderate' | 'high';
+    timeframe: string;
+  }[];
+  competitiveImplications: {
+    advantage: string;
+    threats: string[];
+    opportunities: string[];
+  };
 }

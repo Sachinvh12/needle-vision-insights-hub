@@ -11,7 +11,7 @@ interface BattlecardPDFProps {
     importance: string;
   }>;
   takeaways: string[];
-  personaType?: 'investor' | 'product' | 'sales' | 'researcher';
+  personaType?: 'investor' | 'product' | 'researcher';
 }
 
 // Create styles
@@ -47,20 +47,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   investorBadge: {
-    backgroundColor: '#DCFCE7',
-    color: '#166534',
+    backgroundColor: '#FEF3C7',
+    color: '#92400E',
   },
   productBadge: {
     backgroundColor: '#DBEAFE',
     color: '#1E40AF',
   },
-  salesBadge: {
+  researcherBadge: {
     backgroundColor: '#F3E8FF',
     color: '#6B21A8',
-  },
-  researcherBadge: {
-    backgroundColor: '#FEF3C7',
-    color: '#92400E',
   },
   section: {
     marginBottom: 15,
@@ -219,76 +215,105 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
+  highlightBox: {
+    marginTop: 15,
+    marginBottom: 10,
+    padding: 8,
+    borderRadius: 5,
+    backgroundColor: '#FFEDD5',
+  },
+  highlightTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#92400E',
+    marginBottom: 5,
+  },
+  personaSpecificSection: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#F0FDF4',
+    borderRadius: 5,
+    marginBottom: 15,
+  },
 });
 
 export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings, takeaways, personaType }) => {
-  // Add actions for the PDF
-  const actions = [
-    { title: "Strategic Opportunity", content: "Launch targeted campaign highlighting our superior features within 30 days", priority: "high" },
-    { title: "Risk Mitigation", content: "Develop compliance automation tools to protect market share against regulatory changes", priority: "medium" },
-  ];
-
   // Add persona-specific insights based on personaType
   const getPersonaInsights = () => {
     switch (personaType) {
       case 'investor':
         return {
-          title: "Investment Insights",
+          title: "Energy Trading Intelligence",
           metrics: [
-            { label: "Market Share Growth", value: "+4.2% QoQ" },
-            { label: "Competitor Valuation", value: "$3.8B (-2.1% YoY)" },
-            { label: "Risk Assessment", value: "Medium-Low" },
-            { label: "Market Penetration", value: "23.7%" },
+            { label: "WTI Crude Price", value: "$72.18 (+2.3%)" },
+            { label: "Market Volatility", value: "32% (High)" },
+            { label: "Supply Risk", value: "Moderate" },
+            { label: "Sentiment", value: "Bullish (7.5/10)" },
           ],
           recommendations: [
-            "Prioritize long-term stability over short-term gains",
-            "Consider strategic partnerships to offset competitive threats",
-            "Monitor regulatory changes closely as they impact valuation"
+            "Set real-time alerts for OPEC+ production announcements",
+            "Monitor geopolitical tensions in key producing regions",
+            "Track seasonal storage level reports for natural gas",
+            "Analyze regulatory impacts across global energy markets"
+          ],
+          marketConditions: {
+            supplyDemand: "Supply constraints in Middle East, growing demand in Asia",
+            priceDrivers: "Production cuts, seasonal demand patterns, inventory levels",
+            volatilityFactors: "Geopolitical tensions, weather patterns, transport disruptions"
+          },
+          tradingSignals: [
+            { signal: "Buy", confidence: "High", timeframe: "Short-term (1-2 weeks)" },
+            { signal: "Hold", confidence: "Moderate", timeframe: "Medium-term (1-3 months)" }
           ]
         };
       case 'product':
         return {
-          title: "Product Strategy Insights",
+          title: "Financial Analysis Suite",
           metrics: [
-            { label: "Feature Gap Analysis", value: "8 missing features" },
-            { label: "Customer Sentiment", value: "7.8/10 (+0.5)" },
-            { label: "Time to Market", value: "3.2 months" },
-            { label: "Product-Market Fit", value: "High (85%)" },
+            { label: "Peer Comparison", value: "93% complete" },
+            { label: "Earnings Coverage", value: "Last 8 quarters" },
+            { label: "Valuation Model", value: "DCF, Comps, SOTP" },
+            { label: "Rating Accuracy", value: "87% (12-month)" },
           ],
           recommendations: [
-            "Focus on UX improvements in core workflows",
-            "Accelerate roadmap for API integrations",
-            "Consider pricing simplification to compete effectively"
-          ]
-        };
-      case 'sales':
-        return {
-          title: "Sales Enablement Insights",
-          metrics: [
-            { label: "Competitive Win Rate", value: "62% (+5%)" },
-            { label: "Avg. Deal Value", value: "$86K" },
-            { label: "Sales Cycle", value: "47 days (-3)" },
-            { label: "Objection Frequency", value: "-12% MoM" },
+            "Create alerts for SEC filings and earnings announcements",
+            "Track insider transactions across target companies",
+            "Monitor changes in institutional ownership percentages",
+            "Analyze earnings call transcripts for sentiment shifts"
           ],
-          recommendations: [
-            "Emphasize our superior support in competitive deals",
-            "Highlight security certifications when displacing Competitor A",
-            "Leverage implementation speed as key differentiator"
+          financialHighlights: {
+            keyMetrics: "Revenue CAGR, EBITDA margins, FCF yield, ROIC",
+            comparisonGroups: "Industry peers, market cap range, growth profiles",
+            valuationMethodologies: "Multiple analysis, DCF modeling, sum-of-parts"
+          },
+          catalysts: [
+            { event: "Earnings announcement", impact: "High", timeline: "2 weeks" },
+            { event: "Regulatory approval", impact: "Medium", timeline: "3 months" }
           ]
         };
       case 'researcher':
         return {
-          title: "Market Research Insights",
+          title: "Market Research Intelligence",
           metrics: [
-            { label: "Data Points Analyzed", value: "47,200+" },
-            { label: "Trend Confidence", value: "92%" },
-            { label: "Segment Growth", value: "Enterprise: +18%" },
-            { label: "Market Maturity", value: "Early Majority" },
+            { label: "Data Sources", value: "2,340+" },
+            { label: "Research Coverage", value: "86% of sector" },
+            { label: "Update Frequency", value: "4.2 hours" },
+            { label: "Publication Access", value: "372 journals" },
           ],
           recommendations: [
-            "Focus research on emerging Eastern European markets",
-            "Conduct detailed analysis of SMB adoption patterns",
-            "Investigate correlation between pricing models and retention"
+            "Configure alerts for regulatory filings in key jurisdictions",
+            "Track patent applications in emerging technology sectors",
+            "Monitor academic publications across targeted research areas",
+            "Analyze cross-border policy developments and harmonization"
+          ],
+          researchDomains: {
+            regulatoryFrameworks: "Global policy landscape, compliance requirements, enforcement trends",
+            emergingTechnologies: "AI/ML applications, blockchain use cases, quantum computing",
+            academicPublications: "Peer-reviewed research, white papers, conference proceedings"
+          },
+          trendMonitoring: [
+            { trend: "Regulatory shift", maturity: "Early stage", impact: "High" },
+            { trend: "Technology adoption", maturity: "Growth phase", impact: "Medium" }
           ]
         };
       default:
@@ -305,8 +330,6 @@ export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings
         return styles.investorBadge;
       case 'product':
         return styles.productBadge;
-      case 'sales':
-        return styles.salesBadge;
       case 'researcher':
         return styles.researcherBadge;
       default:
@@ -318,17 +341,43 @@ export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings
   const getPersonaBadgeText = () => {
     switch (personaType) {
       case 'investor':
-        return "Investment Analysis";
+        return "Energy Trading Intelligence";
       case 'product':
-        return "Product Strategy";
-      case 'sales':
-        return "Sales Intelligence";
+        return "Financial Analysis";
       case 'researcher':
         return "Market Research";
       default:
         return "";
     }
   };
+
+  // Get persona-specific action recommendations
+  const getPersonaActions = () => {
+    switch (personaType) {
+      case 'investor':
+        return [
+          { title: "Pricing Strategy", content: "Adjust trading positions based on forecasted supply constraints over next 30 days", priority: "high" },
+          { title: "Risk Management", content: "Implement hedging strategy against volatility in natural gas futures before seasonal peak", priority: "medium" }
+        ];
+      case 'product':
+        return [
+          { title: "Investment Focus", content: "Target undervalued assets in the sector with strong cash flow metrics and low leverage", priority: "high" },
+          { title: "Portfolio Adjustment", content: "Rebalance exposure to companies with high regulatory risk ahead of upcoming policy changes", priority: "medium" }
+        ];
+      case 'researcher':
+        return [
+          { title: "Regulatory Monitoring", content: "Establish tracking system for cross-jurisdiction policy developments affecting target sectors", priority: "high" },
+          { title: "Technology Assessment", content: "Conduct in-depth analysis of patent activity trends to identify emerging competitive threats", priority: "medium" }
+        ];
+      default:
+        return [
+          { title: "Strategic Opportunity", content: "Launch targeted campaign highlighting our superior features within 30 days", priority: "high" },
+          { title: "Risk Mitigation", content: "Develop compliance automation tools to protect market share against regulatory changes", priority: "medium" }
+        ];
+    }
+  };
+
+  const actions = getPersonaActions();
 
   return (
     <Document>
@@ -363,6 +412,85 @@ export const BattlecardPDF: React.FC<BattlecardPDFProps> = ({ feedName, findings
                 <Text style={styles.takeawayText}>{rec}</Text>
               </View>
             ))}
+            
+            {/* Persona-specific content */}
+            {personaType === 'investor' && (
+              <View style={styles.personaSpecificSection}>
+                <Text style={styles.highlightTitle}>Market Conditions Overview</Text>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Supply/Demand:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.marketConditions.supplyDemand}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Price Drivers:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.marketConditions.priceDrivers}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Volatility Factors:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.marketConditions.volatilityFactors}</Text>
+                </View>
+                
+                <Text style={[styles.highlightTitle, { marginTop: 10 }]}>Trading Signals</Text>
+                {personaInsights.tradingSignals.map((signal, idx) => (
+                  <View key={idx} style={styles.metricRow}>
+                    <Text style={styles.metricLabel}>{signal.signal} ({signal.timeframe}):</Text>
+                    <Text style={styles.metricValue}>{signal.confidence} Confidence</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+            
+            {personaType === 'product' && (
+              <View style={styles.personaSpecificSection}>
+                <Text style={styles.highlightTitle}>Financial Analysis Framework</Text>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Key Metrics:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.financialHighlights.keyMetrics}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Comparison Groups:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.financialHighlights.comparisonGroups}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Valuation Methods:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.financialHighlights.valuationMethodologies}</Text>
+                </View>
+                
+                <Text style={[styles.highlightTitle, { marginTop: 10 }]}>Upcoming Catalysts</Text>
+                {personaInsights.catalysts.map((catalyst, idx) => (
+                  <View key={idx} style={styles.metricRow}>
+                    <Text style={styles.metricLabel}>{catalyst.event} ({catalyst.timeline}):</Text>
+                    <Text style={styles.metricValue}>{catalyst.impact} Impact</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+            
+            {personaType === 'researcher' && (
+              <View style={styles.personaSpecificSection}>
+                <Text style={styles.highlightTitle}>Research Domain Coverage</Text>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Regulatory:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.researchDomains.regulatoryFrameworks}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Technology:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.researchDomains.emergingTechnologies}</Text>
+                </View>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>Academic:</Text>
+                  <Text style={styles.metricValue}>{personaInsights.researchDomains.academicPublications}</Text>
+                </View>
+                
+                <Text style={[styles.highlightTitle, { marginTop: 10 }]}>Trend Monitoring Status</Text>
+                {personaInsights.trendMonitoring.map((trend, idx) => (
+                  <View key={idx} style={styles.metricRow}>
+                    <Text style={styles.metricLabel}>{trend.trend} ({trend.maturity}):</Text>
+                    <Text style={styles.metricValue}>{trend.impact} Impact</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         )}
 
