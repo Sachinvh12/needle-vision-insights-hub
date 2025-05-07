@@ -13,6 +13,8 @@ export const toast = {
   info: (message: string, options = {}) => sonnerToast.info(message, { ...defaultOptions, ...options }),
   warning: (message: string, options = {}) => sonnerToast.warning(message, { ...defaultOptions, ...options }),
   custom: (message: React.ReactNode, options = {}) => sonnerToast(message, { ...defaultOptions, ...options }),
+  // Adding direct access to the toast function for compatibility
+  toast: (message: React.ReactNode, options = {}) => sonnerToast(message, { ...defaultOptions, ...options }),
 };
 
 // Export the useToast hook for consistent usage across the app
