@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 
 interface ScrollRevealSectionProps {
   children: ReactNode;
@@ -31,7 +31,7 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
   damping = 25,
   stiffness = 200
 }) => {
-  // Calculate initial position based on direction
+  // Calculate initial position based on direction with refined values
   const getInitialPosition = () => {
     switch (direction) {
       case 'up': return { y: distance, opacity: 0 };
@@ -43,7 +43,7 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
     }
   };
 
-  // Animation variants with enhanced transitions
+  // Enhanced animation variants with more sophisticated transitions
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -56,9 +56,10 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
     }
   };
 
+  // Refined transition with better physics parameters
   const getTransition = () => {
     return easing === "spring" 
-      ? { type: 'spring', damping, stiffness, duration } 
+      ? { type: 'spring', damping, stiffness, duration, mass: 0.8 } 
       : { duration, ease: easing };
   };
 

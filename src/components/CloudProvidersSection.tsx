@@ -18,20 +18,20 @@ const CloudProvidersSection: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.3,
+        staggerChildren: 0.08,
+        delayChildren: 0.2,
         ease: "easeOut",
-        duration: 1
+        duration: 0.8
       }
     }
   };
   
-  // Refined provider animation with more sophisticated movement
+  // Refined provider animation with subtle elegant movement
   const providerVariants = {
     hidden: { 
       opacity: 0, 
-      y: 20,
-      scale: 0.8 
+      y: 15,
+      scale: 0.92 
     },
     visible: {
       opacity: 1,
@@ -39,39 +39,33 @@ const CloudProvidersSection: React.FC = () => {
       scale: 1,
       transition: {
         type: "spring",
-        stiffness: 260,
+        stiffness: 240,
         damping: 20
       }
     },
     hover: { 
-      y: -8,
+      y: -6,
       scale: 1.05,
       transition: { 
         type: "spring", 
         stiffness: 400, 
         damping: 10 
       }
-    },
-    tap: { 
-      scale: 0.95,
-      transition: { 
-        duration: 0.1 
-      }
     }
   };
 
-  // Glow animation variants for elegant visual effect
+  // Elegant glow animation variants
   const glowVariants = {
     idle: {
-      opacity: 0.2,
+      opacity: 0.15,
       scale: 1
     },
     hover: {
-      opacity: [0.2, 0.5, 0.2],
-      scale: [1, 1.2, 1],
+      opacity: [0.15, 0.4, 0.15],
+      scale: [1, 1.15, 1],
       transition: {
         repeat: Infinity,
-        duration: 1.5,
+        duration: 2,
         ease: "easeInOut"
       }
     }
@@ -86,7 +80,7 @@ const CloudProvidersSection: React.FC = () => {
       variants={containerVariants}
     >
       <motion.div 
-        className="flex flex-wrap justify-center gap-8 md:gap-12"
+        className="flex flex-wrap justify-center gap-8 md:gap-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -97,20 +91,19 @@ const CloudProvidersSection: React.FC = () => {
             className="flex flex-col items-center" 
             variants={providerVariants}
             whileHover="hover"
-            whileTap="tap"
             custom={index}
             transition={{
               type: "spring",
-              stiffness: 260,
+              stiffness: 240,
               damping: 20,
-              delay: index * 0.06
+              delay: index * 0.04
             }}
           >
             <motion.div 
               className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-3 shadow-md relative overflow-hidden"
-              whileHover={{ boxShadow: "0 8px 25px rgba(0,0,0,0.1)" }}
+              whileHover={{ boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}
             >
-              {/* Enhanced ambient glow effect with more elegant animation */}
+              {/* Subtle ambient glow effect */}
               <motion.div 
                 className="absolute inset-0 rounded-full bg-needl-primary/5"
                 variants={glowVariants}
@@ -119,7 +112,7 @@ const CloudProvidersSection: React.FC = () => {
                 animate={{
                   boxShadow: [
                     "0 0 0 0px rgba(54, 125, 141, 0)",
-                    "0 0 0 10px rgba(54, 125, 141, 0.05)",
+                    "0 0 0 8px rgba(54, 125, 141, 0.03)",
                     "0 0 0 0px rgba(54, 125, 141, 0)"
                   ]
                 }}
@@ -130,7 +123,7 @@ const CloudProvidersSection: React.FC = () => {
                 }}
               />
               
-              {/* Subtle rotating ring for additional elegant motion */}
+              {/* Subtle rotating ring */}
               <motion.div
                 className="absolute w-full h-full rounded-full border border-needl-primary/10"
                 animate={{
@@ -145,7 +138,7 @@ const CloudProvidersSection: React.FC = () => {
               
               <CloudProviderIcon 
                 provider={provider.id as any} 
-                className="w-9 h-9 relative z-10" 
+                className="w-8 h-8 relative z-10" 
               />
             </motion.div>
             
@@ -153,7 +146,7 @@ const CloudProvidersSection: React.FC = () => {
               className="text-sm text-gray-700 font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
+              transition={{ delay: 0.2 + index * 0.08 }}
             >
               {provider.name}
             </motion.span>
@@ -162,10 +155,10 @@ const CloudProvidersSection: React.FC = () => {
       </motion.div>
       
       <motion.div 
-        className="text-center mt-10 text-sm text-gray-600 max-w-lg mx-auto"
+        className="text-center mt-8 text-sm text-gray-600 max-w-lg mx-auto"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 1.2 }}
+        transition={{ duration: 0.6, delay: 0.8 }}
       >
         <span className="font-medium bg-gradient-to-r from-needl-primary to-needl-dark bg-clip-text text-transparent">
           Connect your favorite platforms
