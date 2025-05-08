@@ -1,116 +1,140 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import MainHeader from '../components/MainHeader';
-import { Button } from '@/components/ui/button';
 import { useApp } from '../context/AppContext';
-import { ChevronRight } from 'lucide-react';
-import CloudProviderIcon from '../components/CloudProviderIcon';
-import AdvancedDataFlowVisualization from '../components/AdvancedDataFlowVisualization';
+import HeroSection from '../components/HeroSection';
+import FeaturesSection from '../components/FeaturesSection';
+import TestimonialsSection from '../components/TestimonialsSection';
+import CTASection from '../components/CTASection';
+import { CustomToaster } from '../components/ui/custom-toaster';
+import ScrollRevealSection from '../components/ScrollRevealSection';
+import { ArrowDown } from 'lucide-react';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useApp();
   const { isLoggedIn } = state;
-
-  // Staggered animation variants for elements
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
+  const { scrollYProgress } = useScroll();
   
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.22, 1, 0.36, 1]
-      }
-    }
-  };
+  // Transform scroll progress for animations
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0.95]);
+  const headerBackdrop = useTransform(
+    scrollYProgress, 
+    [0, 0.1], 
+    ['blur(0px)', 'blur(10px)']
+  );
+  
+  // Update page title and handle scroll restoration
+  useEffect(() => {
+    document.title = "Needl.ai - Turning Information into Intelligence";
+    window.scrollTo(0, 0);
+    
+    // Optional: Add a class to the body for specific landing page styling
+    document.body.classList.add('landing-page');
+    return () => {
+      document.body.classList.remove('landing-page');
+    };
+  }, []);
   
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Always showAlertIcon as true for consistency across pages */}
-      <MainHeader showAlertIcon={true} />
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Header with scroll effects */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{ 
+          opacity: headerOpacity,
+          backdropFilter: headerBackdrop
+        }}
+      >
+        <MainHeader showAlertIcon={true} />
+      </motion.div>
       
-      <main className="flex-1 relative overflow-hidden">
-        {/* Enhanced Hero Section with our improved visualization */}
-        <section className="py-16 md:py-24 px-4 relative z-10">
-          <div className="container mx-auto text-center max-w-4xl">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.7 }} 
-              className="mb-6"
-            >
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight bg-gradient-to-r from-needl-primary to-blue-600 bg-clip-text text-transparent">
-                Turning Information into Intelligence
-              </h1>
-              
-              <motion.p 
-                className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto" 
-                initial={{ opacity: 0, y: 20 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                transition={{ duration: 0.7, delay: 0.2 }}
-              >
-                Needl.ai consolidates insights from your data sources in real-time, empowering your team with actionable intelligence for confident decision making.
-              </motion.p>
-            </motion.div>
-
-            {/* Our new advanced visualization component */}
-            <AdvancedDataFlowVisualization />
-            
-            <motion.div 
-              variants={containerVariants} 
-              initial="hidden" 
-              animate="visible" 
-              className="flex flex-wrap justify-center gap-10 mt-8"
-            >
-              {['google-drive', 'dropbox', 'onedrive'].map((provider, index) => (
-                <motion.div 
-                  key={provider} 
-                  variants={itemVariants} 
-                  className="flex flex-col items-center" 
-                  whileHover={{ y: -5, scale: 1.05 }} 
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-2 shadow-md">
-                    <CloudProviderIcon provider={provider as any} className="w-9 h-9" />
-                  </div>
-                  <span className="text-sm text-gray-700 font-medium">
-                    {provider === 'google-drive' ? 'Google Drive' : provider === 'dropbox' ? 'Dropbox' : 'OneDrive'}
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.8 }} 
-              className="mt-12"
-            >
-              <Button 
-                onClick={() => navigate('/use-cases')} 
-                className="bg-needl-primary hover:bg-needl-dark text-white px-8 py-6 rounded-md text-lg font-medium transition-all duration-300 hover:shadow-lg" 
-                size="lg"
-              >
-                Get Started <ChevronRight className="ml-1 h-5 w-5" />
-              </Button>
-            </motion.div>
-          </div>
-        </section>
+      <main className="flex-1 pt-16 overflow-hidden">
+        {/* Hero Section */}
+        <HeroSection />
+        
+        {/* Features Section with scroll reveal animations */}
+        <ScrollRevealSection>
+          <FeaturesSection />
+        </ScrollRevealSection>
+        
+        {/* Divider with animation */}
+        <div className="relative flex justify-center py-10">
+          <motion.div 
+            className="w-24 h-px bg-gradient-to-r from-transparent via-needl-primary/30 to-transparent"
+            initial={{ width: 0, opacity: 0 }}
+            whileInView={{ width: 120, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          />
+        </div>
+        
+        {/* Testimonials with staggered reveal */}
+        <ScrollRevealSection direction="up" staggerChildren={0.2}>
+          <TestimonialsSection />
+        </ScrollRevealSection>
+        
+        {/* CTA Section with stronger animation */}
+        <ScrollRevealSection direction="none" threshold={0.3}>
+          <CTASection />
+        </ScrollRevealSection>
       </main>
+      
+      {/* Footer with subtle entrance animation */}
+      <motion.footer 
+        className="bg-gray-50 py-12 px-4"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+      >
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-6 md:mb-0">
+              <motion.div 
+                className="text-2xl font-bold text-needl-primary"
+                whileHover={{ scale: 1.05 }}
+              >
+                needl.ai
+              </motion.div>
+              <p className="text-gray-600 mt-2">Transforming data into decisions</p>
+            </div>
+            
+            <div className="flex gap-8">
+              <a href="#" className="text-gray-600 hover:text-needl-primary transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="text-gray-600 hover:text-needl-primary transition-colors">
+                Terms
+              </a>
+              <a href="#" className="text-gray-600 hover:text-needl-primary transition-colors">
+                About
+              </a>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-200 text-center text-gray-500 text-sm">
+            © {new Date().getFullYear()} Needl.ai - All rights reserved.
+          </div>
+        </div>
+      </motion.footer>
+      
+      {/* Floating scroll to top button that appears after scrolling */}
+      <motion.button
+        className="fixed bottom-8 right-8 p-3 rounded-full bg-needl-primary/90 text-white z-40 shadow-md hover:bg-needl-primary transition-colors"
+        initial={{ opacity: 0, y: 80 }}
+        animate={{ 
+          opacity: scrollYProgress.get() > 0.2 ? 1 : 0,
+          y: scrollYProgress.get() > 0.2 ? 0 : 80,
+        }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        <ArrowDown className="h-5 w-5 rotate-180" />
+      </motion.button>
+      
+      <CustomToaster />
     </div>
   );
 };
