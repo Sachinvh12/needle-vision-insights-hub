@@ -1,12 +1,7 @@
 
 import React from 'react';
-import { Toaster, type ToastOptions as SonnerToastOptions } from 'sonner';
+import { Toaster } from 'sonner';
 import { useTheme } from 'next-themes';
-
-// Define our custom toast options with correct typing
-type CustomToastOptions = SonnerToastOptions & {
-  classNames?: Record<string, string>;
-};
 
 export function CustomToaster() {
   const { theme = "system" } = useTheme();

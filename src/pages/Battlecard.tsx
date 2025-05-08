@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { BattlecardPDF } from '@/components/battlecard/BattlecardPDF';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { CustomToaster } from '@/components/ui/custom-toaster';
 
 const Battlecard: React.FC = () => {
   const { feedId } = useParams<{ feedId: string }>();
@@ -244,7 +245,7 @@ const Battlecard: React.FC = () => {
   const actionableInsights = getActionableInsights();
   
   const openDocument = (sourceName: string) => {
-    toast.custom("Opening Document", {
+    toast.info("Opening Document", {
       description: `Opening ${sourceName} in document viewer`
     });
   };
@@ -590,6 +591,7 @@ const Battlecard: React.FC = () => {
           </div>
         </main>
       </PageTransition>
+      <CustomToaster />
     </div>
   );
 };
