@@ -243,6 +243,12 @@ const Battlecard: React.FC = () => {
   
   const actionableInsights = getActionableInsights();
   
+  const openDocument = (sourceName: string) => {
+    toast.custom("Opening Document", {
+      description: `Opening ${sourceName} in document viewer`
+    });
+  };
+  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50/30">
       <MainHeader showAlertIcon />
@@ -440,10 +446,7 @@ const Battlecard: React.FC = () => {
                                           ) : (
                                             <span 
                                               className="text-needl-primary hover:underline flex items-center gap-1 cursor-pointer text-sm"
-                                              onClick={() => toast({
-                                                title: "Opening Document",
-                                                description: `Opening ${source.name} in document viewer`,
-                                              })}
+                                              onClick={() => openDocument(source.name)}
                                             >
                                               <LinkIcon className="h-3 w-3" /> View Document
                                             </span>

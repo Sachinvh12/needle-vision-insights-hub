@@ -1,7 +1,12 @@
 
 import React from 'react';
-import { Toaster } from 'sonner';
+import { Toaster, type ToastOptions as SonnerToastOptions } from 'sonner';
 import { useTheme } from 'next-themes';
+
+// Define our custom toast options with correct typing
+type CustomToastOptions = SonnerToastOptions & {
+  classNames?: Record<string, string>;
+};
 
 export function CustomToaster() {
   const { theme = "system" } = useTheme();
@@ -22,12 +27,6 @@ export function CustomToaster() {
           error: "border-l-4 border-l-red-500",
           warning: "border-l-4 border-l-amber-500",
           info: "border-l-4 border-l-blue-500",
-        },
-        icons: {
-          success: '✓',
-          error: '✗',
-          warning: '⚠',
-          info: 'ℹ',
         }
       }}
       theme={theme as "light" | "dark" | "system"}

@@ -1,27 +1,37 @@
 
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast, type ToastOptions as SonnerToastOptions } from "sonner";
 import { ReactNode } from "react";
 
-// Define types for our toast options
-type ToastOptions = {
-  closeButton?: boolean;
-  [key: string]: any;
+// Extend the original Sonner types with our custom options
+type ExtendedToastOptions = SonnerToastOptions & {
+  description?: ReactNode;
+  title?: string;
 };
 
+// Type definition for our toast methods
+interface ToastAPI {
+  toast: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+  success: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+  error: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+  info: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+  warning: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+  custom: (message: ReactNode, options?: ExtendedToastOptions) => string | number;
+}
+
 // Create properly typed toast methods
-export const toast = {
-  success: (message: string, options: ToastOptions = {}) => 
+export const toast: ToastAPI = {
+  success: (message, options = {}) => 
     sonnerToast.success(message, { closeButton: true, ...options }),
-  error: (message: string, options: ToastOptions = {}) => 
+  error: (message, options = {}) => 
     sonnerToast.error(message, { closeButton: true, ...options }),
-  info: (message: string, options: ToastOptions = {}) => 
+  info: (message, options = {}) => 
     sonnerToast.info(message, { closeButton: true, ...options }),
-  warning: (message: string, options: ToastOptions = {}) => 
+  warning: (message, options = {}) => 
     sonnerToast.warning(message, { closeButton: true, ...options }),
-  custom: (message: ReactNode, options: ToastOptions = {}) => 
+  custom: (message, options = {}) => 
     sonnerToast(message, { closeButton: true, ...options }),
   // Adding direct access to the toast function for compatibility
-  toast: (message: ReactNode, options: ToastOptions = {}) => 
+  toast: (message, options = {}) => 
     sonnerToast(message, { closeButton: true, ...options }),
 };
 

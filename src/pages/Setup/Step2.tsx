@@ -12,6 +12,7 @@ import SetupStepIndicator from '../../components/setup/SetupStepIndicator';
 import SetupTransition from '../../components/setup/SetupTransition';
 import SetupNavButtons from '../../components/setup/SetupNavButtons';
 import EnhancedCard from '../../components/setup/EnhancedCard';
+import { CustomToaster } from '@/components/ui/custom-toaster';
 
 const Step2: React.FC = () => {
   const navigate = useNavigate();
@@ -213,6 +214,9 @@ const Step2: React.FC = () => {
           onSkip={() => navigate('/setup/step3')}
         />
       </SetupTransition>
+      
+      {/* Add CustomToaster component */}
+      <CustomToaster />
     </SetupPageWrapper>
   );
 };
