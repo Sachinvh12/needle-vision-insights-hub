@@ -1,73 +1,101 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import EnhancedDataFlowVisualization from './EnhancedDataFlowVisualization';
+import ScrollRevealSection from './ScrollRevealSection';
 import CloudProvidersSection from './CloudProvidersSection';
-import AmbientBackground from './AmbientBackground';
+import EnhancedDataFlowVisualization from './EnhancedDataFlowVisualization';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
-  const [hasScrolled, setHasScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
-  // Refined parallax effects based on scroll
-  const titleOpacity = useTransform(scrollY, [0, 250], [1, 0.6]);
-  const titleY = useTransform(scrollY, [0, 250], [0, -35]);
-  const visualizationScale = useTransform(scrollY, [0, 300], [1, 0.96]);
+  // Enhanced parallax effects for professional-looking animations
+  const titleOpacity = useTransform(scrollY, [0, 250], [1, 0.7]);
+  const titleY = useTransform(scrollY, [0, 250], [0, -30]);
+  const visualizationScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+  const visualizationY = useTransform(scrollY, [0, 300], [0, 15]);
   
-  // Track scroll position for enhanced animations
-  useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolled(window.scrollY > 50);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Elegant title text animation variants
+  const titleContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.2
+      }
+    }
+  };
   
-  // Elegant heading text animation
-  const headingWords = "Turning Information into Intelligence".split(" ");
+  const headlineVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring", 
+        stiffness: 100, 
+        damping: 20
+      }
+    }
+  };
+  
+  // Enhanced elegant subtitle animation
+  const subtitleVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1, 
+      y: 0,
+      transition: {
+        delay: 0.6,
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
 
   return (
-    <section className="relative py-24 md:py-32 px-4 overflow-hidden z-10">
+    <section className="relative py-28 md:py-36 px-4 overflow-hidden z-10">
       <div className="container mx-auto text-center max-w-4xl relative z-10">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
           style={{ opacity: titleOpacity, y: titleY }}
-          className="mb-6 relative"
+          className="mb-8 relative"
         >
-          <motion.h1 className="text-4xl md:text-6xl font-bold mb-5 tracking-tight relative">
-            {headingWords.map((word, i) => (
-              <motion.span
-                key={i}
-                className="inline-block mr-2 mb-1 bg-gradient-to-br from-needl-primary to-blue-600 bg-clip-text text-transparent"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.7,
-                  delay: 0.2 + i * 0.12,
-                  ease: [0.22, 1, 0.36, 1]
-                }}
-              >
-                {word}
-              </motion.span>
-            ))}
-            
-            {/* Elegant highlight decoration */}
+          {/* Elegant professional headline with staggered reveal */}
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold mb-5 tracking-tight"
+            variants={titleContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <motion.span
-              className="absolute -z-10 bg-needl-lighter/80 rounded-full blur-2xl"
+              className="bg-clip-text text-transparent bg-gradient-to-r from-needl-dark via-needl-primary to-needl-light inline-block mb-2"
+              variants={headlineVariants}
+            >
+              Transforming Data
+            </motion.span>
+            <br />
+            <motion.span 
+              className="bg-clip-text text-transparent bg-gradient-to-br from-slate-700 to-slate-900 dark:from-white dark:to-slate-200 inline-block"
+              variants={headlineVariants}
+            >
+              Into Intelligent Decisions
+            </motion.span>
+            
+            {/* Sophisticated highlight decoration */}
+            <motion.div
+              className="absolute -z-10 bg-needl-lighter/60 rounded-full blur-3xl"
               initial={{ width: 0, height: 0, x: "50%", y: "50%" }}
               animate={{ 
-                width: "120%",
+                width: "140%",
                 height: "120%", 
-                x: "-10%", 
+                x: "-20%", 
                 y: "-10%",
-                opacity: [0, 0.25, 0.1]
+                opacity: [0, 0.3, 0.1]
               }}
               transition={{ 
                 delay: 0.8,
@@ -76,104 +104,140 @@ const HeroSection: React.FC = () => {
               }}
             />
             
-            {/* Subtle sparkle effect */}
+            {/* Professional sparkle accent */}
             <motion.div
-              className="absolute right-0 top-0 text-needl-primary"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.5, duration: 0.5 }}
+              className="absolute -right-3 top-0 text-needl-primary"
+              initial={{ opacity: 0, scale: 0, rotate: -20 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 1.3, duration: 0.7, type: "spring" }}
             >
-              <Sparkles className="h-5 w-5 md:h-6 md:w-6" />
+              <Sparkles className="h-6 w-6 md:h-8 md:w-8" />
             </motion.div>
           </motion.h1>
           
           <motion.p
-            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6 }}
+            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
+            variants={subtitleVariants}
+            initial="hidden"
+            animate="visible"
           >
-            Needl.ai consolidates insights from your data sources in real-time, 
-            empowering your team with actionable intelligence for confident decision making.
+            Needl.ai orchestrates insights from multiple sources, delivering actionable 
+            intelligence that empowers decision makers across your organization.
           </motion.p>
         </motion.div>
 
         <motion.div
-          style={{ scale: visualizationScale }}
-          className="relative z-10"
+          style={{ 
+            scale: visualizationScale,
+            y: visualizationY
+          }}
+          className="relative z-10 mb-2 overflow-visible"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <EnhancedDataFlowVisualization />
+          
+          {/* Elegant glow effects under the visualization */}
+          <motion.div
+            className="absolute -inset-10 -z-10 opacity-70"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.7, 0.3, 0.7] }}
+            transition={{ delay: 1.5, duration: 5, repeat: Infinity, repeatType: "mirror" }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-needl-lighter/20 via-transparent to-transparent rounded-full blur-3xl" />
+          </motion.div>
         </motion.div>
         
-        <CloudProvidersSection />
+        <ScrollRevealSection
+          delay={0.5}
+          direction="up"
+          distance={20}
+          duration={0.8}
+          once={true}
+        >
+          <CloudProvidersSection />
+        </ScrollRevealSection>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1 }}
-          className="mt-10 relative flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6"
+          transition={{ duration: 0.8, delay: 1.2 }}
+          className="mt-12 relative flex flex-col md:flex-row items-center justify-center gap-5 md:gap-8"
         >
-          <Button 
-            onClick={() => navigate('/use-cases')}
-            className="bg-needl-primary hover:bg-needl-dark text-white px-8 py-6 rounded-md text-lg font-medium transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
-            size="lg"
+          <motion.div
+            whileHover={{ scale: 1.03, y: -5 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
           >
-            Get Started <ChevronRight className="ml-1 h-5 w-5" />
-          </Button>
+            <Button 
+              onClick={() => navigate('/use-cases')}
+              className="bg-needl-primary hover:bg-needl-dark text-white px-8 py-7 rounded-md text-lg font-medium transition-all duration-300 hover:shadow-lg relative overflow-hidden group"
+              size="lg"
+            >
+              <span className="relative z-10">Explore Needl.ai</span>
+              <ArrowRight className="ml-2 h-5 w-5 relative z-10 transition-transform group-hover:translate-x-1" />
+              
+              {/* Elegant button background animation */}
+              <motion.div 
+                className="absolute inset-0 bg-needl-dark"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                style={{ originX: 0 }}
+              />
+            </Button>
+            
+            {/* Elegant button glow effect */}
+            <motion.div 
+              className="absolute -inset-1 -z-10 bg-gradient-to-br from-needl-primary to-needl-dark rounded-lg opacity-70 blur-md"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: isHovered ? [0.5, 0.8, 0.5] : 0,
+                scale: isHovered ? [0.8, 1, 0.9] : 0.8
+              }}
+              transition={{ 
+                duration: 2, 
+                repeat: isHovered ? Infinity : 0, 
+                repeatType: "mirror" 
+              }}
+            />
+          </motion.div>
           
           <Button 
             onClick={() => navigate('/dashboard')}
-            className="bg-transparent hover:bg-gray-100 text-gray-700 border border-gray-300 px-8 py-6 rounded-md text-lg font-medium transition-all duration-300"
+            className="bg-white text-gray-800 border border-gray-200 hover:bg-gray-50 px-8 py-7 rounded-md text-lg font-medium transition-all duration-300"
             size="lg"
             variant="outline"
           >
-            View Demo <ArrowRight className="ml-1 h-5 w-5" />
+            View Demo
           </Button>
-          
-          {/* Pulsating circle behind primary button */}
-          <motion.div 
-            className="absolute -z-10 left-1/2 md:left-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-needl-primary/10 rounded-full"
-            initial={{ width: 0, height: 0 }}
-            animate={{ 
-              width: ['100%', '120%', '100%'],
-              height: ['100%', '120%', '100%'],
-              opacity: [0.15, 0.25, 0.15]
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 3,
-              ease: "easeInOut"
-            }}
-          />
+        </motion.div>
+        
+        {/* Elegant scroll indicator with refined animation */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: [0, 1, 0.3], y: 0 }}
+          transition={{ 
+            delay: 2, 
+            duration: 3,
+            repeat: Infinity,
+            repeatType: "reverse",
+            times: [0, 0.5, 1]
+          }}
+        >
+          <span className="text-sm text-gray-400 mb-2">Discover More</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          >
+            <ChevronDown className="h-6 w-6 text-gray-400" />
+          </motion.div>
         </motion.div>
       </div>
-      
-      {/* Elegant scroll indicator - appears when user hasn't scrolled */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: hasScrolled ? 0 : 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div 
-          className="text-gray-400 text-sm mb-2"
-          animate={{ y: [0, 4, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-        >
-          Scroll to explore
-        </motion.div>
-        <motion.div
-          className="w-1 h-8 bg-gradient-to-b from-needl-primary/40 to-transparent rounded-full"
-          animate={{ 
-            scaleY: [1, 1.2, 1],
-            opacity: [0.6, 0.9, 0.6]
-          }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 1.5,
-          }}
-        />
-      </motion.div>
     </section>
   );
 };

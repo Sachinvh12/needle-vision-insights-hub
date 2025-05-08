@@ -1,30 +1,26 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import MainHeader from '../components/MainHeader';
-import { useApp } from '../context/AppContext';
 import HeroSection from '../components/HeroSection';
 import FeaturesSection from '../components/FeaturesSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import CTASection from '../components/CTASection';
 import { CustomToaster } from '../components/ui/custom-toaster';
 import ScrollRevealSection from '../components/ScrollRevealSection';
-import { ChevronUp, Link, MessageSquare, Shield } from 'lucide-react';
+import { ChevronUp } from 'lucide-react';
 import AmbientBackground from '../components/AmbientBackground';
 
 const Landing: React.FC = () => {
-  const navigate = useNavigate();
-  const { state } = useApp();
   const { scrollYProgress } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   
-  // Enhanced scroll animations with smoother transitions
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0.97]);
+  // Enhanced scroll animations with professional transitions
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0.98]);
   const headerBackdrop = useTransform(
     scrollYProgress, 
     [0, 0.1], 
-    ['blur(0px)', 'blur(12px)']
+    ['blur(0px)', 'blur(10px)']
   );
   
   // Track scroll position for refined animations
@@ -39,7 +35,7 @@ const Landing: React.FC = () => {
   
   // Reset scroll position and update title for better UX
   useEffect(() => {
-    document.title = "Needl.ai - Turning Information into Intelligence";
+    document.title = "Needl.ai - Transform Data into Decisions";
     window.scrollTo(0, 0);
     
     // Add a class to the body for specialized landing page styling
@@ -49,34 +45,45 @@ const Landing: React.FC = () => {
     };
   }, []);
 
-  // Footer links for improved navigation
-  const footerLinks = [
-    { label: 'About', href: '#' },
-    { label: 'Privacy', href: '#' },
-    { label: 'Terms', href: '#' },
-    { label: 'Contact', href: '#' }
-  ];
+  // Professionally animated section transitions
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
   
   return (
     <AnimatePresence>
       <div className="min-h-screen flex flex-col relative overflow-hidden">
-        {/* Enhanced header with refined scroll effects */}
+        {/* Professional enhanced header with refined scroll effects */}
         <motion.div 
-          className="fixed top-0 left-0 right-0 z-50 transition-colors"
+          className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
           style={{ 
             opacity: headerOpacity,
             backdropFilter: headerBackdrop
           }}
         >
           <motion.div
-            className={`transition-all duration-500 ${isScrolled ? 'bg-white/80 shadow-sm' : 'bg-transparent'}`}
+            className={`transition-all duration-500 ${isScrolled ? 'bg-white/90 shadow-sm' : 'bg-transparent'}`}
           >
             <MainHeader showAlertIcon={true} />
           </motion.div>
         </motion.div>
         
-        {/* Professional ambient background */}
-        <AmbientBackground intensity="medium" interactive={true} />
+        {/* Elegant ambient background */}
+        <AmbientBackground 
+          variant="particles" 
+          intensity="medium" 
+          color="primary" 
+          interactive={true} 
+          blur={true}
+        />
         
         <main className="flex-1 pt-16 overflow-hidden">
           {/* Hero Section */}
@@ -85,89 +92,88 @@ const Landing: React.FC = () => {
           {/* Features Section with elegant scroll reveal animations */}
           <ScrollRevealSection 
             direction="up" 
-            distance={40} 
-            threshold={0.25}
-            duration={0.9}
-            easing="easeOut"
+            distance={30} 
+            threshold={0.2}
+            duration={0.8}
+            ease="easeOut"
+            staggerChildren={0.1}
           >
-            <FeaturesSection />
+            <motion.div variants={sectionVariants}>
+              <FeaturesSection />
+            </motion.div>
           </ScrollRevealSection>
           
-          {/* Enhanced divider with elegant animation */}
-          <div className="relative flex justify-center py-16">
-            <motion.div 
-              className="flex flex-col items-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.2 }}
-            >
-              <motion.div 
-                className="w-px h-16 bg-gradient-to-b from-transparent via-needl-primary/40 to-transparent"
-                animate={{ 
-                  scaleY: [0.7, 1.3, 0.7],
-                  opacity: [0.3, 0.7, 0.3]
-                }}
-                transition={{ 
-                  duration: 2, 
-                  ease: "easeInOut",
-                  repeat: Infinity
-                }}
-              />
-              <motion.div 
-                className="w-24 h-px bg-gradient-to-r from-transparent via-needl-primary/30 to-transparent mt-3"
-                initial={{ width: 0, opacity: 0 }}
-                whileInView={{ width: 140, opacity: 1 }}
+          {/* Elegant section divider */}
+          <div className="py-16 overflow-hidden">
+            <div className="container mx-auto">
+              <motion.div
+                className="relative h-px bg-gradient-to-r from-transparent via-needl-primary/30 to-transparent"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.3 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
               />
-            </motion.div>
+              
+              <motion.div
+                className="absolute left-1/2 -translate-x-1/2"
+                initial={{ y: -20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                <div className="w-2 h-2 rounded-full bg-needl-primary/40 mx-auto mt-8 mb-4" />
+              </motion.div>
+            </div>
           </div>
           
           {/* Testimonials with elegant staggered reveal */}
           <ScrollRevealSection 
-            direction="up" 
+            direction="fade" 
             staggerChildren={0.2} 
-            distance={30}
             duration={0.8}
-            easing="easeOut"
+            ease="easeOut"
+            cascade={true}
           >
-            <TestimonialsSection />
+            <motion.div variants={sectionVariants}>
+              <TestimonialsSection />
+            </motion.div>
           </ScrollRevealSection>
           
           {/* CTA Section with enhanced animation */}
           <ScrollRevealSection 
-            direction="none" 
-            threshold={0.3}
-            duration={1}
+            direction="scale" 
+            threshold={0.25}
+            duration={0.9}
           >
-            <CTASection />
+            <motion.div variants={sectionVariants}>
+              <CTASection />
+            </motion.div>
           </ScrollRevealSection>
         </main>
         
-        {/* Elegant footer with refined animations */}
+        {/* Professional footer */}
         <motion.footer 
-          className="relative bg-gradient-to-b from-gray-50 to-gray-100 py-16 px-4 overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="relative bg-gray-50 py-16 px-4 overflow-hidden"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
         >
           <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
               {/* Brand column */}
-              <div className="mb-8 md:mb-0">
+              <div className="md:col-span-1">
                 <motion.div 
-                  className="text-2xl font-bold bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent inline-block"
-                  whileHover={{ scale: 1.05 }}
+                  className="text-2xl font-bold bg-gradient-to-r from-needl-dark to-needl-primary bg-clip-text text-transparent inline-block mb-3"
+                  whileHover={{ scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   needl.ai
                 </motion.div>
-                <p className="text-gray-600 mt-2 mb-4">Transforming data into decisions</p>
+                <p className="text-gray-600 mb-6">Transforming data into decisions</p>
                 
-                <div className="flex gap-4 mt-4">
-                  {['linkedin', 'twitter', 'github'].map((social, i) => (
+                <div className="flex gap-4 mt-2">
+                  {['LinkedIn', 'Twitter', 'GitHub'].map((social, i) => (
                     <motion.a
                       key={social}
                       href="#"
@@ -177,28 +183,39 @@ const Landing: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 + i * 0.1 }}
                     >
-                      {social === 'linkedin' && <Link className="h-4 w-4" />}
-                      {social === 'twitter' && <MessageSquare className="h-4 w-4" />}
-                      {social === 'github' && <Shield className="h-4 w-4" />}
+                      <span className="text-xs">{social.charAt(0)}</span>
                     </motion.a>
                   ))}
                 </div>
               </div>
               
               {/* Links columns */}
-              <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-8">
-                {['Solutions', 'Resources', 'Company'].map((category, i) => (
-                  <div key={category}>
+              <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  {
+                    title: 'Product',
+                    links: ['Features', 'Solutions', 'Pricing', 'Updates']
+                  },
+                  {
+                    title: 'Resources',
+                    links: ['Documentation', 'Guides', 'API Reference', 'Support']
+                  },
+                  {
+                    title: 'Company',
+                    links: ['About Us', 'Careers', 'Blog', 'Contact']
+                  }
+                ].map((category, i) => (
+                  <div key={category.title}>
                     <motion.h3
                       className="text-lg font-semibold mb-4 text-gray-800"
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 + i * 0.1 }}
                     >
-                      {category}
+                      {category.title}
                     </motion.h3>
                     <ul className="space-y-2">
-                      {['Features', 'Documentation', 'Pricing', 'Support'].map((item, j) => (
+                      {category.links.map((item, j) => (
                         <motion.li 
                           key={item}
                           initial={{ opacity: 0, x: -5 }}
@@ -225,69 +242,47 @@ const Landing: React.FC = () => {
               transition={{ duration: 0.8 }}
             />
             
-            {/* Copyright section with refined animation */}
-            <motion.div 
-              className="flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              <motion.div
-                initial={{ letterSpacing: "0em" }}
-                animate={{ letterSpacing: "0.01em" }}
-                transition={{ duration: 1 }}
-              >
+            {/* Copyright section */}
+            <div className="flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+              <div>
                 © {new Date().getFullYear()} Needl.ai - All rights reserved.
-              </motion.div>
+              </div>
               
               <div className="flex gap-6 mt-4 md:mt-0">
-                {footerLinks.map((link, i) => (
+                {['Privacy', 'Terms', 'Cookies', 'Contact'].map((link, i) => (
                   <motion.a 
-                    key={link.label}
-                    href={link.href} 
-                    className="text-gray-500 hover:text-needl-primary transition-colors relative group"
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 + i * 0.1 }}
+                    key={link}
+                    href="#" 
+                    className="text-gray-500 hover:text-needl-primary transition-colors"
+                    whileHover={{ y: -2 }}
+                    transition={{ type: "tween" }}
                   >
-                    <span className="relative z-10">{link.label}</span>
-                    <motion.span 
-                      className="absolute bottom-0 left-0 w-0 h-0.5 bg-needl-primary"
-                      initial={{ width: 0 }}
-                      whileHover={{ width: '100%' }}
-                      transition={{ duration: 0.3 }}
-                    />
+                    {link}
                   </motion.a>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
           
           {/* Elegant background decorations */}
           <motion.div 
-            className="absolute top-0 right-0 w-72 h-72 bg-needl-primary/5 rounded-full blur-3xl -z-10"
+            className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl -z-10 opacity-25"
+            style={{ 
+              background: 'radial-gradient(circle at center, rgba(54, 125, 141, 0.3) 0%, rgba(255, 255, 255, 0) 70%)' 
+            }}
             animate={{
               x: [10, 30, 10],
-              opacity: [0.2, 0.3, 0.2],
+              opacity: [0.15, 0.25, 0.15],
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           />
-          
-          <motion.div 
-            className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl -z-10"
-            animate={{
-              x: [-10, -30, -10],
-              opacity: [0.1, 0.2, 0.1],
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          />
         </motion.footer>
         
-        {/* Enhanced floating scroll-to-top button with elegant animation */}
+        {/* Professional floating scroll-to-top button with elegant animation */}
         <AnimatePresence>
           {isScrolled && (
             <motion.button
-              className="fixed bottom-8 right-8 p-3.5 rounded-full bg-needl-primary text-white z-40 shadow-lg hover:shadow-needl-primary/20 hover:bg-needl-dark transition-all"
+              className="fixed bottom-8 right-8 p-3 rounded-full bg-needl-primary text-white z-40 shadow-lg hover:shadow-needl-primary/20 hover:bg-needl-dark transition-all"
               initial={{ opacity: 0, y: 20, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.8 }}

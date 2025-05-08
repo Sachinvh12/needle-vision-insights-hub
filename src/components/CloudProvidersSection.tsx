@@ -12,13 +12,13 @@ const CloudProvidersSection: React.FC = () => {
     { name: 'Notion', id: 'notion' }
   ];
 
-  // Enhanced container animation with elegant timing
+  // Refined container animation with professional timing
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
+        staggerChildren: 0.1,
         delayChildren: 0.2,
         ease: "easeOut",
         duration: 0.8
@@ -26,12 +26,12 @@ const CloudProvidersSection: React.FC = () => {
     }
   };
   
-  // Refined provider animation with subtle elegant movement
+  // Sophisticated provider animation with elegant movement
   const providerVariants = {
     hidden: { 
       opacity: 0, 
       y: 15,
-      scale: 0.92 
+      scale: 0.9 
     },
     visible: {
       opacity: 1,
@@ -39,13 +39,25 @@ const CloudProvidersSection: React.FC = () => {
       scale: 1,
       transition: {
         type: "spring",
-        stiffness: 240,
+        stiffness: 260,
         damping: 20
+      }
+    }
+  };
+
+  // Elegant hover animations
+  const iconContainerVariants = {
+    rest: { 
+      scale: 1,
+      y: 0,
+      transition: { 
+        duration: 0.2,
+        ease: "easeInOut" 
       }
     },
     hover: { 
+      scale: 1.08,
       y: -6,
-      scale: 1.05,
       transition: { 
         type: "spring", 
         stiffness: 400, 
@@ -54,15 +66,44 @@ const CloudProvidersSection: React.FC = () => {
     }
   };
 
-  // Elegant glow animation variants
-  const glowVariants = {
-    idle: {
-      opacity: 0.15,
+  const iconBackgroundVariants = {
+    rest: {
+      opacity: 0.1,
       scale: 1
     },
     hover: {
-      opacity: [0.15, 0.4, 0.15],
-      scale: [1, 1.15, 1],
+      opacity: 0.2,
+      scale: 1.15,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const rotatingRingVariants = {
+    rest: {
+      opacity: 0.1,
+      rotate: 0
+    },
+    hover: {
+      opacity: 0.3,
+      rotate: 90,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const pulsingRingVariants = {
+    rest: {
+      opacity: 0.1,
+      scale: 1
+    },
+    hover: {
+      opacity: [0.1, 0.25, 0.1],
+      scale: [1, 1.2, 1],
       transition: {
         repeat: Infinity,
         duration: 2,
@@ -73,80 +114,69 @@ const CloudProvidersSection: React.FC = () => {
 
   return (
     <motion.div 
-      className="mt-12 mb-8"
+      className="mt-12 mb-10"
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-50px" }}
       variants={containerVariants}
     >
+      <motion.h3
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="text-center text-gray-500 mb-8 font-medium"
+      >
+        Connect with your favorite platforms
+      </motion.h3>
+      
       <motion.div 
-        className="flex flex-wrap justify-center gap-8 md:gap-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        className="flex flex-wrap justify-center gap-10 md:gap-12"
       >
         {providers.map((provider, index) => (
           <motion.div 
             key={provider.id} 
             className="flex flex-col items-center" 
             variants={providerVariants}
-            whileHover="hover"
             custom={index}
-            transition={{
-              type: "spring",
-              stiffness: 240,
-              damping: 20,
-              delay: index * 0.04
-            }}
           >
-            <motion.div 
-              className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-3 shadow-md relative overflow-hidden"
-              whileHover={{ boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}
+            <motion.div
+              className="relative"
+              variants={iconContainerVariants}
+              initial="rest"
+              whileHover="hover"
             >
-              {/* Subtle ambient glow effect */}
+              {/* Main icon container */}
               <motion.div 
-                className="absolute inset-0 rounded-full bg-needl-primary/5"
-                variants={glowVariants}
-                initial="idle"
-                whileHover="hover"
-                animate={{
-                  boxShadow: [
-                    "0 0 0 0px rgba(54, 125, 141, 0)",
-                    "0 0 0 8px rgba(54, 125, 141, 0.03)",
-                    "0 0 0 0px rgba(54, 125, 141, 0)"
-                  ]
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 3,
-                  ease: "easeInOut"
-                }}
-              />
+                className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-3 shadow-sm relative overflow-hidden z-10"
+                whileHover={{ boxShadow: "0 8px 20px rgba(0,0,0,0.08)" }}
+              >
+                {/* Ambient background glow */}
+                <motion.div 
+                  className="absolute inset-0 bg-needl-primary/10 rounded-full"
+                  variants={iconBackgroundVariants}
+                />
+                
+                <CloudProviderIcon 
+                  provider={provider.id as any} 
+                  className="w-8 h-8 relative z-20" 
+                />
+              </motion.div>
               
-              {/* Subtle rotating ring */}
+              {/* Decorative rotating ring */}
               <motion.div
-                className="absolute w-full h-full rounded-full border border-needl-primary/10"
-                animate={{
-                  rotate: 360
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 12,
-                  ease: "linear"
-                }}
+                className="absolute inset-0 rounded-full border-2 border-dashed border-needl-primary/5"
+                variants={rotatingRingVariants}
               />
               
-              <CloudProviderIcon 
-                provider={provider.id as any} 
-                className="w-8 h-8 relative z-10" 
+              {/* Pulsing outer ring */}
+              <motion.div
+                className="absolute -inset-2 rounded-full border border-needl-primary/10"
+                variants={pulsingRingVariants}
               />
             </motion.div>
             
             <motion.span 
               className="text-sm text-gray-700 font-medium"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 + index * 0.08 }}
             >
               {provider.name}
             </motion.span>
@@ -154,15 +184,14 @@ const CloudProvidersSection: React.FC = () => {
         ))}
       </motion.div>
       
-      <motion.div 
-        className="text-center mt-8 text-sm text-gray-600 max-w-lg mx-auto"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
+      {/* Elegant section separator */}
+      <motion.div
+        className="mt-14 flex justify-center"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ delay: 0.6, duration: 0.8 }}
       >
-        <span className="font-medium bg-gradient-to-r from-needl-primary to-needl-dark bg-clip-text text-transparent">
-          Connect your favorite platforms
-        </span> and unlock powerful insights across your ecosystem
+        <div className="w-24 h-px bg-gradient-to-r from-transparent via-needl-primary/30 to-transparent" />
       </motion.div>
     </motion.div>
   );
