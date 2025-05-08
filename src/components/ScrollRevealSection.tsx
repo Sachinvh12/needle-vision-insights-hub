@@ -12,6 +12,9 @@ interface ScrollRevealSectionProps {
   staggerChildren?: number;
   once?: boolean;
   threshold?: number;
+  easing?: "spring" | "easeOut" | "easeIn" | "easeInOut" | "circIn" | "circOut";
+  damping?: number;
+  stiffness?: number;
 }
 
 const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
@@ -23,7 +26,10 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
   duration = 0.7,
   staggerChildren = 0.1,
   once = true,
-  threshold = 0.2
+  threshold = 0.2,
+  easing = "spring",
+  damping = 25,
+  stiffness = 200
 }) => {
   // Calculate initial position based on direction
   const getInitialPosition = () => {
@@ -37,16 +43,23 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
     }
   };
 
-  // Animation variants
+  // Animation variants with enhanced transitions
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: staggerChildren,
-        delayChildren: delay
+        delayChildren: delay,
+        ease: easing === "spring" ? undefined : easing,
       }
     }
+  };
+
+  const getTransition = () => {
+    return easing === "spring" 
+      ? { type: 'spring', damping, stiffness, duration } 
+      : { duration, ease: easing };
   };
 
   const childVariants = {
@@ -55,12 +68,7 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
       x: 0,
       y: 0,
       opacity: 1,
-      transition: {
-        type: 'spring',
-        damping: 25,
-        stiffness: 200,
-        duration: duration
-      }
+      transition: getTransition()
     }
   };
 
@@ -68,7 +76,7 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
   const childrenArray = React.Children.toArray(children);
   const hasMultipleChildren = childrenArray.length > 0;
 
-  // If it has multiple children, we'll stagger them
+  // If it has multiple children, we'll stagger them with enhanced animations
   if (hasMultipleChildren) {
     return (
       <motion.div
@@ -79,7 +87,11 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
         variants={containerVariants}
       >
         {React.Children.map(children, (child, index) => (
-          <motion.div key={index} variants={childVariants}>
+          <motion.div 
+            key={index} 
+            variants={childVariants}
+            className="will-change-transform will-change-opacity"
+          >
             {child}
           </motion.div>
         ))}
@@ -87,20 +99,17 @@ const ScrollRevealSection: React.FC<ScrollRevealSectionProps> = ({
     );
   }
 
-  // If it's a single child or element, just animate it directly
+  // If it's a single child or element, animate it directly with improved animation
   return (
     <motion.div
-      className={className}
+      className={`${className} will-change-transform will-change-opacity`}
       initial={getInitialPosition()}
       whileInView={{
         x: 0,
         y: 0,
         opacity: 1,
         transition: {
-          type: 'spring',
-          damping: 25,
-          stiffness: 200,
-          duration: duration,
+          ...getTransition(),
           delay: delay
         }
       }}
